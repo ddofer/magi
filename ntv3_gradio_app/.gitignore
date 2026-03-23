@@ -1,0 +1,92 @@
+# Large data files
+hg38.fa
+hg38.fa.gz
+hg38.fa.fai
+*.fasta
+*.fa.gz
+*.fai
+
+# Model cache
+models/
+checkpoints/
+*.pt
+*.pth
+*.safetensors
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter
+.ipynb_checkpoints/
+*.ipynb
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Logs
+*.log
+logs/
+flagged/  # Gradio flagged data
+
+# Temporary files
+tmp/
+temp/
+*.tmp
+
+# Output files (results from app)
+outputs/
+results/
+*.csv.bak
+*.csv~
+last_variant_result.csv
+batch_results.csv
+last_variant_tracks.png
+*.png
+
+# System files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# HuggingFace Spaces
+.gradio/
+./data/hg38.fa
+./data/MANE_processed.csv
