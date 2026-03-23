@@ -1,0 +1,9 @@
+feature_group,count,description
+BED elements,21,Structural genomic annotations
+BigWig total (pre-filter),7362,All available functional tracks before filtering
+BigWig selected (post-filter),7191,Tracks retained for inference
+Catlas (kai*),222,Single-cell accessibility tracks
+CAGE (CNhs*),1276,Transcription initiation tracks
+GTEx,84,Tissue expression-derived tracks
+ENCODE (ENCSR*),5609,Histone/chromatin tracks from ENCODE
+MLM core metrics,8,"LLR, priors, deltas, KL and log-prob features"

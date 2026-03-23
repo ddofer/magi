@@ -1,0 +1,4 @@
+species,rows_loaded,cols_loaded,selected_file
+,185,67,cat_deltas.parquet
+,35,67,chicken_deltas.parquet
+,360,67,dog_deltas.parquet

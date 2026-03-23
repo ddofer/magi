@@ -1,0 +1,5 @@
+scope,rows,unique_variant_keys,label_non_null,llr_non_null,n_ref_bed_cols,n_d_bed_cols,n_bw_cols,n_d_bw_cols,n_ref_bw_cols,n_mlm_cols,ref_bed_bounds_violations_total,d_bed_bounds_violations_total
+cat,185,185,185,125,21,21,0,0,0,7,0,0
+chicken,35,35,35,27,21,21,0,0,0,7,0,0
+dog,360,360,360,220,21,21,0,0,0,7,0,0
+all_species,580,580,580,372,21,21,0,0,0,7,0,0

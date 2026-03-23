@@ -1,0 +1,6 @@
+dataset,species,n_variants,labels,source_file
+ClinVar rationale evaluation,human,56,"Pathogenic: 43, Benign: 13",analyses/stav-llm_evaluation_results.csv
+OMIA inferred,unknown,185,curated pathogenic (OMIA),data/results/omia_post_inference_summary.csv
+OMIA inferred,unknown,35,curated pathogenic (OMIA),data/results/omia_post_inference_summary.csv
+OMIA inferred,unknown,360,curated pathogenic (OMIA),data/results/omia_post_inference_summary.csv
+OMIA inferred,unknown,580,curated pathogenic (OMIA),data/results/omia_post_inference_summary.csv

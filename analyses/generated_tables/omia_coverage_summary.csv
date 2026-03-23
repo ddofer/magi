@@ -1,0 +1,4 @@
+species,coverage
+unknown,"{'species_key': 'dog', 'input_file': '/opt/hpc/ddofer/magi_genome/data/dog_variants.parquet', 'input_unique_keys': 360, 'output_unique_keys': 360, 'input_keys_found_in_output': 360, 'input_keys_missing_in_output': 0, 'input_coverage_ratio': 1.0}"
+unknown,"{'species_key': 'cat', 'input_file': '/opt/hpc/ddofer/magi_genome/data/cat_variants.parquet', 'input_unique_keys': 185, 'output_unique_keys': 185, 'input_keys_found_in_output': 185, 'input_keys_missing_in_output': 0, 'input_coverage_ratio': 1.0}"
+unknown,"{'species_key': 'chicken', 'input_file': '/opt/hpc/ddofer/magi_genome/data/chicken_variants.parquet', 'input_unique_keys': 35, 'output_unique_keys': 35, 'input_keys_found_in_output': 35, 'input_keys_missing_in_output': 0, 'input_coverage_ratio': 1.0}"
