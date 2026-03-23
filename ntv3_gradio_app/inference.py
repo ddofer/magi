@@ -2,7 +2,7 @@
 """
 NTv3 inference module for the MAGI Gradio app.
 
-Adapted from nt3_inference.py for web deployment.
+Adapted from the top-level inference.py pipeline for web deployment.
 
 Key features:
 - Uses local hg38.fa via pyfaidx when available

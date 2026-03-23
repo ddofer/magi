@@ -8,8 +8,8 @@ Purpose
   in Animals), wrangle them into the same format as ClinVar SNP/INDEL inputs,
   and run NTv3 inference for supported non-human species.
 
-  Acts as a counterpart to nt3_inference.py (human ClinVar) and
-  nt3_inference_indel.py (human INDELs), extending the pipeline to animals.
+    Acts as a counterpart to inference.py (human ClinVar) and
+    inference_indel.py (human INDELs), extending the pipeline to animals.
 
 Supported Species (NTv3 model config species_to_token_id):
   dog       canis_lupus_familiaris  (token 17)
@@ -23,20 +23,20 @@ Supported Species (NTv3 model config species_to_token_id):
   skipped with a warning.
 
 Usage
-    python nt3_inference_omia.py --validate-only
+    python inference_omia.py --validate-only
         # validation-only: fetch + parse + coordinate checks, no model inference
 
-    python nt3_inference_omia.py
+    python inference_omia.py
         # sample inference: default species, 30 variants/species
-    python nt3_inference_omia.py --species dog cat --sample-size 50
+    python inference_omia.py --species dog cat --sample-size 50
         # sample inference: selected species with custom sample size
 
-    CUDA_VISIBLE_DEVICES=2,3 python nt3_inference_omia.py --full
+    CUDA_VISIBLE_DEVICES=2,3 python inference_omia.py --full
         # full inference (all variants for run species) on GPUs 2 and 3
 
-  python nt3_inference_omia.py --species dog cat     # specific species
-  python nt3_inference_omia.py --fetch-only          # download data + genomes
-  python nt3_inference_omia.py --model-size 100M     # smaller model
+  python inference_omia.py --species dog cat     # specific species
+  python inference_omia.py --fetch-only          # download data + genomes
+  python inference_omia.py --model-size 100M     # smaller model
 
 Data Sources
   OMIA results table (cached locally for reproducibility):
@@ -70,7 +70,7 @@ Gotchas
   7. Many REF mismatch warnings with expected N or '-' are normal for INDEL
       placeholders; mismatches where expected REF is A/C/G/T should be reviewed.
 
-Authors: Dan Ofer / Michal Linial Lab (based on nt3_inference.py)
+Authors: Dan Ofer / Michal Linial Lab (based on inference.py)
 """
 
 import argparse
@@ -87,7 +87,7 @@ import numpy as np
 import pandas as pd
 import requests
 
-import nt3_inference as base
+import inference as base
 
 # ============================================================================
 # CONFIGURATION

@@ -30,13 +30,13 @@ Downstream analysis of NTv3 inference results for semantic validation.
 
 💻 USAGE:
    # Basic analysis:
-   python nt3_analysis.py --input clinvar_new_deltas.parquet
+    python analysis.py --input clinvar_new_deltas.parquet
 
    # Debug mode (first 70 variants):
-   python nt3_analysis.py --input clinvar_new_deltas.parquet --debug
+    python analysis.py --input clinvar_new_deltas.parquet --debug
 
    # In Python:
-   from nt3_analysis import compute_normalized_impact_scores, plot_variant_fingerprint
+    from analysis import compute_normalized_impact_scores, plot_variant_fingerprint
    df = pd.read_parquet('results.parquet')
    df = compute_normalized_impact_scores(df, normalization='z_score')
    plot_variant_fingerprint(df, variant_index=0)

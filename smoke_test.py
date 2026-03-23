@@ -9,7 +9,7 @@ Usage:
 import sys
 import argparse
 import numpy as np
-import nt3_inference as base
+import inference as base
 
 
 def run_smoke_test(mode="snp", model_size="100M"):

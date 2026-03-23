@@ -2,11 +2,11 @@
 ./.venv/*
 ./clinvar_indel_deltas.parquet
 ./clinvar_new_deltas.parquet
-./stav_data/stav data/annotated_indels_signaled.parquet
-./stav_data/stav data/annotated_snps_signaled.parquet
-./stav_data/stav data/indels_annotated_test.parquet
-./stav_data/stav data/indel_LLM_results.csv
-./stav_data/stav data/snps_annotated_test.parquet
+./data/stav_data/stav data/annotated_indels_signaled.parquet
+./data/stav_data/stav data/annotated_snps_signaled.parquet
+./data/stav_data/stav data/indels_annotated_test.parquet
+./data/stav_data/stav data/indel_LLM_results.csv
+./data/stav_data/stav data/snps_annotated_test.parquet
 ./LLM pipeline inputs/LLM pipeline inputs/MANE_processed.csv
 ./LLM pipeline inputs/LLM pipeline inputs/submission_summary.txt.gz
 ./LLM pipeline inputs/LLM pipeline inputs/variant_summary.txt.gz
@@ -42,11 +42,11 @@
 ./.venv/lib/python3.13/site-packages/flash_attn_2_cuda.cpython-313-x86_64-linux-gnu.so
 ./clinvar_indel_deltas.parquet
 ./clinvar_new_deltas.parquet
-./stav_data/stav data/annotated_indels_signaled.parquet
-./stav_data/stav data/annotated_snps_signaled.parquet
-./stav_data/stav data/indels_annotated_test.parquet
-./stav_data/stav data/indel_LLM_results.csv
-./stav_data/stav data/snps_annotated_test.parquet
+./data/stav_data/stav data/annotated_indels_signaled.parquet
+./data/stav_data/stav data/annotated_snps_signaled.parquet
+./data/stav_data/stav data/indels_annotated_test.parquet
+./data/stav_data/stav data/indel_LLM_results.csv
+./data/stav_data/stav data/snps_annotated_test.parquet
 ./LLM pipeline inputs/LLM pipeline inputs/MANE_processed.csv
 ./LLM pipeline inputs/LLM pipeline inputs/submission_summary.txt.gz
 ./LLM pipeline inputs/LLM pipeline inputs/variant_summary.txt.gz
@@ -175,11 +175,11 @@ desktop.ini
 ./.venv/lib/python3.13/site-packages/flash_attn_2_cuda.cpython-313-x86_64-linux-gnu.so
 ./clinvar_indel_deltas.parquet
 ./clinvar_new_deltas.parquet
-./stav_data/stav data/annotated_indels_signaled.parquet
-./stav_data/stav data/annotated_snps_signaled.parquet
-./stav_data/stav data/indels_annotated_test.parquet
-./stav_data/stav data/indel_LLM_results.csv
-./stav_data/stav data/snps_annotated_test.parquet
+./data/stav_data/stav data/annotated_indels_signaled.parquet
+./data/stav_data/stav data/annotated_snps_signaled.parquet
+./data/stav_data/stav data/indels_annotated_test.parquet
+./data/stav_data/stav data/indel_LLM_results.csv
+./data/stav_data/stav data/snps_annotated_test.parquet
 ./LLM pipeline inputs/LLM pipeline inputs/MANE_processed.csv
 ./LLM pipeline inputs/LLM pipeline inputs/submission_summary.txt.gz
 ./LLM pipeline inputs/LLM pipeline inputs/variant_summary.txt.gz

@@ -29,18 +29,18 @@ Method notes
   - KL features capture surprise/novelty in prediction distributions
 
 Quick start
-  - SNPs:   python nt3_inference.py
-  - INDELs: python nt3_inference_indel.py
+    - SNPs:   python inference.py
+    - INDELs: python inference_indel.py
 
 Examples
   - Override config in Python:
-      import nt3_inference as base
+            import inference as base
       base.DEBUG_MODE = True
       base.OUTPUT_RESULTS_FILE = "tmp.parquet"
       base.main()
   - INDEL run with embeddings:
-      import nt3_inference_indel  # sets base.USE_EMBEDDINGS = True
-      import nt3_inference as base
+            import inference_indel  # sets base.USE_EMBEDDINGS = True
+            import inference as base
       base.DEBUG_MODE = True
       base.main()
 
