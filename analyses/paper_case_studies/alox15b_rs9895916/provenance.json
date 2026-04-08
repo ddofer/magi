@@ -10,7 +10,7 @@
   "protein_hgvs": "",
   "provenance_note": "GRCh38 mapping validated from rs9895916 and local MANE transcript context confirmed in repo",
   "provenance_source": "Ensembl REST variation",
-  "recorded_at": "2026-04-08T19:53:25.641593+00:00",
+  "recorded_at": "2026-04-08T21:03:15.150179+00:00",
   "ref": "G",
   "source_id": "rs9895916",
   "source_type": "dbSNP",
