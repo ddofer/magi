@@ -1,0 +1,21 @@
+Track,Type,REF,ALT,Δ,Direction
+exon,BED,0.8672,0.3008,-0.5664,Loss
+ORF,BED,0.8242,0.2871,-0.5371,Loss
+intron,BED,0.1836,0.6406,+0.4570,Gain
+Always-on exon,BED,0.6797,0.2451,-0.4346,Loss
+breast carcinoma cell line | CAGE,BigWig,0.6211,0.8008,+0.1797,Gain
+merkel cell carcinoma cell line | CAGE,BigWig,0.6055,0.7852,+0.1797,Gain
+Small Airway Epithelial Cells | CAGE,BigWig,0.6406,0.8164,+0.1758,Gain
+"lung adenocarcinoma, papillary cell line | CAGE",BigWig,0.6797,0.8359,+0.1562,Gain
+"testis, adult, pool1 | CAGE",BigWig,0.6680,0.8242,+0.1562,Gain
+Protein-coding gene,BED,0.8281,0.6758,-0.1523,Loss
+mixed mullerian tumor cell line | CAGE,BigWig,0.5586,0.7109,+0.1523,Gain
+carcinoid cell line | CAGE,BigWig,0.5508,0.6992,+0.1484,Gain
+blood | RNA-seq,BigWig,0.9805,0.8320,-0.1484,Loss
+glassy cell carcinoma cell line | CAGE,BigWig,0.6484,0.7891,+0.1406,Gain
+medial temporal gyrus - adult | CAGE,BigWig,0.5977,0.7383,+0.1406,Gain
+"placenta, adult, pool1 | CAGE",BigWig,0.6211,0.7578,+0.1367,Gain
+testicular germ cell embryonal carcinoma cell line | CA [1],BigWig,0.5742,0.7070,+0.1328,Gain
+testicular germ cell embryonal carcinoma cell line | CA [2],BigWig,0.5859,0.7188,+0.1328,Gain
+"bladder, adult, pool1 | CAGE",BigWig,0.6055,0.7383,+0.1328,Gain
+"seminal vesicle, adult | CAGE",BigWig,0.6992,0.8320,+0.1328,Gain

@@ -1,0 +1,21 @@
+{
+  "alt": "T",
+  "assembly": "GRCh38",
+  "case_id": "mat1a_gly336arg",
+  "chrom": "chr10",
+  "gene": "MAT1A",
+  "manuscript_note": "Paper case study with dual missense and splice-like interpretation",
+  "panel_label": "MAT1A p.Gly336Arg",
+  "pos": 80274599.0,
+  "protein_hgvs": "p.Gly336Arg",
+  "provenance_note": "GRCh38 mapping validated from rs118204006; repo evaluation row 1211 references the same ClinVar variant and describes strong exon-loss-like MAGI signals",
+  "provenance_source": "Ensembl REST variation",
+  "recorded_at": "2026-04-08T19:53:21.550474+00:00",
+  "ref": "C",
+  "source_id": "rs118204006;VCV000001211",
+  "source_type": "dbSNP+ClinVar",
+  "species": "human",
+  "status": "resolved",
+  "transcript": "NM_000429.3",
+  "transcript_hgvs": "NM_000429.3:c.1006G>A"
+}
