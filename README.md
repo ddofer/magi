@@ -4,8 +4,9 @@ This repository contains the research code used to run MAGI analyses built on th
 
 ## Repository Layout
 
-```
+```text
 inference.py                    # Shared human ClinVar inference pipeline
+
 inference_indel.py              # INDEL wrapper around inference.py
 inference_omia.py               # OMIA multi-species inference pipeline
 analysis.py                     # Downstream statistical analysis and plotting
@@ -106,6 +107,17 @@ python app.py
 ```
 
 See `ntv3_gradio_app/README.md` and `ntv3_gradio_app/SETUP_GUIDE.md` for app-specific details.
+
+### 6. Manuscript case studies
+
+To reproduce the paper-ready figures and captions for the manuscript case studies:
+
+```bash
+python analyses/generate_case_study_assets.py --case-id mat1a_gly336arg --case-id alox15b_rs9895916 --case-id col4a2_chr13_110492070_ga
+python analyses/assemble_case_study_manuscript_package.py
+```
+
+This pipeline reads the targets from `analyses/case_study_manifest.csv`, runs MAGI inference, and exports high-resolution (600 DPI) fingerprint/region-track panels alongside JSON metadata, CSV tables, and review artifacts into `analyses/paper_case_studies/`. The assembly script then composites these into the final manuscript panels. Use `analyses/paper_case_studies/manuscript_figure_package.md` for caption templates and asset mappings.
 
 ## Data Layout Notes
 
