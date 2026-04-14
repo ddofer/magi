@@ -3,6 +3,9 @@
 Status: generated
 Variant: chr17:8047076 G>A
 Gene: ALOX15B
+Transcript: NM_001141.3
+Transcript HGVS: NM_001141.3:c.1457G>A
+Protein HGVS: p.Arg486His
 Region class: CODING
 Variant type: SNP
 MAGI score: 2157.1772837877893

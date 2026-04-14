@@ -3,6 +3,9 @@
 Status: generated
 Variant: chr10:80274599 C>T
 Gene: MAT1A
+Transcript: NM_000429.3
+Transcript HGVS: NM_000429.3:c.1006G>A
+Protein HGVS: p.Gly336Arg
 Region class: CODING
 Variant type: SNP
 MAGI score: 2458.28525073336

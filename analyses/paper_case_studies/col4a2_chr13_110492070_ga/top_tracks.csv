@@ -1,0 +1,21 @@
+Track,Type,REF,ALT,Δ,Direction
+brain | RNA-seq [1],BigWig,1.0000,0.5898,-0.4102,Loss
+liver | RNA-seq [1],BigWig,0.9648,0.5703,-0.3945,Loss
+brain | RNA-seq [2],BigWig,0.9961,0.6133,-0.3828,Loss
+brain | RNA-seq [3],BigWig,0.9922,0.6172,-0.3750,Loss
+liver | RNA-seq [2],BigWig,0.9258,0.5508,-0.3750,Loss
+exon,BED,0.8750,0.5195,-0.3555,Loss
+intron,BED,0.5508,0.8711,+0.3203,Gain
+skipped exon,BED,0.7109,0.4355,-0.2754,Loss
+adipose | CAGE,BigWig,0.8477,0.5820,-0.2656,Loss
+pituitary | RNA-seq,BigWig,1.0000,0.7383,-0.2617,Loss
+pancreas | RNA-seq,BigWig,1.0000,0.7539,-0.2461,Loss
+Endothelial Cells - Thoracic | CAGE,BigWig,0.9297,0.6875,-0.2422,Loss
+anaplastic carcinoma cell line | CAGE,BigWig,0.8711,0.6406,-0.2305,Loss
+Hepatic Sinusoidal Endothelial Cells | CAGE,BigWig,0.9883,0.7617,-0.2266,Loss
+"rectum, fetal | CAGE",BigWig,0.9297,0.7031,-0.2266,Loss
+"testis, adult, pool2 | CAGE",BigWig,0.9375,0.7188,-0.2188,Loss
+"colon, fetal | CAGE",BigWig,0.8008,0.5859,-0.2148,Loss
+"lung, right lower lobe, adult | CAGE",BigWig,0.9102,0.6953,-0.2148,Loss
+ORF,BED,0.6055,0.4082,-0.1973,Loss
+5UTR+,BED,0.4531,0.3047,-0.1484,Loss

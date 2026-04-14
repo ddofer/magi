@@ -10,7 +10,7 @@
   "protein_hgvs": "p.Gly336Arg",
   "provenance_note": "GRCh38 mapping validated from rs118204006; repo evaluation row 1211 references the same ClinVar variant and describes strong exon-loss-like MAGI signals",
   "provenance_source": "Ensembl REST variation",
-  "recorded_at": "2026-04-08T21:03:02.975300+00:00",
+  "recorded_at": "2026-04-14T11:42:57.839550+00:00",
   "ref": "C",
   "source_id": "rs118204006;VCV000001211",
   "source_type": "dbSNP+ClinVar",

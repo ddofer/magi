@@ -7,15 +7,15 @@
   "manuscript_note": "Paper case study at the ALOX15B locus",
   "panel_label": "ALOX15B rs9895916",
   "pos": 8047076.0,
-  "protein_hgvs": "",
-  "provenance_note": "GRCh38 mapping validated from rs9895916 and local MANE transcript context confirmed in repo",
-  "provenance_source": "Ensembl REST variation",
-  "recorded_at": "2026-04-08T21:03:15.150179+00:00",
+  "protein_hgvs": "p.Arg486His",
+  "provenance_note": "GRCh38 mapping validated from rs9895916 and local MANE transcript/CDS context confirms a coding substitution NM_001141.3:c.1457G>A (p.Arg486His)",
+  "provenance_source": "Ensembl REST variation + local MANE CDS projection",
+  "recorded_at": "2026-04-14T11:43:09.524501+00:00",
   "ref": "G",
   "source_id": "rs9895916",
   "source_type": "dbSNP",
   "species": "human",
   "status": "resolved",
   "transcript": "NM_001141.3",
-  "transcript_hgvs": ""
+  "transcript_hgvs": "NM_001141.3:c.1457G>A"
 }
