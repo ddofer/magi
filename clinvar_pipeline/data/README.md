@@ -23,8 +23,7 @@ data/
 ## Sync
 
 ```bash
-# From magi repo: point at a ClinVar / NT data checkout
-python3 tools/sync_inputs.py --source /path/to/clinvar/data/root --force
+python3 tools/sync_inputs.py --source /path/to/data/root --force
 
 # Default: parent directory of clinvar_pipeline/ (symlinks large parquets ≥200 MB)
 python3 tools/sync_inputs.py --force

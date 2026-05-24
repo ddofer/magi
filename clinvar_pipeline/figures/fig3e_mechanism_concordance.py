@@ -15,6 +15,7 @@ if str(REPO_ROOT) not in sys.path:
 
 from config import PATHS
 from figures.common import ensure_dirs
+from figures.merge_eval import _read_llm_results
 from figures.plotting import plot_concordance_by_mechanism
 from nt_mechanism_assignment import run_assignment
 
@@ -35,8 +36,8 @@ def run(*, assign: bool = False) -> None:
         run_assignment(PATHS["snp_annotated_signaled"], PATHS["snp_mechanisms_csv"], "snp")
         run_assignment(PATHS["indel_annotated_signaled"], PATHS["indel_mechanisms_csv"], "indel")
 
-    snp_res = _attach_mechanisms(pd.read_parquet(PATHS["snp_llm_results"]), PATHS["snp_mechanisms_csv"])
-    indel_res = _attach_mechanisms(pd.read_parquet(PATHS["indel_llm_results"]), PATHS["indel_mechanisms_csv"])
+    snp_res = _attach_mechanisms(_read_llm_results("snp"), PATHS["snp_mechanisms_csv"])
+    indel_res = _attach_mechanisms(_read_llm_results("indel"), PATHS["indel_mechanisms_csv"])
 
     plot_concordance_by_mechanism(
         snp_res,

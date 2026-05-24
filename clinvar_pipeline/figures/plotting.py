@@ -14,23 +14,10 @@ from scipy.stats import gaussian_kde
 from sklearn.metrics import roc_auc_score
 
 from config import IMPACT_SCORE_COLS
-from figures.common import DPI, normalize_label_series
+from figures.common import CONCORDANCE_COLORS, DPI, normalize_label_series
 
 SCORE_COLS = list(IMPACT_SCORE_COLS)
 DEFAULT_QUARTILE_ORDER = ["Q1", "Q2", "Q3", "Q4"]
-
-CONC_COLORS = {
-    "CONCORDANT": "forestgreen",
-    "PARTIAL": "goldenrod",
-    "DISCORDANT": "firebrick",
-}
-
-MECH_COLOR_MAP = {
-    "DISCORDANT": "#e25b45",
-    "PARTIAL": "#f0a830",
-    "CONCORDANT": "#6abf69",
-    "NOT_APPLICABLE": "#bbbbbb",
-}
 
 
 def _safe_crosstab(row_vals, col_vals, row_order, col_order) -> pd.DataFrame:
@@ -91,10 +78,12 @@ def plot_overall_concordance_by_variant_type(
 
     cp_counts = counts[["CONCORDANT", "PARTIAL"]].sum(axis=1)
     totals = counts.sum(axis=1)
-    labels = [
-        f"{vt.upper()}\n({int(cp_counts.get(vt, 0))}/{int(totals.get(vt, 0))})"
-        for vt in variant_order
-    ]
+    labels = []
+    for vt in variant_order:
+        cp = int(cp_counts.get(vt, 0))
+        total = int(totals.get(vt, 0))
+        pct = 100 * cp / total if total else 0
+        labels.append(f"{vt.upper()}\n({cp}/{total}, {pct:.0f}%)")
     ax.set_xticks([0, 1])
     ax.set_xticklabels(labels)
     ax.set_ylim(0, 1)
@@ -132,7 +121,7 @@ def plot_concordance_bars(
     d = df.copy()
     d[concord_col] = d[concord_col].astype(str).str.strip().str.upper()
     if conc_colors is None:
-        conc_colors = CONC_COLORS
+        conc_colors = CONCORDANCE_COLORS
 
     is_score_mode = group_col in score_cols and use_quantile_binning_for_scores
     if is_score_mode:
@@ -265,7 +254,7 @@ def plot_concordance_by_mechanism(
             widths,
             left=lefts,
             height=0.65,
-            color=MECH_COLOR_MAP.get(cat, "#999999"),
+            color=CONCORDANCE_COLORS.get(cat, "#999999"),
             edgecolor="white",
             linewidth=0.5,
             label=cat,

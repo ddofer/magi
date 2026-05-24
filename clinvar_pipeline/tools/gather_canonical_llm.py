@@ -59,21 +59,17 @@ def build_snp_llm() -> pd.DataFrame:
 
 
 def build_indel_llm() -> pd.DataFrame:
-    parquet_path = PROJECT_ROOT / "llm_results/indel_results.parquet"
+    # v2 CSV is the canonical full-cohort export (12,301 variants; ~43% C+P).
+    # Prefer it over llm_results/indel_results.parquet, which may be an older partial run.
     csv_path = PROJECT_ROOT / "parquet/indel_evaluation_results_v2.csv"
+    parquet_path = PROJECT_ROOT / "llm_results/indel_results.parquet"
 
-    if parquet_path.exists():
-        df = pd.read_parquet(parquet_path)
-    elif csv_path.exists():
+    if csv_path.exists():
         df = pd.read_csv(csv_path)
+    elif parquet_path.exists():
+        df = pd.read_parquet(parquet_path)
     else:
-        raise FileNotFoundError(f"Need {parquet_path} or {csv_path}")
-
-    if csv_path.exists() and parquet_path.exists():
-        v2 = pd.read_csv(csv_path)
-        missing = [c for c in v2.columns if c not in df.columns and c != "#VariationID"]
-        if missing:
-            df = df.merge(v2[["#VariationID", *missing]], on="#VariationID", how="left")
+        raise FileNotFoundError(f"Need {csv_path} or {parquet_path}")
 
     if "variant_id" in df.columns and "#VariationID" not in df.columns:
         df = df.rename(columns={"variant_id": "#VariationID"})

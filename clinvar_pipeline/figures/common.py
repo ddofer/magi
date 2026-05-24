@@ -11,6 +11,20 @@ from config import PATHS
 FIGURES_DIR = Path(PATHS["figures_root"])
 DPI = 300
 
+# Shared concordance palette (green / orange / red) for fig3b–3e
+CONCORDANCE_COLORS = {
+    "CONCORDANT": "forestgreen",
+    "PARTIAL": "goldenrod",
+    "DISCORDANT": "firebrick",
+    "NOT_APPLICABLE": "#bbbbbb",
+}
+
+DEFAULT_CONCORDANCE_ORDER = ("CONCORDANT", "PARTIAL", "DISCORDANT")
+
+
+def concordance_color_list(categories: list[str] | tuple[str, ...]) -> list[str]:
+    return [CONCORDANCE_COLORS.get(c, "#999999") for c in categories]
+
 
 def ensure_dirs() -> None:
     FIGURES_DIR.mkdir(parents=True, exist_ok=True)

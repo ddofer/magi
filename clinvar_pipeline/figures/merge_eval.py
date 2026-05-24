@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pandas as pd
 
 from config import IMPACT_SCORE_COLS, PATHS
@@ -12,14 +14,29 @@ from figures.mechanism_canonicalize import (
 )
 
 
+def _read_llm_results(variant_type: str) -> pd.DataFrame:
+    parquet_key = "snp_llm_results" if variant_type == "snp" else "indel_llm_results"
+    csv_key = "snp_eval_csv" if variant_type == "snp" else "indel_eval_csv"
+    parquet_path = Path(PATHS[parquet_key])
+    if parquet_path.exists():
+        return pd.read_parquet(parquet_path)
+    csv_path = Path(PATHS[csv_key])
+    if csv_path.exists():
+        print(f"  Note: using parent CSV for {variant_type} LLM results ({csv_path.name})")
+        return pd.read_csv(csv_path)
+    raise FileNotFoundError(
+        f"Missing LLM results for {variant_type}: need {parquet_path} or {csv_path}"
+    )
+
+
 def load_merged_eval_frame() -> pd.DataFrame:
     snps_d = attach_impact_to_signaled(PATHS["snp_annotated_signaled"], PATHS["snp_deltas_impact"])
     indels_d = attach_impact_to_signaled(PATHS["indel_annotated_signaled"], PATHS["indel_deltas_impact"])
     if "variant_id" in indels_d.columns and "#VariationID" not in indels_d.columns:
         indels_d = indels_d.rename(columns={"variant_id": "#VariationID"})
 
-    snps = pd.read_parquet(PATHS["snp_llm_results"])
-    indels = pd.read_parquet(PATHS["indel_llm_results"])
+    snps = _read_llm_results("snp")
+    indels = _read_llm_results("indel")
     snps["variant_type"] = "snp"
     indels["variant_type"] = "indel"
 

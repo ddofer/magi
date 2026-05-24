@@ -8,7 +8,7 @@ from pathlib import Path
 
 from config import PATHS
 from clinvar.impact_scoring import attach_impact_to_signaled
-from figures.common import DPI, ensure_dirs
+from figures.common import DPI, concordance_color_list, ensure_dirs
 from figures.merge_eval import load_merged_eval_frame
 
 
@@ -53,9 +53,9 @@ def run() -> None:
     mod3_props.plot(
         kind="bar",
         stacked=True,
-        color=["forestgreen", "goldenrod", "firebrick"],
+        color=concordance_color_list(col_order),
+        edgecolor="white",
         ax=ax,
-        edgecolor="black",
         legend=True,
     )
     counts_per_mod3 = df["mod3_label"].value_counts().reindex(row_order)

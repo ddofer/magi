@@ -74,6 +74,10 @@ Optional LLM re-runs: `scripts/04_run_llm_parallel.py`, `scripts/05_run_llm_batc
 
 End-to-end validation: `python3 tools/run_validation.py`
 
+### Notebooks
+
+- [`notebooks/variant_rationale_lookup.ipynb`](notebooks/variant_rationale_lookup.ipynb) — inspect ClinVar rationales for any variant by locus
+
 ## Outputs
 
 Publication figures are written to `output/figures/`:

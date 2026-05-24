@@ -59,6 +59,9 @@ PATHS = {
     # canonical LLM judge results (one file per variant type — built by tools/gather_canonical_llm.py)
     "snp_llm_results": _data("llm/snp_llm_results.parquet"),
     "indel_llm_results": _data("llm/indel_llm_results.parquet"),
+    # parent-repo fallbacks when gathered parquets are missing
+    "snp_eval_csv": _in_repo("parquet/snp_evaluation_results_v2.csv"),
+    "indel_eval_csv": _in_repo("parquet/indel_evaluation_results_v2.csv"),
     # legacy reference outputs (read-only comparison)
     "legacy_snp_strict": _in_repo("parquet/snps_strict_test.parquet"),
     "legacy_indel_strict": _in_repo("parquet/indels_strict_test.parquet"),

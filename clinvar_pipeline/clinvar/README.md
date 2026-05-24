@@ -9,6 +9,7 @@ Python package for ClinVar variant preparation, NT delta integration, signal ext
 | `pipeline.py` | Orchestrates stage 1 (prep) and stage 2 (signal extraction) |
 | `variant_prep.py` | Load delta parquets, ClinVar ID mapping, rationale merge, strict filter, deferred BED/BW attach |
 | `clinvar_enrichment.py` | Submission-summary rationale aggregation and quality filtering |
+| `rationale_lookup.py` | Ad-hoc ClinVar rationale lookup by locus (no cohort filter) |
 | `region_annotation.py` | MANE-based genomic region labels on strict cohorts |
 | `mane_build.py` | Build `MANE_processed.csv` / `Promoter_processed.csv` from MANE GFF |
 | `signal_extraction_threshold.py` | Threshold-gated top-k BED/BW/MLM signals (default stage 2 path) |
