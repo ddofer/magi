@@ -1,0 +1,10 @@
+numpy
+pandas
+pyarrow
+tqdm
+google-genai
+google-api-core
+matplotlib
+scikit-learn
+scipy
+seaborn
