@@ -1,6 +1,6 @@
 # ClinVar pipeline — layout overview
 
-Refactored ClinVar / NT-v3 analysis pipeline. Lives as `clinvar_pipeline/` inside the [magi](https://github.com/ddofer/magi) repository (or standalone). Inputs go in `data/`; generated files go to `output/`.
+Refactored ClinVar / NT-v3 analysis pipeline for the [MAGI](https://github.com/ddofer/magi) project. Inputs live in `data/`; generated files are written to `output/`.
 
 ## Repository tree
 
@@ -17,7 +17,7 @@ clinvar_pipeline/
 └── ARTIFACTS.md        # This file
 ```
 
-The parent ClinVar analysis checkout (or `--source` path for `tools/sync_inputs.py`) supplies large parquets and ClinVar tables. Mechanism assignment is bundled under `vendor/`.
+External NT delta parquets and ClinVar tables are supplied locally under `data/` (see `tools/sync_inputs.py`). Mechanism assignment logic is bundled under `vendor/`.
 
 ## `data/` vs `output/`
 
