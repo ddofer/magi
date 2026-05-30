@@ -171,13 +171,10 @@ Variants are automatically classified into:
 ## Citation
 
 If you use MAGI in your research, cite the MAGI manuscript. If you rely on the underlying foundation model, also cite NTv3.
-<!-- 
 ## Links
 
-- 📄 **Paper:** [bioRxiv]()
-- 💻 **GitHub:** 
-
- --><!-- 
+- 📄 **Paper:** *MAGI: Mechanistic Consequences of Genetic Variants via Genomic Foundation Models* (Ofer, Zok & Linial — preprint forthcoming)
+- 💻 **GitHub:** https://github.com/ddofer/magi<!-- 
 ## License
 
 MIT License - see LICENSE file for details -->
