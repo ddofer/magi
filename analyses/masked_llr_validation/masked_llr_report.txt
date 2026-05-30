@@ -1,0 +1,159 @@
+================================================================================
+MASKED vs UNMASKED LLR VALIDATION REPORT
+Date: 2026-02-26 14:51
+Model: InstaDeepAI/NTv3_100M_post  Context: 2048  N=550
+================================================================================
+
+
+1. SOFTMAX ENTROPY AT VARIANT POSITION
+------------------------------------------------------------
+  If unmasked entropy ≈ 0 → model copies input token (bias)
+  If masked entropy >> unmasked → masking unlocks real predictions
+
+  Unmasked (ref context)          mean=1.4161  median=1.4753  std=0.3464  [min=0.1124, max=1.9885]
+  Unmasked (alt context)          mean=1.4245  median=1.5040  std=0.3499  [min=0.2149, max=2.0789]
+  Masked                          mean=1.4712  median=1.5225  std=0.3127  [min=0.2122, max=2.1115]
+
+  Entropy ratio (masked / unmasked_ref): 1.04x
+  ✅ Small entropy gap — unmasked model already has reasonable uncertainty
+
+
+2. LLR DISTRIBUTION COMPARISON (SNPs only)
+------------------------------------------------------------
+  LLR_unmasked            mean=-0.6648  std=1.9882  range=[-6.4183, 5.6776]
+  LLR_masked              mean=-0.1280  std=1.8024  range=[-5.7382, 5.6304]
+  LLR_alt_context         mean=0.3329  std=1.9661  range=[-5.9483, 6.3000]
+
+  Pathogenic vs Benign separation (SNPs):
+  LLR_unmasked            Cohen's d=0.085  AUC=0.538  t=0.99  p=3.25e-01
+  LLR_masked              Cohen's d=0.100  AUC=0.542  t=1.15  p=2.51e-01
+  LLR_alt_context         Cohen's d=0.067  AUC=0.531  t=0.78  p=4.38e-01
+
+
+3. P(REF) AT VARIANT POSITION — Copy-paste diagnostic
+------------------------------------------------------------
+  If P(REF) ≈ 1.0 in unmasked, model is copying the input
+
+  Unmasked      mean=0.3327  median=0.2926  P>0.9: 0.9%  P>0.99: 0.0%
+  Masked        mean=0.2548  median=0.1949  P>0.9: 0.2%  P>0.99: 0.0%
+
+
+4. SPEARMAN CORRELATIONS WITH CONSERVATION SCORES
+------------------------------------------------------------
+
+  A) All SNPs:
+    LLR_unmasked                 vs CADD              ρ=-0.0391     n=534
+    LLR_unmasked                 vs phyloP-100v       ρ=-0.0325     n=534
+    LLR_unmasked                 vs phyloP-241m       ρ=-0.0330     n=534
+    LLR_unmasked                 vs phastCons-100v    ρ=-0.0490     n=534
+    LLR_unmasked                 vs ESM-1b            ρ=-0.0024     n=461
+    LLR_masked                   vs CADD              ρ=-0.0440     n=534
+    LLR_masked                   vs phyloP-100v       ρ=-0.0383     n=534
+    LLR_masked                   vs phyloP-241m       ρ=-0.0439     n=534
+    LLR_masked                   vs phastCons-100v    ρ=-0.0501     n=534
+    LLR_masked                   vs ESM-1b            ρ=-0.0170     n=461
+    LLR_alt_context              vs CADD              ρ=-0.0218     n=534
+    LLR_alt_context              vs phyloP-100v       ρ=-0.0317     n=534
+    LLR_alt_context              vs phyloP-241m       ρ=-0.0285     n=534
+    LLR_alt_context              vs phastCons-100v    ρ=-0.0433     n=534
+    LLR_alt_context              vs ESM-1b            ρ=+0.0048     n=461
+    logprob_delta_unmasked       vs CADD              ρ=-0.0221     n=534
+    logprob_delta_unmasked       vs phyloP-100v       ρ=-0.0271     n=534
+    logprob_delta_unmasked       vs phyloP-241m       ρ=-0.0289     n=534
+    logprob_delta_unmasked       vs phastCons-100v    ρ=-0.0429     n=534
+    logprob_delta_unmasked       vs ESM-1b            ρ=+0.0047     n=461
+    logprob_delta_masked         vs CADD              ρ=-0.0440     n=534
+    logprob_delta_masked         vs phyloP-100v       ρ=-0.0383     n=534
+    logprob_delta_masked         vs phyloP-241m       ρ=-0.0439     n=534
+    logprob_delta_masked         vs phastCons-100v    ρ=-0.0501     n=534
+    logprob_delta_masked         vs ESM-1b            ρ=-0.0170     n=461
+
+  B) Pathogenic SNPs only:
+    LLR_unmasked                 vs CADD              ρ=-0.0230     n=254
+    LLR_unmasked                 vs phyloP-100v       ρ=-0.0859     n=254
+    LLR_unmasked                 vs phyloP-241m       ρ=-0.0672     n=254
+    LLR_unmasked                 vs phastCons-100v    ρ=+0.0157     n=254
+    LLR_unmasked                 vs ESM-1b            ρ=-0.0149     n=242
+    LLR_masked                   vs CADD              ρ=-0.0132     n=254
+    LLR_masked                   vs phyloP-100v       ρ=-0.0840     n=254
+    LLR_masked                   vs phyloP-241m       ρ=-0.0721     n=254
+    LLR_masked                   vs phastCons-100v    ρ=+0.0364     n=254
+    LLR_masked                   vs ESM-1b            ρ=-0.0313     n=242
+    LLR_alt_context              vs CADD              ρ=+0.0077     n=254
+    LLR_alt_context              vs phyloP-100v       ρ=-0.0953     n=254
+    LLR_alt_context              vs phyloP-241m       ρ=-0.0612     n=254
+    LLR_alt_context              vs phastCons-100v    ρ=+0.0219     n=254
+    LLR_alt_context              vs ESM-1b            ρ=-0.0238     n=242
+    logprob_delta_unmasked       vs CADD              ρ=+0.0053     n=254
+    logprob_delta_unmasked       vs phyloP-100v       ρ=-0.0778     n=254
+    logprob_delta_unmasked       vs phyloP-241m       ρ=-0.0615     n=254
+    logprob_delta_unmasked       vs phastCons-100v    ρ=+0.0207     n=254
+    logprob_delta_unmasked       vs ESM-1b            ρ=-0.0242     n=242
+    logprob_delta_masked         vs CADD              ρ=-0.0132     n=254
+    logprob_delta_masked         vs phyloP-100v       ρ=-0.0840     n=254
+    logprob_delta_masked         vs phyloP-241m       ρ=-0.0721     n=254
+    logprob_delta_masked         vs phastCons-100v    ρ=+0.0364     n=254
+    logprob_delta_masked         vs ESM-1b            ρ=-0.0313     n=242
+
+  B) Benign SNPs only:
+    LLR_unmasked                 vs CADD              ρ=+0.0406     n=280
+    LLR_unmasked                 vs phyloP-100v       ρ=+0.0863     n=280
+    LLR_unmasked                 vs phyloP-241m       ρ=+0.0361     n=280
+    LLR_unmasked                 vs phastCons-100v    ρ=+0.0115     n=280
+    LLR_unmasked                 vs ESM-1b            ρ=+0.1785**   n=219
+    LLR_masked                   vs CADD              ρ=+0.0348     n=280
+    LLR_masked                   vs phyloP-100v       ρ=+0.0739     n=280
+    LLR_masked                   vs phyloP-241m       ρ=+0.0226     n=280
+    LLR_masked                   vs phastCons-100v    ρ=+0.0042     n=280
+    LLR_masked                   vs ESM-1b            ρ=+0.1594*    n=219
+    LLR_alt_context              vs CADD              ρ=+0.0478     n=280
+    LLR_alt_context              vs phyloP-100v       ρ=+0.0798     n=280
+    LLR_alt_context              vs phyloP-241m       ρ=+0.0311     n=280
+    LLR_alt_context              vs phastCons-100v    ρ=+0.0062     n=280
+    LLR_alt_context              vs ESM-1b            ρ=+0.1917**   n=219
+    logprob_delta_unmasked       vs CADD              ρ=+0.0437     n=280
+    logprob_delta_unmasked       vs phyloP-100v       ρ=+0.0752     n=280
+    logprob_delta_unmasked       vs phyloP-241m       ρ=+0.0245     n=280
+    logprob_delta_unmasked       vs phastCons-100v    ρ=+0.0021     n=280
+    logprob_delta_unmasked       vs ESM-1b            ρ=+0.1898**   n=219
+    logprob_delta_masked         vs CADD              ρ=+0.0348     n=280
+    logprob_delta_masked         vs phyloP-100v       ρ=+0.0739     n=280
+    logprob_delta_masked         vs phyloP-241m       ρ=+0.0226     n=280
+    logprob_delta_masked         vs phastCons-100v    ρ=+0.0042     n=280
+    logprob_delta_masked         vs ESM-1b            ρ=+0.1594*    n=219
+
+
+5. INDEL FEATURES (n=16)
+------------------------------------------------------------
+  entropy_masked                  mean=1.4140  std=0.2719
+  entropy_unmasked_ref            mean=1.4286  std=0.2634
+  logprob_delta_unmasked          mean=-1.0564  std=1.2407
+  logprob_delta_masked            mean=-1.0989  std=1.1132
+  KL_ref_alt_mean                 mean=0.1116  std=0.0982
+
+  INDEL correlations with conservation:
+    logprob_delta_unmasked       vs CADD              ρ=-0.1824     n=16
+    logprob_delta_unmasked       vs phyloP-100v       ρ=-0.2647     n=16
+    logprob_delta_unmasked       vs phyloP-241m       ρ=-0.0059     n=16
+    logprob_delta_unmasked       vs phastCons-100v    ρ=-0.2487     n=16
+    logprob_delta_unmasked       vs ESM-1b            ρ=+0.1297     n=14
+    logprob_delta_masked         vs CADD              ρ=-0.2353     n=16
+    logprob_delta_masked         vs phyloP-100v       ρ=-0.4176     n=16
+    logprob_delta_masked         vs phyloP-241m       ρ=-0.2412     n=16
+    logprob_delta_masked         vs phastCons-100v    ρ=-0.4099     n=16
+    logprob_delta_masked         vs ESM-1b            ρ=-0.0154     n=14
+    KL_ref_alt_mean              vs CADD              ρ=+0.3176     n=16
+    KL_ref_alt_mean              vs phyloP-100v       ρ=+0.2559     n=16
+    KL_ref_alt_mean              vs phyloP-241m       ρ=-0.0794     n=16
+    KL_ref_alt_mean              vs phastCons-100v    ρ=+0.2441     n=16
+    KL_ref_alt_mean              vs ESM-1b            ρ=-0.0198     n=14
+
+
+================================================================================
+VERDICT
+================================================================================
+  🟢 Minimal copy-paste bias.
+     → Current unmasked LLR is likely adequate.
+
+  Mean |ρ| improvement (masked over unmasked): +0.0075
+  → No meaningful improvement from masking

@@ -1,0 +1,14 @@
+rationale_mechanism,count
+Nonsense / Truncation / NMD,1367
+Benign / Neutral / None,377
+Frameshift,178
+Splicing,143
+Other / Unclassified,128
+Sequence constraint / Conservation,48
+Missense / Protein function,29
+Uncertain / Unknown,8
+Start codon / Initiation / ORF,5
+Regulatory / Transcriptional,3
+Stop-loss / Protein extension,1
+3' UTR,1
+UTR,1

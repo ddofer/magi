@@ -1,77 +1,49 @@
-./hg38.fa
-./.venv/*
-./clinvar_indel_deltas.parquet
-./clinvar_new_deltas.parquet
-./data/stav_data/stav data/annotated_indels_signaled.parquet
-./data/stav_data/stav data/annotated_snps_signaled.parquet
-./data/stav_data/stav data/indels_annotated_test.parquet
-./data/stav_data/stav data/indel_LLM_results.csv
-./data/stav_data/stav data/snps_annotated_test.parquet
-./LLM pipeline inputs/LLM pipeline inputs/MANE_processed.csv
-./LLM pipeline inputs/LLM pipeline inputs/submission_summary.txt.gz
-./LLM pipeline inputs/LLM pipeline inputs/variant_summary.txt.gz
-./ntv3_gradio_app/data/hg38.fa
-./ntv3_gradio_app/data/MANE_processed.csv
-./data/genomes/dog/Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa.gz
-./data/genomes/cat/Felis_catus-GCA_018350175.1-unmasked.fa.gz
-./data/genomes/chicken/Gallus_gallus.GRCg6a.dna.toplevel.fa.gz
-./hg38.fa
-./.venv/lib/python3.13/site-packages/nvidia/cuda_nvrtc/lib/libnvrtc.alt.so.12
-./.venv/lib/python3.13/site-packages/nvidia/cuda_nvrtc/lib/libnvrtc.so.12
-./.venv/lib/python3.13/site-packages/nvidia/cusparselt/lib/libcusparseLt.so.0
-./.venv/lib/python3.13/site-packages/nvidia/curand/lib/libcurand.so.10
-./.venv/lib/python3.13/site-packages/nvidia/cusolver/lib/libcusolver.so.11
-./.venv/lib/python3.13/site-packages/nvidia/cusolver/lib/libcusolverMg.so.11
-./.venv/lib/python3.13/site-packages/nvidia/cusparse/lib/libcusparse.so.12
-./.venv/lib/python3.13/site-packages/nvidia/nccl/lib/libnccl.so.2
-./.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_adv.so.9
-./.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_engines_precompiled.so.9
-./.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_heuristic.so.9
-./.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_ops.so.9
-./.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib/libnvJitLink.so.12
-./.venv/lib/python3.13/site-packages/nvidia/nvshmem/lib/libnvshmem_host.so.3
-./.venv/lib/python3.13/site-packages/nvidia/cublas/lib/libcublas.so.12
-./.venv/lib/python3.13/site-packages/nvidia/cublas/lib/libcublasLt.so.12
-./.venv/lib/python3.13/site-packages/nvidia/cufft/lib/libcufft.so.11
-./.venv/lib/python3.13/site-packages/llvmlite/binding/libllvmlite.so
-./.venv/lib/python3.13/site-packages/_polars_runtime_32/_polars_runtime.abi3.so
-./.venv/lib/python3.13/site-packages/torch/lib/libtorch_cpu.so
-./.venv/lib/python3.13/site-packages/torch/lib/libtorch_cuda.so
-./.venv/lib/python3.13/site-packages/torch/lib/libtorch_cuda_linalg.so
-./.venv/lib/python3.13/site-packages/triton/_C/libtriton.so
-./.venv/lib/python3.13/site-packages/flash_attn_2_cuda.cpython-313-x86_64-linux-gnu.so
-./clinvar_indel_deltas.parquet
-./clinvar_new_deltas.parquet
-./data/stav_data/stav data/annotated_indels_signaled.parquet
-./data/stav_data/stav data/annotated_snps_signaled.parquet
-./data/stav_data/stav data/indels_annotated_test.parquet
-./data/stav_data/stav data/indel_LLM_results.csv
-./data/stav_data/stav data/snps_annotated_test.parquet
-./LLM pipeline inputs/LLM pipeline inputs/MANE_processed.csv
-./LLM pipeline inputs/LLM pipeline inputs/submission_summary.txt.gz
-./LLM pipeline inputs/LLM pipeline inputs/variant_summary.txt.gz
-./ntv3_gradio_app/data/hg38.fa
-./ntv3_gradio_app/data/MANE_processed.csv
-./data/genomes/dog/Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa.gz
-./data/genomes/cat/Felis_catus-GCA_018350175.1-unmasked.fa.gz
-./data/genomes/chicken/Gallus_gallus.GRCg6a.dna.toplevel.fa.gz
-clinvar_indel_deltas.parquet
-# Large data files
+# Large reference genomes & FASTAs
 hg38.fa
 hg38.fa.gz
 hg38.fa.fai
 *.fasta
 *.fa.gz
 *.fai
+data/genomes/
 
-# Model cache
+# Large precomputed delta parquets (regenerable from inference)
+clinvar_input.parquet
+clinvar_indel.parquet
+clinvar_new_deltas.parquet
+clinvar_indel_deltas.parquet
+
+# Stav-data working files (large; regenerable from analysis pipeline).
+# Track the small metadata under data/stav_data/AFs/ explicitly via !-rules below.
+data/stav_data/*.parquet
+data/stav_data/*_LLM_results.csv
+data/stav_data/stav data/
+!data/stav_data/AFs/
+
+# LLM pipeline raw inputs (large reference dumps; download instructions in repo)
+LLM pipeline inputs/LLM pipeline inputs/MANE_processed.csv
+LLM pipeline inputs/LLM pipeline inputs/submission_summary.txt.gz
+LLM pipeline inputs/LLM pipeline inputs/variant_summary.txt.gz
+
+# Gradio app heavy reference data (rebuilt at runtime / downloaded)
+gradio_app/data/MANE_processed.csv
+gradio_app/data/hg38.fa
+ntv3_gradio_app/data/MANE_processed.csv
+ntv3_gradio_app/data/hg38.fa
+
+# Per-file size cap: tracked CSVs over ~50 MB belong outside the repo
+analyses/generated_tables/snp_results_with_mechanism.csv
+analyses/indel_results.csv
+analyses/analyses/stav-llm_evaluation_results.csv
+
+# Model cache / checkpoints
 models/
 checkpoints/
 *.pt
 *.pth
 *.safetensors
 
-# Python cache
+# Python build / cache
 __pycache__/
 *.py[cod]
 *$py.class
@@ -107,9 +79,8 @@ venv.bak/
 *.swp
 *.swo
 *~
-.DS_Store
 
-# Jupyter
+# Jupyter checkpoints
 .ipynb_checkpoints/
 
 # Testing
@@ -121,14 +92,14 @@ htmlcov/
 # Logs
 *.log
 logs/
-flagged/  # Gradio flagged data
+flagged/
 
 # Temporary files
 tmp/
 temp/
 *.tmp
 
-# Output files (results from app)
+# Gradio runtime outputs
 outputs/
 results/
 *.csv.bak
@@ -136,57 +107,11 @@ results/
 last_variant_result.csv
 batch_results.csv
 last_variant_tracks.png
-*.png
 
-# System files
+# Windows / mac system files
 .DS_Store
 Thumbs.db
 desktop.ini
 
-# HuggingFace Spaces
+# HuggingFace Spaces runtime artifacts
 .gradio/
-./data/hg38.fa
-./data/MANE_processed.csv
-./hg38.fa
-./.venv/lib/python3.13/site-packages/nvidia/cuda_nvrtc/lib/libnvrtc.alt.so.12
-./.venv/lib/python3.13/site-packages/nvidia/cuda_nvrtc/lib/libnvrtc.so.12
-./.venv/lib/python3.13/site-packages/nvidia/cusparselt/lib/libcusparseLt.so.0
-./.venv/lib/python3.13/site-packages/nvidia/curand/lib/libcurand.so.10
-./.venv/lib/python3.13/site-packages/nvidia/cusolver/lib/libcusolver.so.11
-./.venv/lib/python3.13/site-packages/nvidia/cusolver/lib/libcusolverMg.so.11
-./.venv/lib/python3.13/site-packages/nvidia/cusparse/lib/libcusparse.so.12
-./.venv/lib/python3.13/site-packages/nvidia/nccl/lib/libnccl.so.2
-./.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_adv.so.9
-./.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_engines_precompiled.so.9
-./.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_heuristic.so.9
-./.venv/lib/python3.13/site-packages/nvidia/cudnn/lib/libcudnn_ops.so.9
-./.venv/lib/python3.13/site-packages/nvidia/nvjitlink/lib/libnvJitLink.so.12
-./.venv/lib/python3.13/site-packages/nvidia/nvshmem/lib/libnvshmem_host.so.3
-./.venv/lib/python3.13/site-packages/nvidia/cublas/lib/libcublas.so.12
-./.venv/lib/python3.13/site-packages/nvidia/cublas/lib/libcublasLt.so.12
-./.venv/lib/python3.13/site-packages/nvidia/cufft/lib/libcufft.so.11
-./.venv/lib/python3.13/site-packages/llvmlite/binding/libllvmlite.so
-./.venv/lib/python3.13/site-packages/_polars_runtime_32/_polars_runtime.abi3.so
-./.venv/lib/python3.13/site-packages/torch/lib/libtorch_cpu.so
-./.venv/lib/python3.13/site-packages/torch/lib/libtorch_cuda.so
-./.venv/lib/python3.13/site-packages/torch/lib/libtorch_cuda_linalg.so
-./.venv/lib/python3.13/site-packages/triton/_C/libtriton.so
-./.venv/lib/python3.13/site-packages/flash_attn_2_cuda.cpython-313-x86_64-linux-gnu.so
-./clinvar_indel_deltas.parquet
-./clinvar_new_deltas.parquet
-./data/stav_data/stav data/annotated_indels_signaled.parquet
-./data/stav_data/stav data/annotated_snps_signaled.parquet
-./data/stav_data/stav data/indels_annotated_test.parquet
-./data/stav_data/stav data/indel_LLM_results.csv
-./data/stav_data/stav data/snps_annotated_test.parquet
-./LLM pipeline inputs/LLM pipeline inputs/MANE_processed.csv
-./LLM pipeline inputs/LLM pipeline inputs/submission_summary.txt.gz
-./LLM pipeline inputs/LLM pipeline inputs/variant_summary.txt.gz
-./ntv3_gradio_app/data/hg38.fa
-./ntv3_gradio_app/data/MANE_processed.csv
-./data/genomes/dog/Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa.gz
-./data/genomes/cat/Felis_catus-GCA_018350175.1-unmasked.fa.gz
-./data/genomes/chicken/Gallus_gallus.GRCg6a.dna.toplevel.fa.gz
-clinvar_indel.parquet
-clinvar_input.parquet
-clinvar_new_deltas.parquet

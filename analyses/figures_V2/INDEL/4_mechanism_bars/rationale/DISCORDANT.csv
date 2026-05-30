@@ -1,0 +1,10 @@
+rationale_mechanism,count
+Nonsense / Truncation / NMD,4737
+Frameshift,1679
+Start codon / Initiation / ORF,334
+Other / Unclassified,112
+Splicing,67
+Missense / Protein function,41
+Stop-loss / Protein extension,27
+Sequence constraint / Conservation,3
+Regulatory / Transcriptional,2

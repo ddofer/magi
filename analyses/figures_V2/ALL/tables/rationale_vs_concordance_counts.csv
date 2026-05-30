@@ -1,0 +1,15 @@
+row,DISCORDANT,PARTIAL,CONCORDANT,NOT_APPLICABLE
+3' UTR,0,0,2,0
+Benign / Neutral / None,0,0,0,0
+Frameshift,0,0,0,0
+Missense / Protein function,0,0,0,0
+Nonsense / Truncation / NMD,0,0,0,0
+Other / Unclassified,0,0,0,0
+Pharmacogenomic,0,0,0,0
+Regulatory / Transcriptional,0,0,0,0
+Sequence constraint / Conservation,0,0,0,0
+Splicing,0,0,0,0
+Start codon / Initiation / ORF,0,0,0,0
+Stop-loss / Protein extension,0,0,0,0
+UTR,0,0,1,0
+Uncertain / Unknown,0,0,0,0

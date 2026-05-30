@@ -1,0 +1,8 @@
+primary_signal_mechanism,count
+Benign / Neutral / None,406
+Uncertain / Unknown,258
+Regulatory / Expression,239
+Other / Unclassified,233
+MLM / Sequence-constraint signal,67
+Start codon / Initiation / ORF,29
+Splicing,8
