@@ -39,7 +39,10 @@ Keeping them separate allows refreshing inputs without deleting regenerated resu
 | 4–5 | `04_run_llm_parallel.py`, `05_run_llm_batch.py` | Optional local LLM re-runs |
 | 6 | `06_compute_impact_scores.py` | `output/impact/*_deltas_impact.parquet` |
 | 7 | `07_assign_mechanisms.py` | `output/mechanisms/*_assigned_mechanisms.csv` |
-| — | `run_figures.py` | `output/figures/fig1c.png`, `fig2a/b.png`, `fig3a`–`fig3e*.png` |
+| 8 | `08_animals_extract_signals.py` | `output/parquet/animals_*_signaled.parquet` |
+| 9 | `09_animals_build_prompts.py` | `output/parquet/animals_*_with_prompts.parquet` |
+| 10 | `10_animals_run_llm_parallel.py` | `data/llm/animals_*_evaluation_results*.parquet` |
+| — | `run_figures.py` | `output/figures/fig1c.png`, `fig2a/b.png`, `fig3a`–`fig3e*.png`, `figs1.png` |
 
 Stage 1 is memory-intensive (deferred BED/BW loading). Stages 6–7 and figures assume prior cohort and LLM artifacts exist.
 
@@ -71,8 +74,20 @@ Flat outputs under `output/figures/`:
 | `fig3d.png` | Indel concordance by \|size\| mod 3 |
 | `fig3e.png` | SNP concordance by NT-assigned mechanism |
 | `fig3e_indel.png` | Indel mechanism concordance |
+| `figs1.png` | Supplementary Fig S1 — per-species SNP vs indel LLM concordance |
 
 All publication PNGs live directly under `output/figures/` (no subfolders).
+
+## OMIA animals (notebook workflow)
+
+Separate from the ClinVar numbered scripts. Documented in [`notebooks/README.md`](notebooks/README.md).
+
+| Stage | Location | Rows (current) |
+|-------|----------|----------------|
+| NT deltas | `data/parquet/deltas_animals_{snp,indel}.parquet` | 372 / 208 |
+| Signaled | `output/parquet/animals_*_signaled.parquet` | same (produced by notebook) |
+| LLM eval | `data/llm/animals_*_evaluation_results*.parquet` | same |
+| Fig S1 | `output/figures/figs1.png` | per-species SNP vs indel accuracy (from `animals_result_analysis.ipynb`) |
 
 ## Tools
 

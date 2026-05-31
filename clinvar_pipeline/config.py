@@ -94,6 +94,24 @@ PATHS = {
     "fig3d": _out("figures/fig3d.png"),
     "fig3e": _out("figures/fig3e.png"),
     "fig3e_indel": _out("figures/fig3e_indel.png"),
+    "figs1": _out("figures/figs1.png"),
+    # OMIA animal variants (notebook: notebooks/analysis_v2 animals.ipynb)
+    "animals_snp_deltas": _data("parquet/deltas_animals_snp.parquet"),
+    "animals_indel_deltas": _data("parquet/deltas_animals_indel.parquet"),
+    "animals_snp_signaled": _out("parquet/animals_snp_signaled.parquet"),
+    "animals_indel_signaled": _out("parquet/animals_indel_signaled.parquet"),
+    "animals_snp_with_prompts": _out("parquet/animals_snp_with_prompts.parquet"),
+    "animals_indel_with_prompts": _out("parquet/animals_indel_with_prompts.parquet"),
+    "animals_snp_eval": _data("llm/animals_snp_evaluation_results.parquet"),
+    "animals_indel_eval": _data("llm/animals_indel_evaluation_results_2.parquet"),
+    "omia_all_species_inferred_full": _data_or_repo(
+        "parquet/omia_all_species_inferred_full.parquet",
+        "data/results/omia_all_species_inferred_full.parquet",
+    ),
+    "omia_all_species_inferred_relevant": _data_or_repo(
+        "parquet/omia_all_species_inferred_relevant.parquet",
+        "data/results/omia_all_species_inferred_relevant.parquet",
+    ),
     "validation_root": _out("validation"),
     "cohort_funnel": _out("validation/cohort_funnel.json"),
     "batch_work_dir": _out("batch_eval"),
@@ -120,4 +138,5 @@ IMPACT_SCORE_COLS = [
 
 MIN_GOLD_STARS = 2
 DEFAULT_TOP_K_SIGNALS = 5
+DEFAULT_ANIMALS_TOP_K_SIGNALS = 10
 DEFAULT_LLM_MODEL = "gemini-3-flash-preview"

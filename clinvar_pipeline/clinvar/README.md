@@ -19,7 +19,10 @@ Python package for ClinVar variant preparation, NT delta integration, signal ext
 | `llm_results.py` | Canonical column lists for gathered LLM parquets |
 | `constants.py` | Shared column lists, review-status maps, feature priority |
 | `llm/` | Parallel and batch LLM evaluation, response parsing |
-| `prompts/` | System prompt templates (`system_prompt_snp.txt`, `system_prompt_indel.txt`) |
+| `prompts/` | System prompt templates (`system_prompt_snp.txt`, `system_prompt_indel.txt`, `system_prompt_animals_*.txt`) |
+| `animals_pipeline.py` | OMIA animal deltas → signaled parquets (stage 8) |
+| `animals_prompts.py` | OMIA animal per-variant prompts + system prompt loader |
+| `animals_data.py` | Load merged OMIA animal LLM eval tables for Fig S1 |
 
 ## Data flow (stages 1–2)
 
@@ -50,6 +53,21 @@ Large delta parquets use **deferred track loading**: slim rows are filtered firs
 ## External dependency
 
 Mechanism assignment (`../scripts/07_assign_mechanisms.py`) imports `nt_mechanism_assignment.py` from the parent ClinVar repository root (hypothesis rules over BED/BW/MLM features).
+
+## OMIA animals (stages 8–10)
+
+```
+data/parquet/deltas_animals_{snp,indel}.parquet
+    → vectorized signal extraction (`animals_pipeline.extract_animals_signals`)
+    → output/parquet/animals_*_signaled.parquet
+    → prompt build (`animals_prompts.build_prompts_table`)
+    → output/parquet/animals_*_with_prompts.parquet
+    → optional Gemini eval (`scripts/10_animals_run_llm_parallel.py`)
+    → data/llm/animals_*_evaluation_results*.parquet
+    → Fig S1 per-species SNP vs indel accuracy (`figures/figs1_animals_concordance.py`)
+```
+
+System prompts: `prompts/system_prompt_animals_snp.txt`, `system_prompt_animals_indel.txt`.
 
 ## Related docs
 

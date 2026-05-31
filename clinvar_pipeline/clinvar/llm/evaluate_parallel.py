@@ -238,11 +238,13 @@ def run_evaluation_pipeline(
     api_key: str | None = None,
     max_workers: int = 10,
     sample_size: int | None = None,
+    system_prompt: str | None = None,
 ) -> pd.DataFrame:
     if not api_key:
         raise ValueError("api_key is required (set GEMINI_API_KEY env var)")
 
-    system_prompt = get_system_prompt(variant_type)
+    if system_prompt is None:
+        system_prompt = get_system_prompt(variant_type)
     df_eval = (
         df_with_prompts.sample(n=sample_size, random_state=42)
         if sample_size and sample_size < len(df_with_prompts)

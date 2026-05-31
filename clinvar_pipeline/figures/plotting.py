@@ -49,8 +49,9 @@ def plot_overall_concordance_by_variant_type(
     out_path: Path,
     *,
     variant_order: list[str] | None = None,
+    title: str = "Concordance by Variant Type",
 ) -> None:
-    """Fig 3a — CONCORDANT (solid) + PARTIAL (hatched) by SNP vs INDEL."""
+    """Fig 3a / S1 — CONCORDANT (solid) + PARTIAL (hatched), blue SNP / orange indel."""
     variant_order = variant_order or ["snp", "indel"]
     d = merged.copy()
     d["concordance"] = d["concordance"].astype(str).str.strip().str.upper()
@@ -62,6 +63,9 @@ def plot_overall_concordance_by_variant_type(
         .unstack(fill_value=0)
         .reindex(index=variant_order)
     )
+    for col in ("CONCORDANT", "PARTIAL"):
+        if col not in counts.columns:
+            counts[col] = 0
     frac = counts.div(counts.sum(axis=1), axis=0)
 
     fig, ax = plt.subplots(figsize=(5, 5))
@@ -84,20 +88,75 @@ def plot_overall_concordance_by_variant_type(
         total = int(totals.get(vt, 0))
         pct = 100 * cp / total if total else 0
         labels.append(f"{vt.upper()}\n({cp}/{total}, {pct:.0f}%)")
-    ax.set_xticks([0, 1])
+    ax.set_xticks(range(len(variant_order)))
     ax.set_xticklabels(labels)
     ax.set_ylim(0, 1)
     ticks = np.arange(0, 1.01, 0.1)
     ax.set_yticks(ticks)
     ax.set_yticklabels([f"{int(t * 100)}%" for t in ticks])
     ax.set_ylabel("Fraction of variants")
-    ax.set_title("Concordance by Variant Type")
+    ax.set_title(title)
     ax.legend(
         handles=[
             Patch(facecolor="white", edgecolor="black", label="CONCORDANT"),
             Patch(facecolor="white", edgecolor="black", hatch="//", label="PARTIAL"),
         ]
     )
+    fig.savefig(out_path, dpi=DPI, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+
+
+def plot_per_species_accuracy_snp_vs_indel(
+    res: pd.DataFrame,
+    out_path: Path,
+    *,
+    title: str = "Per-species accuracy: SNP vs INDEL",
+) -> None:
+    """Supplementary Fig S1 — port of ``animals_result_analysis.ipynb`` grouped bar plot."""
+    by = (
+        res.groupby(["species_key", "variant_type"])
+        .agg(n=("is_correct", "size"), accuracy=("is_correct", "mean"))
+        .reset_index()
+    )
+    by["accuracy_pct"] = by["accuracy"] * 100
+
+    piv = by.pivot(index="species_key", columns="variant_type", values="accuracy_pct").fillna(0)
+    n_piv = by.pivot(index="species_key", columns="variant_type", values="n").fillna(0).astype(int)
+
+    species = piv.index.tolist()
+    x = np.arange(len(species))
+    width = 0.38
+
+    fig, ax = plt.subplots(figsize=(max(8, 0.6 * len(species)), 5))
+    palette = sns.color_palette("deep")
+    ax.bar(
+        x - width / 2,
+        piv.get("SNP", pd.Series(0, index=piv.index)).values,
+        width=width,
+        color=palette[0],
+        label="SNP",
+    )
+    ax.bar(
+        x + width / 2,
+        piv.get("INDEL", pd.Series(0, index=piv.index)).values,
+        width=width,
+        color=palette[1],
+        label="INDEL",
+    )
+
+    labels = []
+    for sp in species:
+        ns = int(n_piv.loc[sp, "SNP"]) if "SNP" in n_piv.columns else 0
+        ni = int(n_piv.loc[sp, "INDEL"]) if "INDEL" in n_piv.columns else 0
+        labels.append(f"{sp}\n(nS={ns}, nI={ni})")
+
+    ax.set_ylabel("Accuracy (% CONCORDANT)")
+    ax.set_title(title)
+    ax.set_xticks(x)
+    ax.set_xticklabels(labels, rotation=45, ha="right")
+    ax.set_ylim(0, 100)
+    ax.legend(loc="upper right", frameon=False)
+    fig.tight_layout()
     fig.savefig(out_path, dpi=DPI, bbox_inches="tight", facecolor="white")
     plt.close(fig)
 
