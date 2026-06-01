@@ -4,11 +4,11 @@ emoji: 🧬
 colorFrom: purple
 colorTo: blue
 sdk: gradio
-sdk_version: 5.0.0
+sdk_version: 6.13.0
 app_file: app.py
 pinned: false
 license: mit
-hardware: zero-a10
+suggested_hardware: zero-a10g
 ---
 
 ## 🧬 MAGI Variant Interpreter

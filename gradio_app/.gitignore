@@ -2,9 +2,11 @@
 hg38.fa
 hg38.fa.gz
 hg38.fa.fai
+hg38.2bit
 *.fasta
 *.fa.gz
 *.fai
+*.2bit
 
 # Model cache
 models/

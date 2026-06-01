@@ -19,6 +19,33 @@ import os
 import warnings
 from pathlib import Path
 
+# Defensive monkey-patch for gradio_client schema bug: get_type() crashes with
+# "TypeError: argument of type 'bool' is not iterable" when JSON Schema
+# additionalProperties is a bool. Breaks the /info endpoint and surfaces in the
+# UI as "Error: No API found". Patch must run before `import gradio`.
+try:
+    import gradio_client.utils as _gc_utils
+
+    _orig_get_type = _gc_utils.get_type
+
+    def _safe_get_type(schema):
+        if not isinstance(schema, dict):
+            return "Any"
+        return _orig_get_type(schema)
+
+    _gc_utils.get_type = _safe_get_type
+
+    _orig_json_schema_to_python_type = _gc_utils._json_schema_to_python_type
+
+    def _safe_json_schema_to_python_type(schema, defs=None):
+        if not isinstance(schema, dict):
+            return "Any"
+        return _orig_json_schema_to_python_type(schema, defs)
+
+    _gc_utils._json_schema_to_python_type = _safe_json_schema_to_python_type
+except Exception:
+    pass
+
 import torch
 import gradio as gr
 import pandas as pd
@@ -415,6 +442,19 @@ def predict_single_variant(
         species = str(species).strip()
         print(f"🔬 Predicting {species} {chrom}:{pos} {ref_clean}>{alt_clean}...")
         results_df = predict_variants(input_df, device=DEVICE, species=species)
+
+        # Surface a sequence-fetch failure clearly instead of a silent N/A row
+        if "fetch_error" in results_df.columns:
+            fetch_err = results_df["fetch_error"].iloc[0]
+            if isinstance(fetch_err, str) and fetch_err:
+                return (
+                    "❌ **Sequence retrieval failed.**\n\n"
+                    f"{fetch_err}\n\n"
+                    "This usually means the external sequence API was rate-limited or "
+                    "temporarily unreachable from the deployment environment. "
+                    "Please try again in a moment.",
+                    *_none9[1:],
+                )
 
         # Annotate
         results_df = _apply_species_annotations(results_df, species)

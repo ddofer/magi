@@ -45,6 +45,7 @@ BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
 GENOME_FILE = DATA_DIR / "hg38.fa"
 GENOME_GZ_FILE = DATA_DIR / "hg38.fa.gz"
+GENOME_2BIT_FILE = DATA_DIR / "hg38.2bit"
 METADATA_FILE = DATA_DIR / "functional_tracks_metadata_human.csv"
 UCSC_SEQUENCE_URL = "https://api.genome.ucsc.edu/getData/sequence"
 ENSEMBL_SEQUENCE_URL = "https://rest.ensembl.org/sequence/region"
@@ -113,6 +114,7 @@ _MODEL_CACHE: Dict[str, Any] = {
     "model": None,
     "tokenizer": None,
     "genome": None,
+    "twobit": None,
     "bed_names": None,
     "bigwig_names": None,
     "selected_bw_indices": None,
@@ -159,15 +161,18 @@ def _fetch_ucsc_window(chrom: str, start: int, end: int) -> Optional[str]:
                 "start": int(start),
                 "end": int(end),
             },
-            timeout=10,
+            timeout=30,
+            headers={"User-Agent": "MAGI-gradio/1.0 (+https://huggingface.co/spaces)"},
         )
         response.raise_for_status()
         payload = response.json()
         dna = payload.get("dna", "")
         if not dna:
+            print(f"⚠️  UCSC returned empty DNA for {chrom}:{start}-{end}: {payload!r}")
             return None
         return str(dna).upper()
-    except Exception:
+    except Exception as exc:
+        print(f"⚠️  UCSC fetch failed for {chrom}:{start}-{end}: {type(exc).__name__}: {exc}")
         return None
 
 
@@ -208,20 +213,55 @@ def _fetch_ensembl_window(
             f"{clean_chrom}:{start_1based}..{end_1based}"
         )
 
+    last_err = None
     for url in urls:
         try:
             response = requests.get(
                 url,
-                headers={"Content-Type": "text/plain", "Accept": "text/plain"},
-                timeout=15,
+                headers={
+                    "Content-Type": "text/plain",
+                    "Accept": "text/plain",
+                    "User-Agent": "MAGI-gradio/1.0 (+https://huggingface.co/spaces)",
+                },
+                timeout=30,
             )
             response.raise_for_status()
             dna = response.text.strip()
             if dna:
                 return dna.upper()
-        except Exception:
+        except Exception as exc:
+            last_err = exc
             continue
 
+    if last_err is not None:
+        print(
+            f"⚠️  Ensembl fetch failed for {species} {chrom}:{start}-{end}: "
+            f"{type(last_err).__name__}: {last_err}"
+        )
+    return None
+
+
+def _fetch_sequence_from_2bit(
+    twobit, chrom: str, start: int, end: int
+) -> Optional[str]:
+    """Fetch sequence window from a py2bit handle. Tries the original chrom name first,
+    then with/without a 'chr' prefix to handle naming variants."""
+    if twobit is None:
+        return None
+
+    candidates = [chrom]
+    if chrom.startswith("chr"):
+        candidates.append(chrom[3:])
+    else:
+        candidates.append(f"chr{chrom}")
+
+    chroms = twobit.chroms()
+    for name in candidates:
+        if name in chroms:
+            try:
+                return twobit.sequence(name, int(start), int(end)).upper()
+            except Exception:
+                return None
     return None
 
 
@@ -271,22 +311,40 @@ def get_genomic_sequence(
 
     ref_seq = None
     if species == "human":
-        if genome is not None:
+        twobit = _MODEL_CACHE.get("twobit")
+        if twobit is not None:
+            ref_seq = _fetch_sequence_from_2bit(twobit, str(chrom), start, end)
+
+        if ref_seq is None and genome is not None:
             ref_seq = _fetch_sequence_from_local(genome, str(chrom), start, end)
 
         if ref_seq is None:
             ucsc_chrom = _normalize_ucsc_chrom(str(chrom))
             ref_seq = _fetch_ucsc_window(ucsc_chrom, start, end)
-            if ref_seq is None:
-                warnings.warn(
-                    f"Failed to fetch sequence for {chrom}:{pos} from local genome and UCSC API"
+
+        # Ensembl REST fallback: HF Spaces egress sometimes blocks UCSC; Ensembl
+        # is on a different host and tends to be reachable.
+        if ref_seq is None:
+            ref_seq = _fetch_ensembl_window("human", str(chrom), start, end)
+            if ref_seq is not None:
+                print(
+                    f"✅ Sequence fetch for {chrom}:{pos} succeeded via Ensembl "
+                    f"fallback (UCSC was unreachable)."
                 )
-                return None, None, None
+
+        if ref_seq is None:
+            print(
+                f"❌ Sequence fetch failed for {chrom}:{pos} "
+                f"(window {start}-{end}); local genome, UCSC API, and Ensembl "
+                f"REST all unavailable. Returning NaN result."
+            )
+            return None, None, None
     else:
         ref_seq = _fetch_ensembl_window(species, str(chrom), start, end)
         if ref_seq is None:
-            warnings.warn(
-                f"Failed to fetch sequence for {species} {chrom}:{pos} from Ensembl REST API"
+            print(
+                f"❌ Sequence fetch failed for {species} {chrom}:{pos} "
+                f"(window {start}-{end}) from Ensembl REST API. Returning NaN result."
             )
             return None, None, None
 
@@ -575,21 +633,56 @@ def load_model_and_resources(device: str = "cuda"):
     # Filter BigWig tracks
     selected_bw_indices, selected_bw_names = get_track_indices(bw_names, METADATA_FILE)
 
-    # Load genome optionally (for fast local lookups); otherwise UCSC fallback
+    # Load genome optionally (for fast local lookups); otherwise UCSC/Ensembl fallback
     genome = None
-    sequence_source = "ucsc"
+    twobit = None
+    sequence_source = "ucsc+ensembl"
+    twobit_path: Optional[str] = None
     if FORCE_UCSC:
         print("⚠️  NTV3_FORCE_UCSC=1 set; using UCSC API for sequence retrieval")
-    elif GENOME_FILE.exists():
-        print(f"🧬 Loading local reference genome from {GENOME_FILE}...")
-        genome = Fasta(str(GENOME_FILE))
-        sequence_source = "local+ucsc-fallback"
-    elif GENOME_GZ_FILE.exists():
-        print(
-            f"⚠️  Found compressed genome at {GENOME_GZ_FILE}; using UCSC API (decompress to enable local fast path)"
-        )
     else:
-        print("⚠️  No local hg38.fa found; using UCSC API for sequence retrieval")
+        # Bundled 2bit file beats network fetch
+        if GENOME_2BIT_FILE.exists():
+            twobit_path = str(GENOME_2BIT_FILE)
+        else:
+            # Fall back to the dedicated HF dataset on first boot
+            twobit_repo = os.environ.get("MAGI_2BIT_DATASET", "GrimSqueaker/hg38-2bit")
+            try:
+                from huggingface_hub import hf_hub_download
+                print(f"📥 Fetching hg38.2bit from dataset {twobit_repo}...")
+                twobit_path = hf_hub_download(
+                    repo_id=twobit_repo,
+                    filename="hg38.2bit",
+                    repo_type="dataset",
+                    token=os.environ.get("HF_TOKEN"),
+                )
+                print(f"✅ hg38.2bit cached at {twobit_path}")
+            except Exception as e:
+                print(f"⚠️  Could not fetch hg38.2bit from {twobit_repo}: {e}")
+
+        if twobit_path is not None:
+            try:
+                import py2bit
+                twobit = py2bit.open(twobit_path)
+                print(
+                    f"🧬 Loaded local reference genome from {twobit_path} (2bit, "
+                    f"{len(twobit.chroms())} contigs)"
+                )
+                sequence_source = "local-2bit"
+            except Exception as e:
+                print(f"⚠️  Failed to open {twobit_path}: {e}")
+                twobit = None
+
+        if twobit is None and GENOME_FILE.exists():
+            print(f"🧬 Loading local reference genome from {GENOME_FILE}...")
+            genome = Fasta(str(GENOME_FILE))
+            sequence_source = "local-fa"
+        elif twobit is None and GENOME_GZ_FILE.exists():
+            print(
+                f"⚠️  Found compressed genome at {GENOME_GZ_FILE}; using UCSC/Ensembl API (decompress to enable local fast path)"
+            )
+        elif twobit is None:
+            print("⚠️  No local hg38.fa or hg38.2bit found; using UCSC/Ensembl API for sequence retrieval")
 
     # Build token map
     nuc_token_map = build_nuc_token_map(tokenizer)
@@ -600,6 +693,7 @@ def load_model_and_resources(device: str = "cuda"):
             "model": model,
             "tokenizer": tokenizer,
             "genome": genome,
+            "twobit": twobit,
             "bed_names": bed_names,
             "bigwig_names": bw_names,
             "selected_bw_indices": selected_bw_indices,
@@ -691,9 +785,16 @@ def predict_variants(
         )
 
         if ref_seq is None or alt_seq is None or vcenter is None:
-            # Failed to fetch sequence - return NaN results
+            # Failed to fetch sequence - return NaN results with a flag
+            # that the UI layer can surface to the user.
             res = {c: row[c] for c in df.columns}
             res["indel_size"] = len(str(row["alt"])) - len(str(row["ref"]))
+            res["fetch_error"] = (
+                f"Could not fetch reference sequence for {row['chrom']}:{row['pos']} "
+                f"(species={species}). The remote sequence API "
+                f"({'UCSC' if species == 'human' else 'Ensembl'}) was unreachable "
+                f"or returned no data."
+            )
             for nm in bed_names:
                 res[f"REF_BED_{nm}"] = np.nan
                 res[f"D_BED_{nm}"] = np.nan
