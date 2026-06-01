@@ -290,6 +290,42 @@ TRACK_META_DICT = {
 }
 
 
+# Built-in example variants shown in the UI. Pre-warmed at startup so the
+# first click on any example hits the lru_cache and skips ~120s of model time.
+EXAMPLE_VARIANTS = [
+    ("human", "chr17", 7675088, "C", "T"),       # TP53 R175H
+    ("human", "chr7", 117559593, "ATCT", "A"),   # CFTR F508del
+    ("human", "chr13", 32332771, "AGAGA", "AGA"),# BRCA2 c.5946delT
+    ("human", "chr11", 5227002, "T", "A"),       # HBB E6V (sickle cell)
+    ("human", "chr17", 43092418, "T", "C"),      # BRCA1 rs16941 (benign)
+]
+
+
+def _warmup_example_cache():
+    """Pre-populate the lru_cache with the built-in examples.
+
+    Each example takes a few minutes on cpu-basic. We run this in a
+    background thread AFTER app.launch() so the Space can serve requests
+    immediately while the cache fills behind the scenes. Examples clicked
+    before their entry is cached just hit the cold path normally.
+    """
+    import time
+
+    # Yield to Gradio's startup so the first inference doesn't race the
+    # initial UI requests.
+    time.sleep(20)
+
+    print(f"🔥 Background warmup for {len(EXAMPLE_VARIANTS)} examples...")
+    for species, chrom, pos, ref, alt in EXAMPLE_VARIANTS:
+        try:
+            t0 = time.time()
+            _cached_inference(species, str(chrom), int(pos), ref, alt)
+            print(f"   ✓ {chrom}:{pos} {ref}>{alt} cached in {time.time() - t0:.1f}s")
+        except Exception as exc:
+            print(f"   ⚠ {chrom}:{pos} {ref}>{alt} skipped: {exc}")
+    print("🔥 Example warmup complete.")
+
+
 # ============================================================================
 # STARTUP - LOAD MODEL AND ANNOTATION DATA
 # ============================================================================
@@ -309,7 +345,8 @@ def initialize_app():
         return False
 
 
-# Initialize on import
+# Initialize on import. The example-cache warmup runs further below, once
+# _cached_inference has been defined.
 _APP_READY = initialize_app()
 
 
@@ -396,6 +433,11 @@ def _cached_inference(species: str, chrom: str, pos: int, ref: str, alt: str):
     df = _apply_species_annotations(df, species)
     df = compute_impact_scores(df)
     return df
+
+
+# Example pre-warming is kicked off as a background thread in __main__ below,
+# so app.launch() can bind the HTTP port immediately. The thread itself waits
+# 20s before starting, to let Gradio finish its own startup.
 
 
 # ============================================================================
@@ -898,43 +940,7 @@ def build_interface():
 
                 with gr.Accordion("📋 Example Variants", open=False):
                     gr.Examples(
-                        examples=[
-                            [
-                                "human",
-                                "chr17",
-                                7675088,
-                                "C",
-                                "T",
-                            ],  # TP53 R175H — Pathogenic missense, most common cancer driver mutation
-                            [
-                                "human",
-                                "chr7",
-                                117559593,
-                                "ATCT",
-                                "A",
-                            ],  # CFTR F508del — Pathogenic 3-bp deletion, ~70% of cystic fibrosis alleles
-                            [
-                                "human",
-                                "chr13",
-                                32332771,
-                                "AGAGA",
-                                "AGA",
-                            ],  # BRCA2 c.5946delT — Pathogenic frameshift, hereditary breast/ovarian cancer
-                            [
-                                "human",
-                                "chr11",
-                                5227002,
-                                "T",
-                                "A",
-                            ],  # HBB E6V (rs334) — Pathogenic missense, causes sickle cell disease
-                            [
-                                "human",
-                                "chr17",
-                                43092418,
-                                "T",
-                                "C",
-                            ],  # BRCA1 c.3113A>G (rs16941) — Benign synonymous variant
-                        ],
+                        examples=[list(v) for v in EXAMPLE_VARIANTS],
                         inputs=[
                             species_input,
                             chrom_input,
@@ -942,7 +948,7 @@ def build_interface():
                             ref_input,
                             alt_input,
                         ],
-                        label="Click to load pre-filled examples",
+                        label="Click to load pre-filled examples (predictions are pre-cached — clicks should be fast)",
                     )
 
                 gr.Markdown("---")
@@ -1197,6 +1203,13 @@ def build_interface():
 
 # Build app at module level for Gradio/Spaces auto-detection
 app = build_interface()
+
+# Kick off background warmup once the module is fully loaded. Daemon thread so
+# it dies if the main process exits; no impact on startup since it sleeps 20s
+# before doing any work.
+if _APP_READY:
+    import threading
+    threading.Thread(target=_warmup_example_cache, daemon=True).start()
 
 if __name__ == "__main__":
     app.launch()
