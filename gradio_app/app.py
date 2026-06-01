@@ -1194,10 +1194,10 @@ def build_interface():
 
                 ### Model configuration
                 - Current model: `InstaDeepAI/NTv3_650M_post`
-                - Current sequence window: **32 kb** (`CONTEXT_LEN = 32768`)
+                - Current sequence window: **16 kb** (`CONTEXT_LEN = 16384`), chosen for ~2.5x faster CPU inference. SNP scores are essentially unchanged from the 32 kb window; **indel MAGI scores shift somewhat** because the bundled baseline statistics were derived at 32 kb. Set the `NTV3_CONTEXT_LEN=32768` environment variable to restore the paper's exact 32 kb window.
                 - Region Track View zoom is capped by the available NTv3 track-profile span for the current prediction
                 - Sequence source:
-                  - **Human:** local `hg38.fa` when available, otherwise UCSC REST fallback
+                  - **Human:** local `hg38.2bit`/`hg38.fa` when available, otherwise UCSC then Ensembl REST fallback
                   - **Non-human animals:** Ensembl REST API
                   - **Plants:** Ensembl Plants REST API (with Ensembl REST fallback)
                 

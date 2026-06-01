@@ -161,7 +161,7 @@ Variants are automatically classified into:
 ## Limitations
 
 1. Predictions are computational and require experimental validation
-2. The app uses a 32 kb local sequence window and does not model long-range chromatin effects
+2. The app uses a **16 kb** local sequence window (`CONTEXT_LEN = 16384`) and does not model long-range chromatin effects. This window was chosen for ~2.5x faster CPU inference; SNP scores match the 32 kb window closely, but **indel `Global_z_sum_log` (MAGI) scores are not directly comparable** to the paper's 32 kb-derived baseline. Set the `NTV3_CONTEXT_LEN=32768` environment variable to restore the original 32 kb window.
 3. No phasing information is used
 4. Human uses GRCh38/hg38; non-human coordinates must match the selected species assembly available through Ensembl
 5. Batch processing limited to 10 variants

@@ -33,7 +33,12 @@ from transformers import AutoModel, AutoTokenizer
 # CONFIGURATION
 # ============================================================================
 MODEL_NAME = "InstaDeepAI/NTv3_650M_post"
-CONTEXT_LEN = 32 * 1024  # 32 kb sequence window
+# Sequence window. Default 16 kb — ~2.5x faster on CPU than 32 kb with
+# essentially unchanged SNP scores; indel MAGI scores shift somewhat vs the
+# 32 kb-derived baseline (see README). Override with NTV3_CONTEXT_LEN (must be
+# a multiple of 128, the model's total conv downsample factor); set 32768 to
+# match the paper's baseline exactly.
+CONTEXT_LEN = int(os.environ.get("NTV3_CONTEXT_LEN", 16 * 1024))
 USE_BED = True
 USE_BIGWIGS = True
 USE_KL_DIVERGENCE = True
