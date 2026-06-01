@@ -17,6 +17,7 @@ For HuggingFace Spaces deployment with ZeroGPU:
 
 import os
 import warnings
+from functools import lru_cache
 from pathlib import Path
 
 # Defensive monkey-patch for gradio_client schema bug: get_type() crashes with
@@ -376,6 +377,27 @@ def _validate_allele(allele: str) -> bool:
     return bool(allele) and all(c in "ACGTNacgtn" for c in allele.strip())
 
 
+@lru_cache(maxsize=256)
+def _cached_inference(species: str, chrom: str, pos: int, ref: str, alt: str):
+    """Run model + annotation + impact scoring once per unique variant tuple.
+
+    Returns the fully-prepared results DataFrame, or raises RuntimeError if the
+    upstream sequence fetch failed (those failures are NOT cached so the user
+    can retry once the API is reachable again).
+    """
+    input_df = pd.DataFrame(
+        [{"chrom": chrom, "pos": int(pos), "ref": ref, "alt": alt}]
+    )
+    df = predict_variants(input_df, device=DEVICE, species=species)
+    if "fetch_error" in df.columns:
+        err = df["fetch_error"].iloc[0]
+        if isinstance(err, str) and err:
+            raise RuntimeError(err)
+    df = _apply_species_annotations(df, species)
+    df = compute_impact_scores(df)
+    return df
+
+
 # ============================================================================
 # SINGLE VARIANT PREDICTION
 # ============================================================================
@@ -438,29 +460,23 @@ def predict_single_variant(
             ]
         )
 
-        # Run inference
+        # Run inference (cached by exact variant tuple — examples and repeat
+        # lookups return instantly)
         species = str(species).strip()
         print(f"🔬 Predicting {species} {chrom}:{pos} {ref_clean}>{alt_clean}...")
-        results_df = predict_variants(input_df, device=DEVICE, species=species)
-
-        # Surface a sequence-fetch failure clearly instead of a silent N/A row
-        if "fetch_error" in results_df.columns:
-            fetch_err = results_df["fetch_error"].iloc[0]
-            if isinstance(fetch_err, str) and fetch_err:
-                return (
-                    "❌ **Sequence retrieval failed.**\n\n"
-                    f"{fetch_err}\n\n"
-                    "This usually means the external sequence API was rate-limited or "
-                    "temporarily unreachable from the deployment environment. "
-                    "Please try again in a moment.",
-                    *_none9[1:],
-                )
-
-        # Annotate
-        results_df = _apply_species_annotations(results_df, species)
-
-        # Compute impact scores
-        results_df = compute_impact_scores(results_df)
+        try:
+            results_df = _cached_inference(
+                species, str(chrom), int(pos), ref_clean, alt_clean
+            )
+        except RuntimeError as fetch_err:
+            return (
+                "❌ **Sequence retrieval failed.**\n\n"
+                f"{fetch_err}\n\n"
+                "This usually means the external sequence API was rate-limited or "
+                "temporarily unreachable from the deployment environment. "
+                "Please try again in a moment.",
+                *_none9[1:],
+            )
 
         # Extract data
         row = results_df.iloc[0]
