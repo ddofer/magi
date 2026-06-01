@@ -195,9 +195,13 @@ def predict_single_variant_ui(species, chrom, pos, ref, alt, zoom_bp=DEFAULT_ZOO
 
     tracks_png_path = None
     try:
-        tracks_png_path = _export_figure_png(
-            region_tracks_fig, "last_variant_tracks.png"
-        )
+        # Per-variant PNG name so cached paths point to stable files
+        try:
+            png_key = _variant_cache_key(species, chrom, pos, ref, alt)
+            png_name = f"cache_{_variant_safe_name(png_key)}_tracks.png"
+        except Exception:
+            png_name = "last_variant_tracks.png"
+        tracks_png_path = _export_figure_png(region_tracks_fig, png_name)
     except Exception as exc:
         print(f"\u26a0\ufe0f  Track PNG export failed: {exc}")
 
@@ -302,12 +306,16 @@ EXAMPLE_VARIANTS = [
 
 
 def _warmup_example_cache():
-    """Pre-populate the lru_cache with the built-in examples.
+    """Pre-populate the FULL-output cache with the built-in examples.
 
-    Each example takes a few minutes on cpu-basic. We run this in a
-    background thread AFTER app.launch() so the Space can serve requests
-    immediately while the cache fills behind the scenes. Examples clicked
-    before their entry is cached just hit the cold path normally.
+    Runs `predict_single_variant` end-to-end (model + annotation + figures +
+    CSV write), so a subsequent example click returns the cached tuple in
+    ~50ms. Sequential to avoid concurrent forward passes through the same
+    PyTorch model.
+
+    Each example takes ~3-5 min on cpu-basic. We run this in a background
+    daemon thread AFTER app.launch() so the Space can serve requests
+    immediately while the cache fills.
     """
     import time
 
@@ -319,7 +327,10 @@ def _warmup_example_cache():
     for species, chrom, pos, ref, alt in EXAMPLE_VARIANTS:
         try:
             t0 = time.time()
-            _cached_inference(species, str(chrom), int(pos), ref, alt)
+            # Run the FULL pipeline; populates _FULL_OUTPUT_CACHE on success
+            predict_single_variant(
+                species, str(chrom), int(pos), ref, alt, zoom_bp=DEFAULT_ZOOM_BP
+            )
             print(f"   ✓ {chrom}:{pos} {ref}>{alt} cached in {time.time() - t0:.1f}s")
         except Exception as exc:
             print(f"   ⚠ {chrom}:{pos} {ref}>{alt} skipped: {exc}")
@@ -435,6 +446,40 @@ def _cached_inference(species: str, chrom: str, pos: int, ref: str, alt: str):
     return df
 
 
+# ----------------------------------------------------------------------------
+# Full-output cache: maps (species, chrom, pos, ref, alt) → the complete
+# return tuple of predict_single_variant() (markdown, figures, dataframes,
+# file paths, ranked list). A cache hit skips ALL post-processing —
+# matplotlib renders, table builds, CSV write — returning in ~50ms.
+#
+# Sized for the warmup set + a healthy buffer for ad-hoc lookups.
+# Errors are NOT stored, so retries still hit the cold path.
+# Keyed on the default zoom only; non-default zooms always recompute the
+# region-tracks figure to honour user intent.
+# ----------------------------------------------------------------------------
+import threading as _threading
+
+_FULL_OUTPUT_CACHE: dict = {}
+_FULL_OUTPUT_LOCK = _threading.Lock()
+_FULL_OUTPUT_MAX = 256
+
+
+def _variant_cache_key(species, chrom, pos, ref, alt):
+    return (
+        str(species).strip(),
+        str(chrom).strip(),
+        int(pos),
+        str(ref).upper().strip(),
+        str(alt).upper().strip(),
+    )
+
+
+def _variant_safe_name(key) -> str:
+    raw = "_".join(str(p) for p in key)
+    safe = "".join(c if c.isalnum() or c in "._-" else "_" for c in raw)
+    return safe[:80]
+
+
 # Example pre-warming is kicked off as a background thread in __main__ below,
 # so app.launch() can bind the HTTP port immediately. The thread itself waits
 # 20s before starting, to let Gradio finish its own startup.
@@ -489,6 +534,20 @@ def predict_single_variant(
                 f"❌ Error: ALT allele '{alt}' contains invalid characters. Use A/C/G/T/N only.",
                 *_none9[1:],
             )
+
+        # Full-output cache lookup. Only valid for default zoom; other zooms
+        # always recompute the region-tracks figure.
+        cache_key = _variant_cache_key(species, chrom, pos, ref_clean, alt_clean)
+        use_full_cache = int(zoom_bp) == DEFAULT_ZOOM_BP
+        if use_full_cache:
+            with _FULL_OUTPUT_LOCK:
+                cached = _FULL_OUTPUT_CACHE.get(cache_key)
+            if cached is not None:
+                print(
+                    f"⚡ Full-output cache HIT: {species} {chrom}:{pos} "
+                    f"{ref_clean}>{alt_clean}"
+                )
+                return cached
 
         # Create input DataFrame
         input_df = pd.DataFrame(
@@ -701,9 +760,10 @@ These metrics summarize how the NTv3 model responds to the alternate sequence re
 - Mean per-position dist: {_fmt(emb_mean)}
 """
 
-        # === 4. CSV Export ===
+        # === 4. CSV Export (per-variant filename so cached paths remain valid) ===
         try:
-            result_csv_path = str(BASE_DIR / "last_variant_result.csv")
+            csv_name = f"cache_{_variant_safe_name(cache_key)}_result.csv"
+            result_csv_path = str(BASE_DIR / csv_name)
             results_df.to_csv(result_csv_path, index=False)
         except Exception as e:
             print(f"⚠️  CSV export failed: {e}")
@@ -720,7 +780,7 @@ These metrics summarize how the NTv3 model responds to the alternate sequence re
             print(f"⚠️  Region tracks plot failed: {e}")
             region_tracks_fig = None
 
-        return (
+        result = (
             summary_md,
             interpretation_md,
             top_table_df,
@@ -731,6 +791,16 @@ These metrics summarize how the NTv3 model responds to the alternate sequence re
             mlm_md,
             ranked,  # stashed for slider re-renders
         )
+
+        # Store in full-output cache only for default zoom (other zooms recompute)
+        if use_full_cache:
+            with _FULL_OUTPUT_LOCK:
+                if len(_FULL_OUTPUT_CACHE) >= _FULL_OUTPUT_MAX:
+                    # FIFO eviction: dict preserves insertion order in py3.7+
+                    _FULL_OUTPUT_CACHE.pop(next(iter(_FULL_OUTPUT_CACHE)))
+                _FULL_OUTPUT_CACHE[cache_key] = result
+
+        return result
 
     except Exception as e:
         import traceback
