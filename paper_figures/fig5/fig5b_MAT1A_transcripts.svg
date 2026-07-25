@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1452.0" height="194.0" viewBox="148.0 0 1452.0 194.0">
+<defs><style type="text/css">
+poly { stroke-linecap: round }
+line, rect, poly { stroke-width: 0.5; }
+text { font-family:Helvetica, Arial, sans-serif;font-size:6pt;font-weight:normal;text-align:left;fill:black; }
+.az { fill:rgb(99,99,99);opacity:1;stroke:none; }
+.ak { fill:rgb(54,142,201);opacity:1;stroke:none; }
+.ay { stroke:none;opacity:1;fill:rgb(112,128,144); }
+.bw { fill:rgb(139,137,137);opacity:1;stroke:none; }
+.bi { fill:rgb(255,105,180);opacity:1;stroke:none; }
+.bx { fill:rgb(165,162,162);opacity:1;stroke:none; }
+.br { fill:rgb(238,0,0);opacity:1;stroke:none; }
+.bu { fill:rgb(122,103,238);opacity:1;stroke:none; }
+.ca { fill:rgb(225,222,222);opacity:1;stroke:none; }
+.ai { stroke:none;opacity:1;fill:rgb(139,99,108); }
+.al { stroke:none;opacity:1;fill:rgb(255,255,255); }
+.av { fill:rgb(205,155,29);opacity:1;stroke:none; }
+.bj { fill:rgb(165,42,42);opacity:1;stroke:none; }
+.bt { fill:rgb(97,82,241);opacity:1;stroke:none; }
+.bd { fill:rgb(255,215,0);opacity:1;stroke:none; }
+.ap { stroke:none;opacity:1;fill:rgb(100,0,0); }
+.bg { fill:rgb(148,0,211);opacity:1;stroke:none; }
+.aa { fill:none;stroke:rgb(229,229,229); }
+.ar { fill:none;stroke:rgb(0,0,255);opacity:1; }
+.bs { fill:rgb(48,41,248);opacity:1;stroke:none; }
+.bz { fill:rgb(205,201,201);opacity:1;stroke:none; }
+.aq { fill:none;stroke:rgb(0,0,255); }
+.aw { fill:none;stroke:rgb(205,155,29);opacity:1; }
+.aj { fill:rgb(127,127,127);opacity:1;stroke:none; }
+.ah { fill:rgb(139,99,108);opacity:1;stroke:none; }
+.ag { stroke:none;opacity:1;fill:rgb(0,0,0); }
+.bo { fill:rgb(0,77,64);opacity:1;stroke:none; }
+.bp { stroke:none;opacity:1;fill:rgb(255,0,0); }
+.bm { fill:rgb(250,202,0);opacity:1;stroke:none; }
+.bh { fill:rgb(255,88,26);opacity:1;stroke:none; }
+.be { fill:rgb(255,127,80);opacity:1;stroke:none; }
+.bv { fill:rgb(175,163,244);opacity:1;stroke:none; }
+.an { fill:rgb(160,0,0);opacity:1;stroke:none; }
+.au { fill:none;stroke:rgb(205,155,29); }
+.am { fill:none;stroke:rgb(160,0,0); }
+.bf { fill:rgb(2,89,156);opacity:1;stroke:none; }
+.as { fill:rgb(0,0,255);opacity:1;stroke:none; }
+.ae { fill:rgb(255,255,255);opacity:1;stroke:rgb(0,0,0); }
+.af { fill:rgb(0,0,0);opacity:1;stroke:none; }
+.ao { fill:none;stroke:rgb(160,0,0);opacity:1; }
+.by { fill:rgb(191,188,188);opacity:1;stroke:none; }
+.at { stroke:none;opacity:1;fill:rgb(0,0,255); }
+.bk { fill:rgb(69,139,0);opacity:1;stroke:none; }
+.bq { fill:rgb(255,255,255);opacity:1;stroke:none; }
+.bb { fill:rgb(255,0,0);opacity:1;stroke:none; }
+.ac { fill:none;stroke:none; }
+.ab { fill:none;stroke:rgb(204,204,204); }
+.bl { fill:rgb(134,1,175);opacity:1;stroke:none; }
+.ad { fill:rgb(0,0,0);opacity:1;stroke:rgb(0,0,0); }
+.bc { fill:rgb(118,238,0);opacity:1;stroke:none; }
+.ba { fill:rgb(122,197,205);opacity:1;stroke:none; }
+.ax { stroke:none;opacity:1;fill:rgb(164,94,3); }
+.bn { fill:rgb(255,105,105);opacity:1;stroke:none; }
+</style></defs>
+<rect x="0" y="0" width="1610" height="194.0" fill="rgb(255,255,255)" stroke="none"/>
+<rect x="520.713" y="0" width="1.000" height="194.0" class="aa" />
+<rect x="875.802" y="0" width="1.000" height="194.0" class="aa" />
+<rect x="1408.436" y="0" width="1.000" height="194.0" class="ab" />
+<rect x="1230.892" y="0" width="1.000" height="194.0" class="aa" />
+<rect x="1585.981" y="0" width="1.000" height="194.0" class="aa" />
+<rect x="698.258" y="0" width="1.000" height="194.0" class="ab" />
+<rect x="165.624" y="0" width="1.000" height="194.0" class="aa" />
+<rect x="1053.347" y="0" width="1.000" height="194.0" class="ab" />
+<rect x="343.169" y="0" width="1.000" height="194.0" class="ab" />
+<rect x="150.000" y="0" width="1.000" height="194.0" class="ab" />
+<g id="MAT1A-205" transform="translate(0,-99.000)">
+<rect x="150.000" y="105.000" width="1446.000" height="1.000" class="aj" />
+<rect x="150.000" y="107.000" width="285.213" height="9.000" class="am" />
+<rect x="434.142" y="107.000" width="8.315" height="9.000" class="an" />
+<path d="M441.457217280189,111 l22.5836732687866,4 l22.5836732687866,-4" class="ao" />
+<rect x="486.625" y="107.000" width="10.516" height="9.000" class="an" />
+<path d="M496.140954440458,111 l12.8897380449206,4 l12.8897380449206,-4" class="ao" />
+<rect x="521.920" y="107.000" width="13.996" height="9.000" class="an" />
+<path d="M534.916695335922,111 l41.7584901951148,4 l41.7584901951148,-4" class="ao" />
+<rect x="618.434" y="107.000" width="11.227" height="9.000" class="an" />
+<path d="M628.660244753526,111 l129.714085614587,4 l129.714085614587,-4" class="ao" />
+<rect x="888.088" y="107.000" width="11.227" height="9.000" class="an" />
+<path d="M898.314985010075,111 l12.8897380449206,4 l12.8897380449206,-4" class="ao" />
+<rect x="924.094" y="107.000" width="9.025" height="9.000" class="an" />
+<path d="M932.119477072787,111 l110.894357890598,4 l110.894357890598,-4" class="ao" />
+<rect x="1153.908" y="107.000" width="9.735" height="9.000" class="an" />
+<path d="M1162.64338723153,111 l52.3046395045953,4 l52.3046395045953,-4" class="ao" />
+<rect x="1267.253" y="107.000" width="6.539" height="9.000" class="an" />
+<path d="M1272.79205779722,111 l132.909888435642,4 l132.909888435642,-4" class="ao" />
+<rect x="1538.612" y="107.000" width="7.392" height="9.000" class="an" />
+<rect x="1544.932" y="107.000" width="19.252" height="9.000" class="am" />
+<path d="M1563.18400747039,111 l15.1978178601268,4 l15.1978178601268,-4" class="ao" />
+<rect x="1593.580" y="107.000" width="2.420" height="9.000" class="am" />
+<text x="150" y="121.000" text-size="100%" class="ap">&lt; MAT1A-205 - ENST00000871619</text>
+<text x="150" y="134.000" text-size="100%" class="ap">protein coding</text>
+<text x="15" y="114" text-size="100%" class="ag">Genes (Comprehensive </text>
+<text x="15" y="127" text-size="100%" class="ag">set from GENCODE 50)</text>
+</g>
+<g id="MAT1A-208" transform="translate(0,-319.000)">
+<rect x="294.805" y="371.000" width="140.408" height="9.000" class="am" />
+<rect x="434.142" y="371.000" width="8.315" height="9.000" class="an" />
+<path d="M441.457217280189,375 l22.5836732687866,4 l22.5836732687866,-4" class="ao" />
+<rect x="486.625" y="371.000" width="10.516" height="9.000" class="an" />
+<path d="M496.140954440458,375 l12.8897380449206,4 l12.8897380449206,-4" class="ao" />
+<rect x="521.920" y="371.000" width="13.996" height="9.000" class="an" />
+<path d="M534.916695335922,375 l41.7584901951148,4 l41.7584901951148,-4" class="ao" />
+<rect x="618.434" y="371.000" width="11.227" height="9.000" class="an" />
+<path d="M628.660244753526,375 l129.714085614587,4 l129.714085614587,-4" class="ao" />
+<rect x="888.088" y="371.000" width="11.227" height="9.000" class="an" />
+<path d="M898.314985010075,375 l12.8897380449206,4 l12.8897380449206,-4" class="ao" />
+<rect x="924.094" y="371.000" width="9.025" height="9.000" class="an" />
+<path d="M932.119477072787,375 l167.566594583968,4 l167.566594583968,-4" class="ao" />
+<rect x="1267.253" y="371.000" width="6.539" height="9.000" class="an" />
+<path d="M1272.79205779722,375 l132.909888435642,4 l132.909888435642,-4" class="ao" />
+<rect x="1538.612" y="371.000" width="7.392" height="9.000" class="an" />
+<rect x="1544.932" y="371.000" width="50.286" height="9.000" class="am" />
+<text x="294.805376714012" y="385.000" text-size="100%" class="ap">&lt; MAT1A-208 - ENST00000871622</text>
+<text x="294.805376714012" y="398.000" text-size="100%" class="ap">protein coding</text>
+</g>
+<g id="MAT1A-207" transform="translate(0,-319.000)">
+<rect x="294.805" y="415.000" width="140.408" height="9.000" class="am" />
+<rect x="434.142" y="415.000" width="8.315" height="9.000" class="an" />
+<path d="M441.457217280189,419 l22.5836732687866,4 l22.5836732687866,-4" class="ao" />
+<rect x="486.625" y="415.000" width="5.829" height="9.000" class="an" />
+<path d="M491.453776969578,419 l15.2333267803607,4 l15.2333267803607,-4" class="ao" />
+<rect x="521.920" y="415.000" width="13.996" height="9.000" class="an" />
+<path d="M534.916695335922,419 l41.7584901951148,4 l41.7584901951148,-4" class="ao" />
+<rect x="618.434" y="415.000" width="16.553" height="9.000" class="an" />
+<path d="M633.986582788618,419 l127.050916597041,4 l127.050916597041,-4" class="ao" />
+<rect x="888.088" y="415.000" width="11.227" height="9.000" class="an" />
+<path d="M898.314985010075,419 l12.8897380449206,4 l12.8897380449206,-4" class="ao" />
+<rect x="924.094" y="415.000" width="9.025" height="9.000" class="an" />
+<path d="M932.119477072787,419 l110.894357890598,4 l110.894357890598,-4" class="ao" />
+<rect x="1153.908" y="415.000" width="9.735" height="9.000" class="an" />
+<path d="M1162.64338723153,419 l52.3046395045953,4 l52.3046395045953,-4" class="ao" />
+<rect x="1267.253" y="415.000" width="6.539" height="9.000" class="an" />
+<path d="M1272.79205779722,419 l132.909888435642,4 l132.909888435642,-4" class="ao" />
+<rect x="1538.612" y="415.000" width="7.392" height="9.000" class="an" />
+<rect x="1544.932" y="415.000" width="50.286" height="9.000" class="am" />
+<text x="294.805376714012" y="429.000" text-size="100%" class="ap">&lt; MAT1A-207 - ENST00000871621</text>
+<text x="294.805376714012" y="442.000" text-size="100%" class="ap">protein coding</text>
+</g>
+<g id="MAT1A-201" transform="translate(0,-363.000)">
+<rect x="294.876" y="503.000" width="140.337" height="9.000" class="au" />
+<rect x="434.142" y="503.000" width="8.315" height="9.000" class="av" />
+<path d="M441.457217280189,507 l22.5836732687866,4 l22.5836732687866,-4" class="aw" />
+<rect x="486.625" y="503.000" width="10.516" height="9.000" class="av" />
+<path d="M496.140954440458,507 l12.8897380449206,4 l12.8897380449206,-4" class="aw" />
+<rect x="521.920" y="503.000" width="13.996" height="9.000" class="av" />
+<path d="M534.916695335922,507 l41.7584901951148,4 l41.7584901951148,-4" class="aw" />
+<rect x="618.434" y="503.000" width="16.553" height="9.000" class="av" />
+<path d="M633.986582788618,507 l127.050916597041,4 l127.050916597041,-4" class="aw" />
+<rect x="888.088" y="503.000" width="11.227" height="9.000" class="av" />
+<path d="M898.314985010075,507 l12.8897380449206,4 l12.8897380449206,-4" class="aw" />
+<rect x="924.094" y="503.000" width="9.025" height="9.000" class="av" />
+<path d="M932.119477072787,507 l110.894357890598,4 l110.894357890598,-4" class="aw" />
+<rect x="1153.908" y="503.000" width="9.735" height="9.000" class="av" />
+<path d="M1162.64338723153,507 l52.3046395045953,4 l52.3046395045953,-4" class="aw" />
+<rect x="1267.253" y="503.000" width="6.539" height="9.000" class="av" />
+<path d="M1272.79205779722,507 l132.909888435642,4 l132.909888435642,-4" class="aw" />
+<rect x="1538.612" y="503.000" width="7.392" height="9.000" class="av" />
+<rect x="1544.932" y="503.000" width="17.831" height="9.000" class="au" />
+<text x="294.87639455448" y="517.000" text-size="100%" class="ax">&lt; MAT1A-201 - ENST00000372213</text>
+<text x="294.87639455448" y="530.000" text-size="100%" class="ax">protein coding</text>
+</g>
+</svg>

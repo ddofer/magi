@@ -1,0 +1,20 @@
+Validation of regenerated Figure 6c (ALOX15B rs9895916) against the published panel
+reference: /mnt/d/Research/NT_genomics/MAGI/analyses/paper_case_studies/alox15b_rs9895916/ranked_tracks.csv
+context window: 32768 bp
+
+  #  track (published panel)                              Δ pub     Δ new   |Δdiff|  ok
+  0  intron                                              0.4238    0.4277    0.0039  OK
+  1  exon                                               -0.4082   -0.4121    0.0039  OK
+  2  ORF                                                -0.3984   -0.3984    0.0000  OK
+  3  blood vessel | RNA-seq [1]                         -0.3477   -0.3398    0.0078  OK
+  4  colon | RNA-seq                                    -0.3477   -0.3438    0.0039  OK
+  5  small intestine | RNA-seq [1]                      -0.3398   -0.3359    0.0039  OK
+  6  adrenal gland | RNA-seq [1]                        -0.3242   -0.3203    0.0039  OK
+  7  adrenal gland | RNA-seq [2]                        -0.3164   -0.3203    0.0039  OK
+  8  small intestine | RNA-seq [2]                      -0.3164   -0.3125    0.0039  OK
+  9  Always-on exon                                     -0.3115   -0.3115    0.0000  OK
+
+  track set identical: True
+  max |Δ difference| over the 10 rendered tracks: 0.0078
+
+RESULT: MATCH

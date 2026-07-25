@@ -1,0 +1,20 @@
+Validation of regenerated Figure 5d (MAT1A p.Gly336Arg) against the published panel
+reference: /mnt/d/Research/NT_genomics/MAGI/analyses/paper_case_studies/mat1a_gly336arg/ranked_tracks.csv
+context window: 32768 bp
+
+  #  track (published panel)                              Δ pub     Δ new   |Δdiff|  ok
+  0  exon                                               -0.5664   -0.5645    0.0020  OK
+  1  ORF                                                -0.5371   -0.5371    0.0000  OK
+  2  intron                                              0.4570    0.4570    0.0000  OK
+  3  Always-on exon                                     -0.4346   -0.4375    0.0029  OK
+  4  breast carcinoma cell line | CAGE                   0.1797    0.1719    0.0078  OK
+  5  merkel cell carcinoma cell line | CAGE              0.1797    0.1680    0.0117  OK
+  6  Small Airway Epithelial Cells | CAGE                0.1758    0.1641    0.0117  OK
+  7  lung adenocarcinoma, papillary cell line | CAG      0.1562    0.1484    0.0078  OK
+  8  testis, adult, pool1 | CAGE                         0.1562    0.1484    0.0078  OK
+  9  Protein-coding gene                                -0.1523   -0.1562    0.0039  OK
+
+  track set identical: True
+  max |Δ difference| over the 10 rendered tracks: 0.0117
+
+RESULT: MATCH
