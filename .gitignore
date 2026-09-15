@@ -10,6 +10,7 @@ paper_figures/_reference_current/
 analyses/paper_case_studies/review.md
 analyses/paper_case_studies/review.csv
 analyses/paper_case_studies/rubber_duck_review.md
+analyses/stav-llm_evaluation_results.csv
 *.gdoc
 
 # Large reference genomes & FASTAs
