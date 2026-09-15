@@ -6,7 +6,6 @@
 - Supplementary region composite: analyses/paper_case_studies/figure_case_studies_region_tracks.png
 - Panel manifest: analyses/paper_case_studies/manuscript_panel_manifest.csv
 - Results text: analyses/paper_case_studies/manuscript_case_text.md
-- Review memo: analyses/paper_case_studies/rubber_duck_review.md
 
 ## Main Figure Caption
 

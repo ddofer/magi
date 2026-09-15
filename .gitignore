@@ -1,3 +1,17 @@
+# Private manuscript-revision material (shared with co-authors, not public)
+rebuttal/
+CONTEXT.md
+docs/
+NAR_MAGI_Proof.PDF
+paper_figures/FINDINGS_FOR_AUTHORS.md
+paper_figures/RESOLUTION_AUDIT.md
+paper_figures/_validation/
+paper_figures/_reference_current/
+analyses/paper_case_studies/review.md
+analyses/paper_case_studies/review.csv
+analyses/paper_case_studies/rubber_duck_review.md
+*.gdoc
+
 # Large reference genomes & FASTAs
 hg38.fa
 hg38.fa.gz

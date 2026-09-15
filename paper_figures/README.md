@@ -36,18 +36,7 @@ routinely reject.
 versions were produced with `NTv3_100M_post` at 2 kb context from a results file that no
 longer exists; everything else in the paper uses `NTv3_650M_post` at 32–64 kb. What is in
 `fig2/` is the same analysis code on the current 650M data, so bar heights differ by a
-median factor of ~1.4×. See `FINDINGS_FOR_AUTHORS.md` §1 and `fig2/fig2de_VALIDATION.md`.
-
-Read next:
-
-- **`FINDINGS_FOR_AUTHORS.md`** — nine things found along the way that need your
-  decision, including two factual errors in the current figures (Fig 5b "385 aa" should
-  be 395 aa; Fig 7a "363 aa" should be 362 aa) and a typo ("Trsnscript strsnd").
-- `_validation/` — current vs regenerated shown side by side at matched on-page size,
-  plus the numeric write-ups.
-- `RESOLUTION_AUDIT.md` — measured effective DPI of every figure in the manuscript.
-- `_reference_current/` — the panels as they exist in the paper today, extracted from the
-  PPTX at native resolution. Reference only; not deliverables.
+median factor of ~1.4×. See `fig2/fig2de_VALIDATION.md`.
 
 ---
 

@@ -180,11 +180,6 @@ Use `_print90mm` if the panel keeps its current footprint.
    6b and 6d have no regenerable source and stay at their current resolution.
 3. **Composite from the PPTX, not the DOCX** — the DOCX stores Figures 7 and 8 as
    lower-resolution flattened copies.
-4. **Read `FINDINGS_FOR_AUTHORS.md`** before finalising. It lists two factual errors in
-   the current figures (Fig 5b "385 aa" should be **395 aa**; Fig 7a row 12 "363 aa"
-   should be **362 aa**), a typo ("Trsnscript strsnd"), a transcript-count mismatch in
-   Fig 7a (16 shown vs 17 in the text), and a duplicated + inaccurate sentence in the
-   Fig 2 caption.
 
 ## Troubleshooting
 
