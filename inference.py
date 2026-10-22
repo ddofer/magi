@@ -19,6 +19,11 @@ Outputs
       MLM_KL_mean, MLM_KL_max (KL(alt || ref) across window)
       MLM_logprob_ref/alt/delta (sequence log-prob around variant)
   - Embedding features (optional): EMB_* distances from the final embedding
+  - LFC_*: log2 fold change of the raw BigWig signal (before MAGI's sigmoid) over the selected
+    tracks: LFC_max_abs, LFC_mean_abs, LFC_top_track, LFC_max_abs_<assay group> (lfc_summary)
+  - WIN_<element>_gain/loss(_pos): largest Alt-Ref rise (>= 0) / drop (<= 0) in the softmax
+    probability of splice donor, splice acceptor, start and stop codon within WIN_LETTERS of the
+    variant, and its offset in reference letters (NaN when there is no rise / drop)
   - Metadata: indel_size plus any extra input columns (+ window_offset with SHARE_WINDOWS)
   - Variants whose sequence cannot be fetched keep their row, with NaN features
 
@@ -139,6 +144,9 @@ USE_EMBEDDINGS = False  # distances between ref/alt final embeddings around the 
 MLM_WINDOW = (
     4  # positions each side for embedding window only (KL uses variant_span, not this).
 )
+WIN_LETTERS = 50  # WIN_ columns: annotation elements read this many letters each side of the variant
+WIN_ELEMENTS = ("splice_donor", "splice_acceptor", "start_codon", "stop_codon")
+LFC_PSEUDOCOUNT = 1.0  # LFC_ columns: log2(signal + 1) as in Borzoi's logSED; damps near-zero signal
 SHARE_WINDOWS = False  # nearby variants share one reference pass (see run_inference)
 COMPILE = False  # torch.compile the whole model (~1.5x after a ~1 min compile; README)
 CHUNK_ROWS = 1024  # variants per checkpointed part (main writes OUTPUT_RESULTS_FILE.parts/)
@@ -207,6 +215,9 @@ def get_genomic_sequence(genome, chrom, pos, ref, alt, context_len=1024):
     return ref_seq[:target_len], alt_seq[:target_len], center
 
 
+KEY_MARKS = ("H3K4me3", "H3K27ac", "H3K36me3", "H3K27me3", "H3K9me3", "H3K4me1", "H3K9ac")
+
+
 def get_track_indices(bigwig_names, metadata_file=None):
     """Filter BigWig tracks to a meaningful subset (<4k) via metadata."""
     if not metadata_file or not os.path.exists(metadata_file):
@@ -217,15 +228,6 @@ def get_track_indices(bigwig_names, metadata_file=None):
     print(f"📂 Loaded metadata: {len(metadata)} tracks")
     metadata_lookup = metadata.drop_duplicates("file_id").set_index("file_id").to_dict("index")
 
-    key_marks = {
-        "H3K4me3",
-        "H3K27ac",
-        "H3K36me3",
-        "H3K27me3",
-        "H3K9me3",
-        "H3K4me1",
-        "H3K9ac",
-    }
     sel_idx, sel_names = [], []
 
     for i, tid in enumerate(bigwig_names):
@@ -239,7 +241,7 @@ def get_track_indices(bigwig_names, metadata_file=None):
         keep = (
             (
                 "ChIP" in assay
-                and any(m in target for m in key_marks)
+                and any(m in target for m in KEY_MARKS)
                 and dataset in ("encode_v3", "geo")
             )
             or (("ATAC" in assay or "DNase" in assay) and dataset == "encode_v3")
@@ -253,6 +255,57 @@ def get_track_indices(bigwig_names, metadata_file=None):
 
     print(f"📊 Tracks: {len(sel_idx)}/{len(bigwig_names)} selected")
     return sel_idx, sel_names
+
+
+def track_groups(track_ids, metadata_file):
+    """Assay group -> positions in track_ids: each KEY_MARKS histone mark, DNase, ATAC, CAGE, RNA.
+
+    Empty groups are left out; {} without metadata.
+    """
+    if not metadata_file or not os.path.exists(metadata_file):
+        return {}
+    meta = pd.read_csv(metadata_file).drop_duplicates("file_id").set_index("file_id")
+    groups = {}
+    for i, tid in enumerate(track_ids):
+        if tid not in meta.index:
+            continue
+        assay, target = str(meta.at[tid, "assay"]), str(meta.at[tid, "experiment_target"])
+        g = target if "ChIP" in assay and target in KEY_MARKS else next(
+            (a for a in ("DNase", "ATAC", "CAGE", "RNA") if a in assay), None
+        )
+        if g:
+            groups.setdefault(g, []).append(i)
+    return groups
+
+
+def log2_fold_change(ref, alt):
+    """Per-track log2 fold change of raw BigWig signal (softplus head output, >= 0)."""
+    return np.log2(alt + LFC_PSEUDOCOUNT) - np.log2(ref + LFC_PSEUDOCOUNT)
+
+
+def _signed_max_abs(m):
+    """Per row: the value with the largest |value| (sign kept) and its column; NaN entries skipped."""
+    a = np.where(np.isnan(m), -1, np.abs(m))
+    i = a.argmax(1)
+    return np.where(a.max(1) >= 0, m[np.arange(len(m)), i], np.nan), i
+
+
+def lfc_summary(lfc, track_ids, groups):
+    """LFC_ columns from a [rows, tracks] log2_fold_change matrix (NaN tracks skipped).
+
+    LFC_max_abs: the lfc with the largest |lfc|, signed; LFC_top_track: its track;
+    LFC_mean_abs: mean |lfc|; LFC_max_abs_<group>: LFC_max_abs within each track_groups group.
+    """
+    top, i = _signed_max_abs(lfc)
+    n = (~np.isnan(lfc)).sum(1)
+    out = {
+        "LFC_max_abs": top,
+        "LFC_mean_abs": np.nansum(np.abs(lfc), 1) / np.where(n > 0, n, np.nan),
+        "LFC_top_track": np.where(np.isnan(top), None, np.asarray(track_ids, object)[i]),
+    }
+    for g, idx in groups.items():
+        out[f"LFC_max_abs_{g}"] = _signed_max_abs(lfc[:, idx])[0]
+    return out
 
 
 def clean_data(df, require_valid_pos=False):
@@ -498,10 +551,23 @@ def _variant_pairs(rows, genome, context_len, share_windows, max_span):
         yield g[:context_len], pairs
 
 
+def _win_offsets(ref, alt, allele):
+    """WIN_ letters of one allele, as offsets from the variant letter.
+
+    The WIN_LETTERS letters before the variant; the variant letters only when ref and alt have the
+    same length (SNV, MNV); then WIN_LETTERS letters after the allele. Ref and alt reads line up
+    entry by entry, and _win_offsets(ref, alt, ref) gives the offsets in reference letters.
+    """
+    m = len(allele) if len(ref) == len(alt) else 0
+    j = np.arange(2 * WIN_LETTERS + m)
+    return np.where(j < WIN_LETTERS + m, j - WIN_LETTERS, len(allele) + j - WIN_LETTERS - m)
+
+
 def _score_rows(rows, model, ntm, lut, pad_id, cfg):
     """Forward passes and features for a list of row dicts (sorted by locus).
 
-    Returns (track REF matrix, track delta matrix, MLM feature dicts, variant letter per row).
+    Returns (track REF matrix, track delta matrix, MLM feature dicts, variant letter per row,
+    LFC_ / WIN_ columns).
     """
     c, L = cfg, cfg["context_len"]
     track_len = int(L * model.config.keep_target_center_fraction)
@@ -523,7 +589,7 @@ def _score_rows(rows, model, ntm, lut, pad_id, cfg):
         sp = torch.tensor([sid for (_, sid), _ in fill], device=c["device"])
         with torch.inference_mode():
             logits, emb = forward_trunk(model, ids, sp)
-            track_rows, track_reads = [], []
+            track_rows, track_reads, win_rows, win_reads = [], [], [], []
             for b, ((seq, _), seq_reads) in enumerate(batch):
                 for k, role, vc in seq_reads:
                     span = max(1, len(rows[k]["ref"]), len(rows[k]["alt"]))
@@ -538,20 +604,38 @@ def _score_rows(rows, model, ntm, lut, pad_id, cfg):
                     if 0 <= vc - track_start < track_len:  # tracks: mean over the span, clipped to the output
                         track_rows.append(emb[b, vc : min(vc + span, track_start + track_len)])
                         track_reads.append(read)
+                        if c["win_el"]:  # window letters inside the track output
+                            p = vc + _win_offsets(rows[k]["ref"], rows[k]["alt"], rows[k][role])
+                            read["win_ok"] = (p >= track_start) & (p < min(track_start + track_len, len(seq)))
+                            win_rows.append(emb[b, torch.as_tensor(p[read["win_ok"]], device=emb.device)])
+                            win_reads.append(read)
                     reads[k][role] = read
             heads = [h for h in (c["bed_head"], c["bw_head"]) if h is not None]
             if track_rows and heads:
                 x, n = torch.cat(track_rows), [len(t) for t in track_rows]
-                out = [to_track_probabilities(h(x)) for h in heads]
+                raw = [h(x) for h in heads]
+                out = [to_track_probabilities(r) for r in raw]
                 if c["bw_head"] is not None:
                     out[-1] = out[-1][:, c["bw_sel"]]
+                    bw_raw = torch.stack([m.mean(0) for m in raw[-1][:, c["bw_sel"]].split(n)]).cpu()
+                    for read, m in zip(track_reads, bw_raw):
+                        read["bw_raw"] = m  # softplus signal, for LFC_
                 means = torch.stack([m.mean(0) for m in torch.cat(out, -1).split(n)]).cpu()
                 for read, m in zip(track_reads, means):
                     read["tracks"] = m
+            if win_rows:  # its own head call, so the track values above stay as they were
+                # standard probability (softmax over the 2 classes), not MAGI's sigmoid (AGENTS.md)
+                w = c["bed_head"](torch.cat(win_rows))[:, c["win_el"]].softmax(-1)[..., 1].cpu().numpy()
+                for read, part in zip(win_reads, np.split(w, np.cumsum([r["win_ok"].sum() for r in win_reads])[:-1])):
+                    read["win"] = np.full((len(read["win_ok"]), w.shape[1]), np.nan)
+                    read["win"][read["win_ok"]] = part
 
     tr_ref = np.full((len(rows), c["n_tracks"]), np.nan)
     tr_d = np.full((len(rows), c["n_tracks"]), np.nan)
     mlm, vcs = [], np.full(len(rows), np.nan)
+    n_bw = len(c["bw_ids"])
+    bw_ref, bw_alt = np.full((len(rows), n_bw), np.nan), np.full((len(rows), n_bw), np.nan)
+    win = np.full((len(rows), len(c["win_el"]), 4), np.nan)
     for k, row in enumerate(rows):
         if "ref" not in reads[k]:
             mlm.append({})
@@ -561,12 +645,25 @@ def _score_rows(rows, model, ntm, lut, pad_id, cfg):
         if c["n_tracks"] and "tracks" in ref and "tracks" in alt:
             tr_ref[k] = ref["tracks"].numpy()
             tr_d[k] = (alt["tracks"] - ref["tracks"]).numpy()
+        if n_bw and "bw_raw" in ref and "bw_raw" in alt:
+            bw_ref[k], bw_alt[k] = ref["bw_raw"].numpy(), alt["bw_raw"].numpy()
+        if "win" in ref and "win" in alt:
+            d = alt["win"] - ref["win"]  # NaN where a letter falls outside the track output
+            if not np.isnan(d).all():
+                g, lo, e = np.nanargmax(d, 0), np.nanargmin(d, 0), np.arange(d.shape[1])
+                off = _win_offsets(row["ref"], row["alt"], row["ref"])
+                gain, loss = np.maximum(d[g, e], 0), np.minimum(d[lo, e], 0)
+                win[k] = np.stack([gain, loss, np.where(gain > 0, off[g], np.nan), np.where(loss < 0, off[lo], np.nan)], 1)
         mlm.append(
             compute_mlm_features(
                 ref, alt, row["ref"], row["alt"], ntm, use_kl=c["use_kl"], use_embeddings=c["use_embeddings"]
             )
         )
-    return tr_ref, tr_d, mlm, vcs
+    extra = lfc_summary(log2_fold_change(bw_ref, bw_alt), c["bw_ids"], c["lfc_groups"]) if n_bw else {}
+    for e, el in enumerate(c["win_names"]):
+        for s, kind in enumerate(("gain", "loss", "gain_pos", "loss_pos")):
+            extra[f"WIN_{el}_{kind}"] = win[:, e, s]
+    return tr_ref, tr_d, mlm, vcs, extra
 
 
 def run_inference(
@@ -591,6 +688,7 @@ def run_inference(
     share_windows=None,
     parts_dir=None,
     chunk_rows=None,
+    lfc_groups=None,
 ):
     """
     Run inference on any variant DataFrame and compute deltas. Output rows follow df's order.
@@ -603,6 +701,7 @@ def run_inference(
              features move slightly, so never mix the two modes in one cohort). Adds `window_offset`.
     parts_dir: write each chunk of `chunk_rows` variants there and skip chunks already written,
              so a preempted run resumes; a run with other variants or settings refuses them.
+    lfc_groups: track_groups() of the selected tracks, for the LFC_max_abs_<group> columns.
     """
     use_bed = USE_BED if use_bed is None else use_bed
     use_bigwigs = USE_BIGWIGS if use_bigwigs is None else use_bigwigs
@@ -615,7 +714,9 @@ def run_inference(
         raise ValueError("species='auto' has no BigWig tracks (each species has its own head); pass use_bigwigs=False")
     bed_head = model.core.bed_head if use_bed and bed_names else None
     names = [f"BED_{nm}" for nm in (bed_names if bed_head is not None else [])]
-    names += [f"BW_{bigwig_names[gi]}" for gi in (selected_bw_indices if bw_head is not None else [])]
+    bw_ids = [bigwig_names[gi] for gi in (selected_bw_indices if bw_head is not None else [])]
+    names += [f"BW_{t}" for t in bw_ids]
+    win_names = [e for e in WIN_ELEMENTS if e in (bed_names if bed_head is not None else [])]
     cfg = dict(
         genome=genome,
         device=device,
@@ -629,6 +730,10 @@ def run_inference(
         bw_head=bw_head,
         bw_sel=torch.as_tensor(selected_bw_indices, dtype=torch.long, device=device),
         n_tracks=len(names),
+        bw_ids=bw_ids,
+        lfc_groups=lfc_groups or {},
+        win_names=win_names,
+        win_el=[bed_names.index(e) for e in win_names],
     )
     context_len, share_windows = cfg["context_len"], cfg["share_windows"]
     lut = build_token_lut(tokenizer)
@@ -657,7 +762,7 @@ def run_inference(
         variants = pd.util.hash_pandas_object(df[["chrom", "pos", "ref", "alt"]].astype(str), index=False)
         manifest = dict(
             variants=hashlib.sha1(variants.to_numpy().tobytes()).hexdigest(),
-            columns=names,
+            columns=names + sorted(cfg["lfc_groups"]) + cfg["win_names"],
             model=str(getattr(model, "name_or_path", "")),
             compiled=hasattr(model, "_orig_mod"),
             genome=str(getattr(genome, "filename", genome)),
@@ -682,7 +787,7 @@ def run_inference(
             out.append(pd.read_parquet(part))
             continue
         chunk = sdf.iloc[c0 : c0 + chunk_rows]
-        tr_ref, tr_d, mlm, vcs = _score_rows(chunk.to_dict("records"), model, ntm, lut, pad_id, cfg)
+        tr_ref, tr_d, mlm, vcs, extra = _score_rows(chunk.to_dict("records"), model, ntm, lut, pad_id, cfg)
         failed += int(np.isnan(vcs).sum())
         cols = {c: chunk[c].to_numpy() for c in ("chrom", "pos", "ref", "alt", "label") if c in df.columns}
         for c in extra_cols:
@@ -693,7 +798,7 @@ def run_inference(
         for j, nm in enumerate(names):
             cols[f"REF_{nm}"] = tr_ref[:, j]
             cols[f"D_{nm}"] = tr_d[:, j]
-        res = pd.concat([pd.DataFrame(cols), pd.DataFrame(mlm, index=range(len(chunk)))], axis=1)
+        res = pd.concat([pd.DataFrame(cols), pd.DataFrame(mlm, index=range(len(chunk))), pd.DataFrame(extra)], axis=1)
         res["_row"] = chunk["_row"].to_numpy()
         if part:
             res.to_parquet(part + ".tmp", index=False)
@@ -823,6 +928,7 @@ def main():
         sel_idx, sel_names = get_track_indices(bw_names, METADATA_FILE)
     else:
         sel_idx, sel_names = list(range(len(bw_names))), bw_names
+    groups = track_groups(sel_names, METADATA_FILE)
 
     print(f"  {len(sel_names)} BW selected, {len(bed_names)} BED")
 
@@ -839,6 +945,7 @@ def main():
         extra_cols=extra,
         species=SPECIES,
         parts_dir=parts_dir,
+        lfc_groups=groups,
     )
     validate_output(rdf)
 

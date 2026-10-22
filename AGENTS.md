@@ -39,6 +39,11 @@ srun -n 1 -p low -w sblxa123c --gres=gpu:1 -c 4 --mem=32G -t 0:20:00 uv run --no
 - `paper_figures/fig5/fig5b*`, `fig5c*`, `fig7/`, `fig8/` are finished vector files that cannot be rebuilt (upstream sources gone). Do not delete or regenerate them. See `paper_figures/RUNBOOK.md` before touching figures.
 - Paths with spaces and odd nesting exist: `LLM pipeline inputs/LLM pipeline inputs/` and `analyses/analyses/`. Quote paths.
 
+## For a future full rerun (decided 2026-10-22: not before)
+
+- Track value scale. `D_BED_*`/`D_BW_*` are sigmoid of the head output: sigmoid(class 1) for BED instead of the softmax probability, and sigmoid(softplus) for BigWig, which squashes high-signal tracks. Kept for comparability with the paper. Switching to softmax (BED) and raw signal (BigWig) means re-deriving the rule cut-offs (±0.1/0.15/0.2, 0.08), rebuilding `gradio_app/data/magi_baseline_stats.csv` and `clinvar_pipeline/data/thresholds_*.csv`, and fixing the LLM prompt text, all in one versioned change. New columns already use the standard scales (`LFC_*` raw signal, `WIN_*` softmax).
+- Window placement. NTv3 deltas move ~37% when the window shifts by 1 letter (the variant moves within its 128-letter token); every variant sits at the same place, so this is noise rather than bias. The user chose one pass per allele; treat it as a stated limitation.
+
 ## Tests and sub-project docs
 
 `clinvar_pipeline/README.md` and `ARTIFACTS.md`, `gradio_app/README.md` and `SETUP_GUIDE.md`, `paper_figures/RUNBOOK.md`.

@@ -45,6 +45,15 @@ python inference.py --input my_variants.parquet --output my_deltas.parquet --com
 - Results are written in chunks to `<output>.parts/`. A run that is stopped resumes from there; the folder is removed when the output is written.
 - `inference.sbatch` runs this on a SLURM GPU, for example `sbatch inference.sbatch --input my_variants.parquet --output my_deltas.parquet`.
 
+Two column groups come after the paper's features. They use the model's standard scales, not MAGI's sigmoid, and their prefixes keep them out of the impact scores:
+
+- `LFC_*`: track change as a log2 fold change of the raw predicted signal, log2(alt+1) − log2(ref+1), over the selected tracks.
+  - `LFC_max_abs` is the largest change, keeping its sign; `LFC_top_track` is its track.
+  - `LFC_mean_abs` is the mean absolute change.
+  - `LFC_max_abs_<group>` is the largest change per assay group (each histone mark, DNase, CAGE, RNA).
+  - For an existing SNV output, `python lfc_from_deltas.py in.parquet out.parquet` adds the same columns without a GPU. Track values stored as 1.0 are too saturated to recover and are skipped.
+- `WIN_<element>_gain` / `_loss`: the largest rise and drop in splice donor, splice acceptor, start codon and stop codon probability within 50 letters of the variant. `_gain_pos` / `_loss_pos` give the offset in reference letters (NaN when there is no rise or drop). This catches, for example, a splice site created a few letters away. For indels, letters after the variant are compared shifted by the length difference.
+
 ### Indel inference
 
 ```bash

@@ -497,6 +497,71 @@ def get_hypothesis_logic(variant_type="snp"):
     return logic
 
 
+_OPS = {"negative": "<=", "positive": ">=", "any": "|x|>="}
+
+
+def _cond_label(cond):
+    """Condition as text, e.g. 'splice_donor<=-0.20' or '|exon|>=0.08'."""
+    name = cond['feature'].replace('D_BED_', '')
+    if cond['direction'] == 'any':
+        return f"|{name}|>={abs(cond['threshold']):.2f}"
+    return f"{name}{_OPS[cond['direction']]}{cond['threshold']:.2f}"
+
+
+def _implies(a, b):
+    """True if condition a passing means condition b passes (same feature and direction only)."""
+    if a['feature'] != b['feature'] or a['direction'] != b['direction']:
+        return False
+    if a['direction'] == 'negative':
+        return a['threshold'] <= b['threshold']
+    if a['direction'] == 'positive':
+        return a['threshold'] >= b['threshold']
+    return abs(a['threshold']) >= abs(b['threshold'])
+
+
+def _always_fires(conds, rules):
+    """True if every row passing all of conds also fires rules."""
+    hit = lambda c: any(_implies(a, c) for a in conds)
+    return any(hit(p) for p in rules['primary']) and all(hit(s) for s in rules.get('secondary', []))
+
+
+def rule_table(variant_type="snp"):
+    """
+    The rule layer as a table: one row per condition, rules in the order
+    assign_mechanisms_vectorized checks them.
+
+    order_within_tier: 0-based position among rules of the same tier. The
+    assignment sorts by tier with a stable sort, so ties keep the order the
+    rules are written in (shared rules, then the tier 5 rules).
+    can_be_primary: False when a higher-priority rule always fires whenever
+    this rule fires, so this rule can never be the assigned mechanism.
+    Limit: the check only compares conditions on the same feature and
+    direction, so it misses blocking through other features.
+    """
+    ordered = sorted(get_hypothesis_logic(variant_type).items(), key=lambda x: x[1]['priority'])
+    rows = []
+    for i, (name, rules) in enumerate(ordered):
+        higher = [r for _, r in ordered[:i]]
+        secondary = rules.get('secondary', [])
+        blocked = all(any(_always_fires([p] + secondary, h) for h in higher) for p in rules['primary'])
+        for role, conds in (("primary (OR)", rules['primary']), ("secondary (AND)", secondary)):
+            for c in conds:
+                rows.append({
+                    "variant_type": variant_type,
+                    "mechanism": name,
+                    "tier": rules['priority'],
+                    "order_within_tier": sum(r['priority'] == rules['priority'] for r in higher),
+                    "condition_role": role,
+                    "feature": c['feature'],
+                    "direction": c['direction'],
+                    "operator": _OPS[c['direction']],
+                    "threshold": c['threshold'],
+                    "description": rules.get('description', ''),
+                    "can_be_primary": not blocked,
+                })
+    return pd.DataFrame(rows)
+
+
 # =============================================================================
 # 2. CORE FUNCTIONS — VECTORIZED (no df.apply, no row-by-row iteration)
 # =============================================================================
@@ -520,6 +585,24 @@ def _get_column_safe(df, feature):
     return pd.Series(0, index=df.index, dtype=float)
 
 
+def _rule_text(df, rules):
+    """Assigned rule per row: primary conditions that fired (OR), then secondary conditions (AND), with observed values."""
+    def part(cond):
+        col = _get_column_safe(df, cond['feature'])
+        text = _cond_label(cond) + ' [obs ' + col.map('{:.3f}'.format) + ']'
+        return text, _check_condition_vec(col, cond['threshold'], cond['direction'])
+
+    out = pd.Series('', index=df.index)
+    for cond in rules['primary']:
+        text, hit = part(cond)
+        out = out.where(~hit, out.where(out == '', out + ' OR ') + text)
+    if rules.get('secondary'):
+        out = out.where(~out.str.contains(' OR '), '(' + out + ')')
+        for cond in rules['secondary']:
+            out = out + ' AND ' + part(cond)[0]
+    return out
+
+
 def assign_mechanisms_vectorized(df, hypothesis_logic):
     """
     Vectorized mechanism assignment across the entire dataframe.
@@ -528,7 +611,10 @@ def assign_mechanisms_vectorized(df, hypothesis_logic):
     using numpy/pandas vectorized ops. No row-by-row iteration.
     
     Adds columns: NT_Mechanism, NT_Description, NT_Trigger, 
-                  NT_All_Mechanisms, NT_Mechanism_Count
+                  NT_All_Mechanisms, NT_Mechanism_Count,
+                  NT_Tier (-1 if no rule fired), NT_Rule (assigned rule with
+                  observed values), NT_Scored (False when every rule input is
+                  NaN; such rows fall to UNCERTAIN_SIGNIFICANCE)
     """
     n = len(df)
     sorted_hypotheses = sorted(hypothesis_logic.items(), key=lambda x: x[1]['priority'])
@@ -599,6 +685,8 @@ def assign_mechanisms_vectorized(df, hypothesis_logic):
     nt_trigger = pd.Series('', index=df.index)
     nt_all_mechs = pd.Series('', index=df.index)
     nt_mech_count = pd.Series(0, index=df.index, dtype=int)
+    nt_tier = pd.Series(-1, index=df.index, dtype=int)
+    nt_rule = pd.Series('', index=df.index)
     
     # Track which rows already have a primary assignment
     has_primary = pd.Series(False, index=df.index)
@@ -625,6 +713,8 @@ def assign_mechanisms_vectorized(df, hypothesis_logic):
             nt_mechanism[new_primary] = mname
             nt_description[new_primary] = desc
             nt_trigger[new_primary] = tfeat[new_primary] + '=' + tval[new_primary].map(lambda v: f"{v:.3f}")
+            nt_tier[new_primary] = prio
+            nt_rule[new_primary] = _rule_text(df.loc[new_primary], hypothesis_logic[mname])
             has_primary = has_primary | new_primary
     
     df['NT_Mechanism'] = nt_mechanism
@@ -632,6 +722,11 @@ def assign_mechanisms_vectorized(df, hypothesis_logic):
     df['NT_Trigger'] = nt_trigger
     df['NT_All_Mechanisms'] = nt_all_mechs
     df['NT_Mechanism_Count'] = nt_mech_count
+    df['NT_Tier'] = nt_tier
+    df['NT_Rule'] = nt_rule
+    inputs = sorted({c['feature'] for r in hypothesis_logic.values()
+                     for c in r['primary'] + r.get('secondary', [])} & set(df.columns))
+    df['NT_Scored'] = df[inputs].notna().any(axis=1)
     
     return df
 

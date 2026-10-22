@@ -72,6 +72,22 @@ python3 scripts/run_figures.py --fig all
 
 Optional LLM re-runs: `scripts/04_run_llm_parallel.py`, `scripts/05_run_llm_batch.py`.
 
+**Rule table (supplement).** Run `python3 scripts/export_rule_table.py [--out PATH]`. It writes one row per rule condition, for SNVs and indels, to `output/mechanisms/rule_table.csv`.
+- Columns: tier, order within the tier (the tie-break used), primary (OR) or secondary (AND) role, feature, operator and threshold.
+- `can_be_primary` flags rules that a higher-priority rule always pre-empts. It compares conditions on the same feature only, so it can miss blocking through correlated features.
+
+**Rule provenance.** Mechanism assignment adds three columns next to `NT_Mechanism`:
+- `NT_Tier`: tier of the assigned rule, or −1 when no rule fired.
+- `NT_Rule`: the conditions that fired, with the observed values. A missing input prints as 0, as the rule sees it.
+- `NT_Scored`: False when all of a variant's rule inputs are missing.
+
+`analyses/nt_mechanism_assignment.py` is a byte copy of `vendor/`. Copy it again after any edit.
+
+**Frozen benign background.** `compute_impact_frame(df, background="gradio_app/data/magi_baseline_stats.csv")` z-scores against the stored per-type benign mean and SD. Use it instead of the cohort's own benign rows for sets without labels, such as gnomAD or saturation mutagenesis.
+- `tools/build_background.py SNV.parquet INDEL.parquet -o out.csv` rebuilds that file (population SD, NaN ignored). Run it through srun with about 4 CPUs and 48 GB.
+- Rebuilt from the paper deltas, it matches the tracked file byte for byte.
+- Background keys are lower-case ClinVar types: snp, deletion, insertion and indel.
+
 Regenerate impact scores, mechanisms, and figures from existing cohorts, then validate:
 
 ```bash

@@ -146,6 +146,37 @@ class RunInferenceTest(unittest.TestCase):
             with self.assertRaises(ValueError):  # other settings never reuse these parts
                 run(self.df, parts_dir=d, chunk_rows=2, share_windows=True)
 
+    def test_lfc_and_win_columns(self):
+        pos = 4000
+        ref = GENOME["chr1"][pos - 1 : pos + 3].seq
+        df = pd.concat([self.df, pd.DataFrame([("chr1", pos, ref, ref[0])], columns=self.df.columns)], ignore_index=True)
+        model = FakeNTv3()
+        out = inference.run_inference(
+            df, model, Tok(), GENOME, ["splice_donor", "stop_codon"], ["t0", "t1", "t2"], [0, 2], "cpu",
+            context_len=CTX, batch_size=1, lfc_groups={"G": [1]},
+        )
+        new = [c for c in out.columns if c.startswith(("LFC_", "WIN_"))]
+        self.assertEqual(list(out.columns[-len(new) :]), new)  # appended after the existing columns
+        self.assertEqual(len(new), 4 + 8)
+        ok = out.drop(index=2)
+        self.assertTrue(np.isfinite(ok[[c for c in new if c != "LFC_top_track" and not c.endswith("_pos")]].to_numpy(float)).all())
+        self.assertTrue(out.iloc[2][new].isna().all())  # missing contig
+        # The fake's 5-letter conv changes only letters within 2 of an edit. Aligned correctly, the
+        # 3-letter deletion leaves deltas only at offsets -2, -1 (upstream) and 4, 5 (after the allele).
+        last = out.iloc[-1]
+        for el in ("splice_donor", "stop_codon"):
+            for kind in ("gain", "loss"):
+                if not np.isnan(last[f"WIN_{el}_{kind}_pos"]):  # NaN: no rise / drop
+                    self.assertIn(last[f"WIN_{el}_{kind}_pos"], (-2, -1, 4, 5))
+
+    def test_lfc_summary(self):
+        lfc = np.array([[0.1, -0.5, np.nan], [np.nan, np.nan, np.nan]])
+        s = inference.lfc_summary(lfc, ["a", "b", "c"], {"G": [0, 2]})
+        np.testing.assert_allclose(s["LFC_max_abs"], [-0.5, np.nan])
+        np.testing.assert_allclose(s["LFC_mean_abs"], [0.3, np.nan])
+        np.testing.assert_allclose(s["LFC_max_abs_G"], [0.1, np.nan])
+        self.assertEqual(s["LFC_top_track"].tolist(), ["b", None])
+
     def test_token_lut_matches_tokenizer(self):
         lut = inference.build_token_lut(Tok())
         ids = inference.tokenize(["ACGTNacgtn-"], lut, 16, 1)[0].tolist()

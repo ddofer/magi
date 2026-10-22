@@ -1,11 +1,15 @@
 """Global impact scores with benign-referenced z-scoring (per variant type).
 
 Ported from ``impact_score.ipynb``. Z-score background: **Benign-labelled rows**
-within each ``variant_type`` group (SNP vs indel types pooled for indels).
+within each ``variant_type`` group (SNP, Deletion, Insertion, Indel; indel types are
+not pooled). If a group has under 10 benign rows, all benign rows are used.
+Pass ``background`` (``gradio_app/data/magi_baseline_stats.csv`` format) to use a
+frozen per-type mean/SD instead, e.g. for unlabelled variant sets.
 """
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Iterable
 
 import numpy as np
@@ -38,16 +42,33 @@ def _harmonize_labels(df: pd.DataFrame) -> pd.DataFrame:
     return out
 
 
+def load_background(background: str | Path | pd.DataFrame) -> dict[str, pd.DataFrame]:
+    """Frozen benign background (variant_type, delta_col, mean, std) keyed by lower-case type."""
+    bg = background if isinstance(background, pd.DataFrame) else pd.read_csv(background)
+    bg = bg.assign(variant_type=bg["variant_type"].str.strip().str.lower())
+    # The CSV lists "indel" twice: first all benign indels pooled, then ClinVar's "Indel"
+    # (delins) subtype. Keep the last, so "Indel" rows get the same subtype background
+    # that the recomputed path uses.
+    bg = bg.drop_duplicates(["variant_type", "delta_col"], keep="last")
+    return {vt: g.set_index("delta_col") for vt, g in bg.groupby("variant_type")}
+
+
 def z_score_matrix(
     df: pd.DataFrame,
     cols: list[str],
-    benign_mask: np.ndarray,
+    benign_mask: np.ndarray | None,
     *,
     per_type: bool = True,
+    background: dict[str, pd.DataFrame] | None = None,
 ) -> np.ndarray:
-    """Z-score columns against benign distribution (optionally per variant_type)."""
+    """Z-score columns against benign distribution (optionally per variant_type).
+
+    With ``background`` (from ``load_background``), mean/SD come from it, not the rows.
+    """
     matrix = df[cols].values.astype(np.float64)
     result = np.empty_like(matrix)
+    if background is not None and not (per_type and "variant_type" in df.columns):
+        raise ValueError("a frozen background needs per_type=True and a variant_type column")
 
     groups = (
         df["variant_type"].unique()
@@ -60,11 +81,19 @@ def z_score_matrix(
             if vt is not None
             else np.ones(len(df), dtype=bool)
         )
-        ben = idx & benign_mask
-        if ben.sum() < 10:
-            ben = benign_mask
-        mu = np.nanmean(matrix[ben], axis=0)
-        sigma = np.nanstd(matrix[ben], axis=0)
+        if background is not None:
+            key = str(vt).lower()
+            if key not in background:
+                raise KeyError(f"variant_type {vt!r} not in background {sorted(background)}")
+            stats = background[key].loc[cols]
+            mu = stats["mean"].to_numpy(dtype=np.float64)
+            sigma = stats["std"].to_numpy(dtype=np.float64, copy=True)
+        else:
+            ben = idx & benign_mask
+            if ben.sum() < 10:
+                ben = benign_mask
+            mu = np.nanmean(matrix[ben], axis=0)
+            sigma = np.nanstd(matrix[ben], axis=0)
         sigma[sigma < 1e-8] = 1.0
         result[idx] = (matrix[idx] - mu) / sigma
     return result
@@ -86,12 +115,22 @@ def top_k_mean(matrix: np.ndarray, k: int) -> np.ndarray:
     return np.sort(np.abs(matrix), axis=1)[:, -k:].mean(axis=1)
 
 
-def compute_impact_frame(df: pd.DataFrame) -> pd.DataFrame:
-    """Add BED/BW/Global_z impact columns to a labelled delta dataframe."""
-    df = _harmonize_labels(df)
+def compute_impact_frame(
+    df: pd.DataFrame,
+    background: str | Path | pd.DataFrame | None = None,
+) -> pd.DataFrame:
+    """Add BED/BW/Global_z impact columns to a delta dataframe.
+
+    Without ``background`` the frame must be labelled: z-scores use its own benign rows.
+    With it (path or DataFrame, see ``load_background``) no label is needed.
+    """
+    df = _harmonize_labels(df) if "label" in df.columns else df.copy()
     d_bed = sorted(c for c in df.columns if c.startswith("D_BED_"))
     d_bw = sorted(c for c in df.columns if c.startswith("D_BW_"))
-    benign_mask = (df["label"] == "Benign").values
+    if background is None:
+        benign_mask = (df["label"] == "Benign").values
+    else:
+        benign_mask, background = None, load_background(background)
 
     if d_bed:
         bed_raw = df[d_bed].values.astype(np.float64)
@@ -100,7 +139,7 @@ def compute_impact_frame(df: pd.DataFrame) -> pd.DataFrame:
         df["BED_top3_mean"] = top_k_mean(bed_raw, 3)
 
     if d_bw:
-        bw_z = z_score_matrix(df, d_bw, benign_mask, per_type=True)
+        bw_z = z_score_matrix(df, d_bw, benign_mask, per_type=True, background=background)
         np.nan_to_num(bw_z, copy=False, nan=0.0)
         bw_abs = np.abs(bw_z)
         for name, arr in agg_scores(bw_abs, "BW_z").items():
@@ -108,7 +147,7 @@ def compute_impact_frame(df: pd.DataFrame) -> pd.DataFrame:
         df["BW_z_top10_mean"] = top_k_mean(bw_z, 10)
 
     if d_bed and d_bw:
-        bed_z = z_score_matrix(df, d_bed, benign_mask, per_type=True)
+        bed_z = z_score_matrix(df, d_bed, benign_mask, per_type=True, background=background)
         np.nan_to_num(bed_z, copy=False, nan=0.0)
         global_abs = np.hstack([np.abs(bed_z), np.abs(bw_z)])
         for name, arr in agg_scores(global_abs, "Global_z").items():
