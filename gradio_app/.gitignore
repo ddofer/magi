@@ -90,5 +90,6 @@ desktop.ini
 
 # HuggingFace Spaces
 .gradio/
-./data/hg38.fa
-./data/MANE_processed.csv
+data/hg38.fa
+data/MANE_processed.csv
+data/Promoter_processed.csv

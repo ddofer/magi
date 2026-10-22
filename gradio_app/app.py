@@ -53,6 +53,7 @@ import pandas as pd
 import numpy as np
 
 # Import our modules
+import inference as _inference
 from inference import (
     CONTEXT_LEN,
     predict_variants,
@@ -74,6 +75,22 @@ from interpretation import build_signal_interpretation
 
 # Suppress warnings for cleaner UI
 warnings.filterwarnings("ignore")
+
+CUSTOM_CSS = """
+.variant-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    border-radius: 10px;
+    margin-bottom: 2rem;
+}
+.metric-card {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+"""
 
 # ============================================================================
 # CONFIGURATION
@@ -154,14 +171,14 @@ def _apply_species_annotations(results_df: pd.DataFrame, species: str) -> pd.Dat
     return annotated
 
 
-def _build_zoom_slider_update(requested_zoom_bp):
+def _build_zoom_slider_update(requested_zoom_bp, profiles):
     """Update the zoom slider to the current variant's available track-view span."""
     try:
         requested_zoom_bp = max(MIN_ZOOM_BP, int(requested_zoom_bp))
     except (TypeError, ValueError):
         requested_zoom_bp = DEFAULT_ZOOM_BP
 
-    view_bounds = get_track_view_bounds()
+    view_bounds = get_track_view_bounds(profiles)
     max_radius = view_bounds.get("max_radius")
     if max_radius is None:
         return gr.update()
@@ -186,8 +203,10 @@ def predict_single_variant_ui(species, chrom, pos, ref, alt, zoom_bp=DEFAULT_ZOO
         csv_path,
         bed_table_df,
         mlm_md,
-        ranked,
+        plot_state,
     ) = result
+    if not isinstance(plot_state, dict):  # error path
+        plot_state = None
 
     tracks_png_path = None
     try:
@@ -202,8 +221,9 @@ def predict_single_variant_ui(species, chrom, pos, ref, alt, zoom_bp=DEFAULT_ZOO
         print(f"\u26a0\ufe0f  Track PNG export failed: {exc}")
 
     zoom_update = gr.update()
-    if isinstance(ranked, list):
-        zoom_update = _build_zoom_slider_update(zoom_bp)
+    if plot_state:
+        zoom_update = _build_zoom_slider_update(zoom_bp, plot_state["profiles"])
+        plot_state = {**plot_state, "ranked": plot_state["ranked"][:50]}
 
     return (
         summary_md,
@@ -216,17 +236,16 @@ def predict_single_variant_ui(species, chrom, pos, ref, alt, zoom_bp=DEFAULT_ZOO
         bed_table_df,
         mlm_md,
         zoom_update,
-        ranked[:50]
-        if isinstance(ranked, list)
-        else ranked,  # → gr.State for zoom slider
+        plot_state,  # → gr.State for zoom slider / track filter
     )
 
 
-def _update_region_zoom(zoom_bp, ranked, track_filter="All"):
+def _update_region_zoom(zoom_bp, plot_state, track_filter="All"):
     """Re-render region tracks plot when the zoom slider or filter changes."""
-    if not ranked:
+    if not plot_state:
         return None, None
     try:
+        ranked = plot_state["ranked"]
         filtered = ranked
         if track_filter and track_filter != "All":
             filtered = [r for r in ranked if r["track_type"] == track_filter]
@@ -236,6 +255,7 @@ def _update_region_zoom(zoom_bp, ranked, track_filter="All"):
             ranked_tracks=filtered,
             max_ranked_tracks=10,
             visible_radius_bp=max(int(zoom_bp), 8),
+            profiles=plot_state["profiles"],
         )
         png_path = _export_figure_png(fig, "last_variant_tracks.png")
         return fig, png_path
@@ -294,8 +314,8 @@ TRACK_META_DICT = {
 # first click on any example hits the lru_cache and skips ~120s of model time.
 EXAMPLE_VARIANTS = [
     ("human", "chr17", 7675088, "C", "T"),       # TP53 R175H
-    ("human", "chr7", 117559593, "ATCT", "A"),   # CFTR F508del
-    ("human", "chr13", 32332771, "AGAGA", "AGA"),# BRCA2 c.5946delT
+    ("human", "chr7", 117559590, "ATCT", "A"),   # CFTR F508del (p.Phe508del)
+    ("human", "chr13", 32340300, "GT", "G"),     # BRCA2 c.5946delT (6174delT)
     ("human", "chr11", 5227002, "T", "A"),       # HBB E6V (sickle cell)
     ("human", "chr17", 43092418, "T", "C"),      # BRCA1 rs16941 (benign)
 ]
@@ -437,9 +457,10 @@ def _cached_inference(species: str, chrom: str, pos: int, ref: str, alt: str):
         err = df["fetch_error"].iloc[0]
         if isinstance(err, str) and err:
             raise RuntimeError(err)
+    profiles = _inference._LAST_TRACK_PROFILES  # set by predict_variants for this variant
     df = _apply_species_annotations(df, species)
     df = compute_impact_scores(df)
-    return df
+    return df, profiles
 
 
 # ----------------------------------------------------------------------------
@@ -511,7 +532,7 @@ def predict_single_variant(
                 *_none9[1:],
             )
 
-        if pos <= 0:
+        if pos is None or pos <= 0:
             return (
                 "❌ Error: Position must be a positive integer",
                 *_none9[1:],
@@ -550,10 +571,16 @@ def predict_single_variant(
         species = str(species).strip()
         print(f"🔬 Predicting {species} {chrom}:{pos} {ref_clean}>{alt_clean}...")
         try:
-            results_df = _cached_inference(
+            results_df, profiles = _cached_inference(
                 species, str(chrom), int(pos), ref_clean, alt_clean
             )
         except RuntimeError as fetch_err:
+            if "REF mismatch" in str(fetch_err):
+                return (
+                    f"❌ **Reference allele does not match the genome.**\n\n{fetch_err}\n\n"
+                    "Check the position (1-based, GRCh38 for human) and the REF allele.",
+                    *_none9[1:],
+                )
             return (
                 "❌ **Sequence retrieval failed.**\n\n"
                 f"{fetch_err}\n\n"
@@ -759,6 +786,7 @@ These metrics summarize how the NTv3 model responds to the alternate sequence re
                 ranked_tracks=ranked,
                 max_ranked_tracks=10,
                 visible_radius_bp=max(int(zoom_bp), 8),
+                profiles=profiles,
             )
         except Exception as e:
             print(f"⚠️  Region tracks plot failed: {e}")
@@ -773,7 +801,7 @@ These metrics summarize how the NTv3 model responds to the alternate sequence re
             result_csv_path,
             bed_table_df,
             mlm_md,
-            ranked,  # stashed for slider re-renders
+            {"ranked": ranked, "profiles": profiles},  # for slider / filter re-renders
         )
 
         # Store in full-output cache only for default zoom (other zooms recompute)
@@ -843,6 +871,18 @@ def predict_batch(species, file):
                 None,
             )
 
+        input_df = input_df.copy()
+        input_df["chrom"] = input_df["chrom"].astype(str).str.strip()
+        for col in ("ref", "alt"):
+            input_df[col] = input_df[col].astype(str).str.strip().str.upper()
+        bad = ~(input_df["ref"].map(_validate_allele) & input_df["alt"].map(_validate_allele))
+        if bad.any():
+            rows = ", ".join(str(i + 1) for i in input_df.index[bad])
+            return (
+                pd.DataFrame([{"Error": f"Invalid REF/ALT in row(s) {rows}: use A/C/G/T/N only"}]),
+                None,
+            )
+
         species = str(species).strip()
         print(f"🔬 Processing batch of {len(input_df)} variants for {species}...")
 
@@ -879,23 +919,6 @@ def predict_batch(species, file):
 def build_interface():
     """Build the Gradio interface."""
 
-    # Custom CSS
-    custom_css = """
-    .variant-header {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-        color: white;
-        padding: 2rem;
-        border-radius: 10px;
-        margin-bottom: 2rem;
-    }
-    .metric-card {
-        background: #f8f9fa;
-        padding: 1rem;
-        border-radius: 8px;
-        border-left: 4px solid #667eea;
-    }
-    """
-
     # Build status line from cached model info (safe — loads at startup)
     _seq_src = _MODEL_CACHE.get("sequence_source", "ucsc")
     _bed_n = len(_MODEL_CACHE.get("bed_names", []) or [])
@@ -915,10 +938,7 @@ def build_interface():
     else:
         _status_line = "🔴 **Model failed to load** — Check configuration and logs"
 
-    # Gradio 6.x: create Blocks without theme/css, then set as attributes
     app = gr.Blocks(title="MAGI Variant Interpreter")
-    app.theme = gr.themes.Soft()
-    app.css = custom_css
 
     with app:
         gr.Markdown(
@@ -1119,7 +1139,7 @@ def build_interface():
                 ```
                 chrom,pos,ref,alt
                 chr17,7675088,C,T
-                chr7,117559593,ATCT,A
+                chr7,117559590,ATCT,A
                 chr13,32340300,G,A
                 ```
                 
@@ -1178,7 +1198,7 @@ def build_interface():
 
                 ### Model configuration
                 - Current model: `InstaDeepAI/NTv3_650M_post`
-                - Current sequence window: **16 kb** (`CONTEXT_LEN = 16384`), chosen for ~2.5x faster CPU inference. SNP scores are essentially unchanged from the 32 kb window; **indel MAGI scores shift somewhat** because the bundled baseline statistics were derived at 32 kb. Set the `NTV3_CONTEXT_LEN=32768` environment variable to restore the paper's exact 32 kb window.
+                - Current sequence window: **16 kb** (`CONTEXT_LEN = 16384`), chosen for faster CPU inference. SNP scores are essentially unchanged from the paper's 64 kb window; **indel MAGI scores shift somewhat** because the bundled baseline statistics were derived at 64 kb. Set `NTV3_CONTEXT_LEN=65536` to use the paper's window.
                 - Region Track View zoom is capped by the available NTv3 track-profile span for the current prediction
                 - Sequence source:
                   - **Human:** local `hg38.2bit`/`hg38.fa` when available, otherwise UCSC then Ensembl REST fallback
@@ -1266,4 +1286,5 @@ if _APP_READY:
     threading.Thread(target=_warmup_example_cache, daemon=True).start()
 
 if __name__ == "__main__":
-    app.launch()
+    # Gradio 6: theme and css are launch() arguments; set on Blocks they are overwritten.
+    app.launch(theme=gr.themes.Soft(), css=CUSTOM_CSS)

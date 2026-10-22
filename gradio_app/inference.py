@@ -5,7 +5,8 @@ NTv3 inference module for the MAGI Gradio app.
 Adapted from the top-level inference.py pipeline for web deployment.
 
 Key features:
-- Uses local hg38.fa via pyfaidx when available
+- Sequence source order for human: local hg38.2bit, then the hg38-2bit HF dataset,
+  then local hg38.fa, then the UCSC and Ensembl REST APIs
 - Loads the configured NTv3 model once and caches it across requests
 - Returns BED/BigWig deltas together with sequence-model metrics
 
@@ -15,7 +16,6 @@ Usage:
 """
 
 import os
-import warnings
 from pathlib import Path
 from typing import Optional, Tuple, List, Any, Dict, cast
 from functools import lru_cache
@@ -32,11 +32,11 @@ from transformers import AutoModel, AutoTokenizer
 # CONFIGURATION
 # ============================================================================
 MODEL_NAME = "InstaDeepAI/NTv3_650M_post"
-# Sequence window. Default 16 kb — ~2.5x faster on CPU than 32 kb with
-# essentially unchanged SNP scores; indel MAGI scores shift somewhat vs the
-# 32 kb-derived baseline (see README). Override with NTV3_CONTEXT_LEN (must be
-# a multiple of 128, the model's total conv downsample factor); set 32768 to
-# match the paper's baseline exactly.
+# Sequence window. Default 16 kb for CPU speed. The bundled baseline
+# (magi_baseline_stats.csv) was computed from the paper's 64 kb deltas, so
+# indel MAGI scores shift somewhat at 16 kb (see README). Override with
+# NTV3_CONTEXT_LEN (a multiple of 128, the model's conv downsample factor);
+# 65536 matches the paper exactly.
 CONTEXT_LEN = int(os.environ.get("NTV3_CONTEXT_LEN", 16 * 1024))
 USE_BED = True
 USE_BIGWIGS = True
@@ -288,7 +288,7 @@ def _fetch_sequence_from_local(
         return None
 
     try:
-        return str(genome[query_chrom][start:end]).upper()
+        return str(genome[query_chrom][start:end]).upper() or None  # '' = truncated contig
     except Exception:
         return None
 
@@ -362,7 +362,7 @@ def get_genomic_sequence(
     ref_end = min(center + len(ref), len(ref_seq))
     actual_ref = ref_seq[center:ref_end]
     if actual_ref.upper() != ref.upper():
-        warnings.warn(
+        raise ValueError(
             f"REF mismatch at {chrom}:{pos}: expected '{ref}' but genome has '{actual_ref}'"
         )
 
@@ -617,12 +617,6 @@ def load_model_and_resources(device: str = "cuda"):
 
     species_to_token_id = dict(getattr(model.config, "species_to_token_id", {}) or {})
 
-    # Extract human species ID
-    try:
-        human_id = model.encode_species(["human"]).item()
-    except (AttributeError, TypeError):
-        human_id = species_to_token_id.get("human", 6)
-
     # Extract BED/BigWig names
     bed_names = []
     if USE_BED:
@@ -702,7 +696,6 @@ def load_model_and_resources(device: str = "cuda"):
             "bigwig_names": bw_names,
             "selected_bw_indices": selected_bw_indices,
             "nuc_token_map": nuc_token_map,
-            "human_id": human_id,
             "species_to_token_id": species_to_token_id,
             "sequence_source": sequence_source,
         }
@@ -778,22 +771,26 @@ def predict_variants(
 
     for idx, row in df.iterrows():
         # Get sequences
-        ref_seq, alt_seq, vcenter = get_genomic_sequence(
-            genome,
-            row["chrom"],
-            row["pos"],
-            row["ref"],
-            row["alt"],
-            CONTEXT_LEN,
-            species=species,
-        )
+        fetch_error = None
+        try:
+            ref_seq, alt_seq, vcenter = get_genomic_sequence(
+                genome,
+                row["chrom"],
+                row["pos"],
+                row["ref"],
+                row["alt"],
+                CONTEXT_LEN,
+                species=species,
+            )
+        except ValueError as err:  # REF allele does not match the genome
+            ref_seq = alt_seq = vcenter = None
+            fetch_error = str(err)
 
         if ref_seq is None or alt_seq is None or vcenter is None:
-            # Failed to fetch sequence - return NaN results with a flag
-            # that the UI layer can surface to the user.
+            # No usable sequence: return NaN results with a flag the UI shows.
             res = {c: row[c] for c in df.columns}
             res["indel_size"] = len(str(row["alt"])) - len(str(row["ref"]))
-            res["fetch_error"] = (
+            res["fetch_error"] = fetch_error or (
                 f"Could not fetch reference sequence for {row['chrom']}:{row['pos']} "
                 f"(species={species}). The remote sequence API "
                 f"({'UCSC' if species == 'human' else 'Ensembl'}) was unreachable "

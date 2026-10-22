@@ -12,6 +12,8 @@ import sys
 import os
 import requests
 
+__test__ = False  # file name matches test_*.py; keep pytest from running the network/model checks
+
 
 def check_dependencies():
     """Check if all required packages are importable"""

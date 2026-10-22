@@ -7,16 +7,16 @@ MAGI is a variant interpretation app that scores genomic variants using the NTv3
 Current runtime configuration:
 
 - Model: `InstaDeepAI/NTv3_650M_post`
-- Sequence window: `16384` bp (16 kb) by default; set `NTV3_CONTEXT_LEN=32768` to match the paper's baseline
+- Sequence window: `16384` bp (16 kb) by default; set `NTV3_CONTEXT_LEN=65536` to match the paper's baseline
 - Batch limit: `10` variants
-- Reference genome: local `data/hg38.fa` when available for human, otherwise UCSC / Ensembl fallback
+- Reference genome (human): local `data/hg38.2bit`, else the `GrimSqueaker/hg38-2bit` HF dataset, else local `data/hg38.fa`, else UCSC / Ensembl REST
 
 ## Hugging Face Spaces
 
 1. Create a new Space at [Hugging Face Spaces](https://huggingface.co/spaces).
-2. Select the `Gradio` SDK and `zero-a10` hardware.
+2. Select the `Gradio` SDK and `zero-a10g` hardware.
 3. Upload the contents of this directory.
-   - **Important:** `data/hg38.fa` is ~915 MB. Do **not** commit it to the Space repo without Git LFS — instead rely on the UCSC API fallback (the app does this automatically when the file is absent).
+   - **Important:** `data/hg38.fa` is ~3.1 GB. Do **not** commit it to the Space repo without Git LFS — instead rely on the UCSC API fallback (the app does this automatically when the file is absent).
    - `data/MANE_processed.parquet` (~24 MB) is committed and is all the app needs; the ~235 MB CSV is optional and gitignored (if present, it is converted to parquet on first run).
 4. Set the `HF_TOKEN` Space secret so the app can access the gated `NTv3_650M_post` model weights.
 5. Start the Space.
@@ -30,7 +30,7 @@ Notes:
 
 ### Prerequisites
 
-- Python 3.8+
+- Python 3.10+ (Gradio 6)
 - Enough disk space for the model cache and optional local genome
 - Internet access for model download and, if needed, UCSC fallback sequence retrieval
 - A Hugging Face account with access to `InstaDeepAI/NTv3_650M_post`
@@ -127,7 +127,7 @@ Required columns:
 ```csv
 chrom,pos,ref,alt
 chr17,7675088,C,T
-chr7,117559593,ATCT,A
+chr7,117559590,ATCT,A
 chr13,32340300,G,A
 ```
 
@@ -197,4 +197,4 @@ Source-of-truth files for runtime behavior:
 - NTv3 paper: [bioRxiv preprint](https://www.biorxiv.org/content/10.1101/2023.01.11.523679v2)
 - Gradio docs: [gradio.app/docs](https://www.gradio.app/docs)
 
-**Last updated:** March 2026
+**Last updated:** October 2026

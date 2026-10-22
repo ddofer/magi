@@ -58,8 +58,8 @@ Upload a CSV file with these columns:
 ```csv
 chrom,pos,ref,alt
 chr17,7675088,C,T
-chr7,117559593,ATCT,A
-chr13,32332771,AGAGA,AGA
+chr7,117559590,ATCT,A
+chr13,32340300,GT,G
 ```
 
 **Limit:** 10 variants per batch
@@ -143,7 +143,7 @@ Variants are automatically classified into:
 - **Model:** InstaDeepAI/NTv3_650M_post (HuggingFace)
 - **Annotation:** MANE Select v1.3 (RefSeq + Ensembl)
 - **BigWig Metadata:** ENCODE v3, GTEx, FANTOM5, GEO, CATLAS
-- **Reference Genome:** GRCh38/hg38 (local `hg38.fa` preferred; UCSC API used as fallback when local sequence is unavailable)
+- **Reference Genome:** GRCh38/hg38. Source order: local `data/hg38.2bit`, the `GrimSqueaker/hg38-2bit` HF dataset (`MAGI_2BIT_DATASET`), local `data/hg38.fa`, then the UCSC and Ensembl REST APIs
 
 ## Species Support
 
@@ -155,13 +155,13 @@ Variants are automatically classified into:
 
 - A Hugging Face token may be required to access the gated NTv3 model weights.
 - No external LLM calls are made.
-- No secret-management flow is used by the Gradio app.
+- The only secret is the `HF_TOKEN` Space secret for the gated model weights.
 - Ordinary external network access can still occur when downloading model assets from Hugging Face or when falling back to the UCSC sequence API.
 
 ## Limitations
 
 1. Predictions are computational and require experimental validation
-2. The app uses a **16 kb** local sequence window (`CONTEXT_LEN = 16384`) and does not model long-range chromatin effects. This window was chosen for ~2.5x faster CPU inference; SNP scores match the 32 kb window closely, but **indel `Global_z_sum_log` (MAGI) scores are not directly comparable** to the paper's 32 kb-derived baseline. Set the `NTV3_CONTEXT_LEN=32768` environment variable to restore the original 32 kb window.
+2. The app uses a **16 kb** local sequence window (`CONTEXT_LEN = 16384`) and does not model long-range chromatin effects. The window is shorter than the paper's 64 kb for CPU speed; SNP scores match closely, but **indel `Global_z_sum_log` (MAGI) scores are not directly comparable** to the bundled 64 kb-derived baseline. Set `NTV3_CONTEXT_LEN=65536` to use the paper's window.
 3. No phasing information is used
 4. Human uses GRCh38/hg38; non-human coordinates must match the selected species assembly available through Ensembl
 5. Batch processing limited to 10 variants

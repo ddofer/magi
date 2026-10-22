@@ -17,7 +17,6 @@ Usage:
 from typing import Optional, Dict, List
 
 import numpy as np
-import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 from matplotlib.patches import Patch
@@ -33,11 +32,16 @@ _BED_BG = "#f7f7f7"  # subtle background for BED group
 _BW_BG = "#fffef5"  # subtle warm tint for BigWig group
 
 
-def get_track_view_bounds() -> Dict[str, Optional[int]]:
-    """Return the exact symmetric track-view bounds available for the current variant."""
-    from inference import _LAST_TRACK_PROFILES
+def _profiles_or_last(profiles):
+    if profiles is None:
+        from inference import _LAST_TRACK_PROFILES
+        return _LAST_TRACK_PROFILES
+    return profiles
 
-    profiles = _LAST_TRACK_PROFILES
+
+def get_track_view_bounds(profiles: Optional[Dict] = None) -> Dict[str, Optional[int]]:
+    """Return the symmetric track-view bounds available for *profiles* (default: last variant run)."""
+    profiles = _profiles_or_last(profiles)
     if not profiles:
         return {"max_radius": None, "window_start": None, "window_end": None}
 
@@ -70,35 +74,26 @@ def get_track_view_bounds() -> Dict[str, Optional[int]]:
 
 def generate_region_tracks_plot(
     ranked_tracks: Optional[List[Dict]] = None,
-    metadata_df: Optional[pd.DataFrame] = None,
-    metadata_dict: Optional[Dict[str, Dict[str, str]]] = None,
-    top_k_bed: int = 3,
-    top_k_bw: int = 3,
     visible_radius_bp: int = 1000,
     max_ranked_tracks: int = 10,
     figsize_x: float = 14.0,
     row_height: float = 1.6,
+    profiles: Optional[Dict] = None,
 ) -> Optional[plt.Figure]:
     """
-    Generate fill-between region view from cached track profiles.
-
-    If *ranked_tracks* is provided (from analysis.rank_top_disrupted_tracks),
-    those exact tracks are shown (ensuring consistency with fingerprint).
-    Otherwise falls back to auto-selecting top-N by point delta.
+    Fill-between region view of the ranked tracks from the variant's track profiles.
 
     Args:
-        ranked_tracks: Pre-ranked list of dicts with keys {track_id, track_type, display_name, delta}.
-        metadata_df / metadata_dict: BigWig metadata (used only for fallback auto-select).
-        top_k_bed / top_k_bw: Fallback auto-select counts (ignored when ranked_tracks given).
+        ranked_tracks: From analysis.rank_top_disrupted_tracks; dicts with
+            {track_id, track_type, display_name, delta}. Same tracks as the fingerprint.
         visible_radius_bp: Half-width of visible window centred on variant (bp).
         max_ranked_tracks: Maximum number of ranked tracks to render.
         figsize_x: Figure width in inches.
         row_height: Height per subplot row.
+        profiles: Track profiles from inference (default: the last variant run in this process).
     """
-    from inference import _LAST_TRACK_PROFILES
-
-    profiles = _LAST_TRACK_PROFILES
-    if not profiles:
+    profiles = _profiles_or_last(profiles)
+    if not profiles or not ranked_tracks:
         return None
 
     chrom = profiles["chrom"]
@@ -112,73 +107,65 @@ def generate_region_tracks_plot(
     # ── Build per-track rendering list ──────────────────────────────────
     all_tracks: List[dict] = []
 
-    if ranked_tracks:
-        # Use unified ranking — pull continuous arrays from cache
-        for item in ranked_tracks[: max(1, int(max_ranked_tracks))]:
-            tid = item["track_id"]
-            ttype = item["track_type"]
+    for item in ranked_tracks[: max(1, int(max_ranked_tracks))]:
+        tid = item["track_id"]
+        ttype = item["track_type"]
 
-            if ttype == "BED":
-                if profiles.get("bed_ref") is None:
-                    continue
-                bed_ref = profiles["bed_ref"]
-                bed_alt = profiles["bed_alt"]
-                track_len = profiles["bed_track_len"]
-                track_start = profiles["bed_track_start"]
-                try:
-                    idx = bed_names.index(tid)
-                except ValueError:
-                    continue
-                bed_pos = vcenter - track_start
-                delta_at = (
-                    float(bed_alt[bed_pos, idx] - bed_ref[bed_pos, idx])
-                    if 0 <= bed_pos < track_len
-                    else 0.0
-                )
-                all_tracks.append(
-                    {
-                        "name": item["display_name"],
-                        "ref": bed_ref[:, idx],
-                        "alt": bed_alt[:, idx],
-                        "type": "BED",
-                        "track_start": track_start,
-                        "delta_at_variant": delta_at,
-                    }
-                )
+        if ttype == "BED":
+            if profiles.get("bed_ref") is None:
+                continue
+            bed_ref = profiles["bed_ref"]
+            bed_alt = profiles["bed_alt"]
+            track_len = profiles["bed_track_len"]
+            track_start = profiles["bed_track_start"]
+            try:
+                idx = bed_names.index(tid)
+            except ValueError:
+                continue
+            bed_pos = vcenter - track_start
+            delta_at = (
+                float(bed_alt[bed_pos, idx] - bed_ref[bed_pos, idx])
+                if 0 <= bed_pos < track_len
+                else 0.0
+            )
+            all_tracks.append(
+                {
+                    "name": item["display_name"],
+                    "ref": bed_ref[:, idx],
+                    "alt": bed_alt[:, idx],
+                    "type": "BED",
+                    "track_start": track_start,
+                    "delta_at_variant": delta_at,
+                }
+            )
 
-            elif ttype == "BigWig":
-                if profiles.get("bw_ref") is None:
-                    continue
-                bw_ref = profiles["bw_ref"]
-                bw_alt = profiles["bw_alt"]
-                track_len = profiles["bw_track_len"]
-                track_start = profiles["bw_track_start"]
-                try:
-                    global_idx = bigwig_names.index(tid)
-                except ValueError:
-                    continue
-                bw_pos = vcenter - track_start
-                delta_at = (
-                    float(bw_alt[bw_pos, global_idx] - bw_ref[bw_pos, global_idx])
-                    if 0 <= bw_pos < track_len
-                    else 0.0
-                )
-                all_tracks.append(
-                    {
-                        "name": item["display_name"],
-                        "ref": bw_ref[:, global_idx],
-                        "alt": bw_alt[:, global_idx],
-                        "type": "BigWig",
-                        "track_start": track_start,
-                        "delta_at_variant": delta_at,
-                    }
-                )
-    else:
-        # Fallback: auto-select by point delta (legacy behaviour)
-        all_tracks = _auto_select_tracks(
-            profiles, metadata_df, metadata_dict, top_k_bed, top_k_bw
-        )
-
+        elif ttype == "BigWig":
+            if profiles.get("bw_ref") is None:
+                continue
+            bw_ref = profiles["bw_ref"]
+            bw_alt = profiles["bw_alt"]
+            track_len = profiles["bw_track_len"]
+            track_start = profiles["bw_track_start"]
+            try:
+                global_idx = bigwig_names.index(tid)
+            except ValueError:
+                continue
+            bw_pos = vcenter - track_start
+            delta_at = (
+                float(bw_alt[bw_pos, global_idx] - bw_ref[bw_pos, global_idx])
+                if 0 <= bw_pos < track_len
+                else 0.0
+            )
+            all_tracks.append(
+                {
+                    "name": item["display_name"],
+                    "ref": bw_ref[:, global_idx],
+                    "alt": bw_alt[:, global_idx],
+                    "type": "BigWig",
+                    "track_start": track_start,
+                    "delta_at_variant": delta_at,
+                }
+            )
     if not all_tracks:
         return None
 
@@ -200,7 +187,7 @@ def generate_region_tracks_plot(
     genomic_origin = pos - vcenter  # genomic coord at token 0
     n_bed = len(bed_group)
     requested_radius_bp = max(int(visible_radius_bp), 8)
-    view_bounds = get_track_view_bounds()
+    view_bounds = get_track_view_bounds(profiles)
     max_radius_bp = view_bounds.get("max_radius")
     effective_radius_bp = (
         min(requested_radius_bp, max_radius_bp)
@@ -347,108 +334,3 @@ def generate_region_tracks_plot(
 
     plt.tight_layout(rect=(0, 0.03, 1, 0.96))
     return fig
-
-
-# ── Fallback auto-select (preserves legacy behaviour) ──────────────────
-def _auto_select_tracks(profiles, metadata_df, metadata_dict, top_k_bed, top_k_bw):
-    """Select top tracks by point-delta when no pre-ranked list is given."""
-    tracks = []
-    vcenter = profiles["variant_center"]
-    bed_names = profiles["bed_names"]
-    bigwig_names = profiles["bigwig_names"]
-    selected_bw = profiles["selected_bw_indices"]
-
-    if profiles.get("bed_ref") is not None:
-        bed_ref = profiles["bed_ref"]
-        bed_alt = profiles["bed_alt"]
-        track_len = profiles["bed_track_len"]
-        track_start = profiles["bed_track_start"]
-        bed_pos = vcenter - track_start
-        if 0 <= bed_pos < track_len:
-            deltas = np.abs(bed_alt[bed_pos] - bed_ref[bed_pos])
-            top_idx = np.argsort(deltas)[-top_k_bed:][::-1]
-            for idx in top_idx:
-                name = bed_names[idx] if idx < len(bed_names) else f"BED_{idx}"
-                tracks.append(
-                    {
-                        "name": name,
-                        "ref": bed_ref[:, idx],
-                        "alt": bed_alt[:, idx],
-                        "type": "BED",
-                        "track_start": track_start,
-                        "delta_at_variant": float(
-                            bed_alt[bed_pos, idx] - bed_ref[bed_pos, idx]
-                        ),
-                    }
-                )
-
-    if profiles.get("bw_ref") is not None:
-        bw_ref = profiles["bw_ref"]
-        bw_alt = profiles["bw_alt"]
-        track_len = profiles["bw_track_len"]
-        track_start = profiles["bw_track_start"]
-        bw_pos = vcenter - track_start
-        if 0 <= bw_pos < track_len and selected_bw:
-            sel_ref = bw_ref[bw_pos, selected_bw]
-            sel_alt = bw_alt[bw_pos, selected_bw]
-            abs_d = np.abs(sel_alt - sel_ref)
-            top_local = np.argsort(abs_d)[-top_k_bw:][::-1]
-            for li in top_local:
-                gi = selected_bw[li]
-                tid = bigwig_names[gi] if gi < len(bigwig_names) else f"BW_{gi}"
-                display = _resolve_track_name(tid, metadata_df, metadata_dict)
-                tracks.append(
-                    {
-                        "name": display,
-                        "ref": bw_ref[:, gi],
-                        "alt": bw_alt[:, gi],
-                        "type": "BigWig",
-                        "track_start": track_start,
-                        "delta_at_variant": float(
-                            bw_alt[bw_pos, gi] - bw_ref[bw_pos, gi]
-                        ),
-                    }
-                )
-    return tracks
-
-
-def _resolve_track_name(
-    track_id: str,
-    metadata_df: Optional[pd.DataFrame] = None,
-    metadata_dict: Optional[Dict[str, Dict[str, str]]] = None,
-) -> str:
-    """Resolve a BigWig track ID to a human-readable name."""
-    if metadata_dict:
-        meta = metadata_dict.get(track_id)
-        if meta:
-            parts = [
-                p
-                for p in [
-                    meta.get("tissue", ""),
-                    meta.get("assay", ""),
-                    meta.get("target", ""),
-                ]
-                if p.strip() and p != "nan"
-            ]
-            if parts:
-                name = " | ".join(parts)
-                return name[:55] if len(name) > 55 else name
-
-    if metadata_df is not None:
-        rows = metadata_df[metadata_df["file_id"] == track_id]
-        if not rows.empty:
-            r = rows.iloc[0]
-            parts = [
-                str(p)
-                for p in [
-                    r.get("tissue", ""),
-                    r.get("assay", ""),
-                    r.get("experiment_target", ""),
-                ]
-                if pd.notna(p) and str(p).strip()
-            ]
-            if parts:
-                name = " | ".join(parts)
-                return name[:55] if len(name) > 55 else name
-
-    return track_id[:40]

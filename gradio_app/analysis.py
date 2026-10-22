@@ -13,10 +13,10 @@ Provides:
 Usage:
     from analysis import compute_impact_scores, make_fingerprint_plot
     df = compute_impact_scores(df)
-    fig = make_fingerprint_plot(row, bed_names, bw_names, metadata_df)
+    ranked = rank_top_disrupted_tracks(row, bed_names, bw_names)
+    fig = make_fingerprint_plot(ranked, top_k=15)
 """
 
-from dataclasses import dataclass
 from pathlib import Path
 from typing import List, Tuple, Optional, Dict, Any
 
@@ -45,22 +45,6 @@ MLM_SIGNAL_SPECS = [
     ("EMB_max_pos_dist", "Embedding max-pos dist", False),
     ("EMB_mean_pos_dist", "Embedding mean-pos dist", False),
 ]
-
-
-# ============================================================================
-# DATA STRUCTURES
-# ============================================================================
-@dataclass
-class MechanisticSummary:
-    """Concise summary of top disrupted features for a variant."""
-
-    variant_id: str
-    gene_name: str
-    region_class: str
-    top_features: List[Tuple[str, float, str]]  # (name, delta, GOF/LOF)
-    impact_score_bed: float
-    llr: float
-    description: Optional[str] = None
 
 
 # ============================================================================
@@ -190,6 +174,9 @@ def load_magi_baseline(
     baseline: Dict[str, Dict[str, pd.Series]] = {}
     for variant_type, subset in stats_df.groupby("variant_type"):
         key = str(variant_type).strip().lower()
+        # The CSV lists "indel" twice: first the pooled benign-indel background used in
+        # the paper, then ClinVar's small "Indel" (delins) subtype. Keep the pooled rows.
+        subset = subset.drop_duplicates("delta_col")
         baseline[key] = {
             "mean": pd.Series(
                 subset["mean"].astype(float).to_numpy(),
@@ -317,137 +304,8 @@ def extract_top_summary_signals(
     return summary
 
 
-def get_top_features(
-    row: pd.Series,
-    bed_cols: List[str],
-    bw_cols: Optional[List[str]] = None,
-    k: int = 10,
-) -> List[Tuple[str, float, str]]:
-    """
-    Extract top K disrupted features for a variant.
-
-    Args:
-        row: DataFrame row with delta columns
-        bed_cols: BED delta column names
-        bw_cols: BigWig delta column names (optional)
-        k: Number of features to return
-
-    Returns:
-        List of (feature_name, delta, direction) tuples
-        direction is 'GOF' (gain) or 'LOF' (loss)
-    """
-    deltas = {}
-
-    # Accumulate BED deltas
-    for col in bed_cols:
-        if col in row.index and not pd.isna(row[col]):
-            name = col.replace("D_BED_", "")
-            deltas[name] = float(row[col])
-
-    # Accumulate BigWig deltas (truncate long names)
-    if bw_cols:
-        for col in bw_cols:
-            if col in row.index and not pd.isna(row[col]):
-                name = col.replace("D_BW_", "")
-                if len(name) > 40:
-                    name = name[:37] + "..."
-                deltas[name] = float(row[col])
-
-    # Sort by absolute value
-    top_items = sorted(deltas.items(), key=lambda x: abs(x[1]), reverse=True)[:k]
-
-    # Add direction
-    result = []
-    for feat_name, delta_val in top_items:
-        direction = "GOF" if delta_val > 0 else "LOF"
-        result.append((feat_name, delta_val, direction))
-
-    return result
 
 
-def summarize_variant(
-    row: pd.Series, bed_cols: List[str], bw_cols: Optional[List[str]] = None, k: int = 5
-) -> MechanisticSummary:
-    """
-    Create a mechanistic summary for a variant.
-
-    Args:
-        row: DataFrame row
-        bed_cols: BED delta column names
-        bw_cols: BigWig delta column names
-        k: Number of top features
-
-    Returns:
-        MechanisticSummary object
-    """
-    top_features = get_top_features(row, bed_cols, bw_cols, k=k)
-
-    variant_id = f"{row.get('chrom', 'chr?')}:{row.get('pos', '?')} {row.get('ref', '?')}>{row.get('alt', '?')}"
-    gene_name = row.get("gene_name", "")
-    region_class = row.get("region_class", "OTHER")
-    impact_bed = row.get("Impact_Score_BED", np.nan)
-    llr = row.get("LLR", np.nan)
-
-    return MechanisticSummary(
-        variant_id=variant_id,
-        gene_name=gene_name,
-        region_class=region_class,
-        top_features=top_features,
-        impact_score_bed=impact_bed,
-        llr=llr,
-    )
-
-
-# ============================================================================
-# BIGWIG DESCRIPTION MAPPING
-# ============================================================================
-def get_top_bigwig_descriptions(
-    row: pd.Series, metadata_df: pd.DataFrame, k: int = 5
-) -> List[Tuple[str, float, str]]:
-    """
-    Get top BigWig track changes with human-readable descriptions.
-
-    Args:
-        row: DataFrame row with D_BW_* columns
-        metadata_df: Track metadata with columns [file_id, tissue, assay, experiment_target]
-        k: Number of tracks to return
-
-    Returns:
-        List of (description, delta, direction) tuples
-        description format: "{tissue} | {assay} | {target}"
-    """
-    bw_cols = [c for c in row.index if c.startswith("D_BW_")]
-
-    deltas = {}
-    for col in bw_cols:
-        if not pd.isna(row[col]):
-            track_id = col.replace("D_BW_", "")
-            delta = float(row[col])
-
-            # Look up metadata
-            meta = metadata_df[metadata_df["file_id"] == track_id]
-            if not meta.empty:
-                r = meta.iloc[0]
-                tissue = r.get("tissue", "")
-                assay = r.get("assay", "")
-                target = r.get("experiment_target", "")
-                desc = f"{tissue} | {assay}"
-                if pd.notna(target) and str(target).strip():
-                    desc += f" | {target}"
-            else:
-                desc = track_id
-
-            deltas[desc] = delta
-
-    # Sort by absolute value
-    top_items = sorted(deltas.items(), key=lambda x: abs(x[1]), reverse=True)[:k]
-
-    result = []
-    for desc, delta in top_items:
-        direction = "Gain" if delta > 0 else "Loss"
-        result.append((desc, delta, direction))
-
-    return result
 
 
 def _clean_part(s: str) -> str:
