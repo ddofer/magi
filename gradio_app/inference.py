@@ -573,7 +573,6 @@ def load_model_and_resources(device: str = "cuda"):
 
     Handles:
     - HF_TOKEN authentication for gated models
-    - bf16 mixed precision when supported by GPU
     """
     if _MODEL_CACHE["model"] is not None:
         return  # Already loaded
@@ -585,23 +584,10 @@ def load_model_and_resources(device: str = "cuda"):
 
     print(f"🧠 Loading NTv3 model '{MODEL_NAME}' on {device}...")
 
-    # Prepare bf16 kwargs if GPU supports bfloat16
-    bf16_kwargs = {}
-    if device == "cuda" and torch.cuda.is_bf16_supported():
-        print("💾 Enabling bf16 mixed precision to reduce memory usage")
-        bf16_kwargs = {
-            "stem_compute_dtype": "bfloat16",
-            "down_convolution_compute_dtype": "bfloat16",
-            "transformer_qkvo_compute_dtype": "bfloat16",
-            "transformer_ffn_compute_dtype": "bfloat16",
-            "up_convolution_compute_dtype": "bfloat16",
-            "modulation_compute_dtype": "bfloat16",
-        }
-
     try:
         model = (
             AutoModel.from_pretrained(
-                MODEL_NAME, trust_remote_code=True, token=hf_token, **bf16_kwargs
+                MODEL_NAME, trust_remote_code=True, token=hf_token
             )
             .to(device)
             .eval()
