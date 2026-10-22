@@ -4,7 +4,7 @@ Public repo (github.com/ddofer/magi). Layout, usage and citation are in README.m
 
 ## Environment
 
-- Python 3.13 in `.venv`, managed by `uv` (torch cu128, transformers 5). Run scripts with `uv run --no-sync python ...` or `.venv/bin/python`; add packages with `uv add`/`uv pip install`, not `pip`. One venv for everything, including `clinvar_pipeline/` and `rebuttal/`.
+- Python 3.13 in `.venv`, managed by `uv` (torch cu128, transformers 5). Run scripts with `uv run --no-sync python ...` or `.venv/bin/python`; add packages with `uv pip install` (no `pyproject.toml`; `pip` is not in the venv). One venv for everything, including `clinvar_pipeline/` and `rebuttal/`.
 - NTv3 (`InstaDeepAI/NTv3_650M_post`) is gated: needs `HF_TOKEN`. Use the shared cache `HF_HOME=/storage/models/hf_home`; never copy models into the repo.
 - LLM stages read `GEMINI_API_KEY` from the environment. Never hardcode keys in notebooks or scripts.
 
