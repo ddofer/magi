@@ -36,22 +36,24 @@ def run_smoke_test(mode="snp", model_size="100M"):
         if result is None or result.empty:
             raise ValueError("Inference returned no variants")
 
-        for kind in ("BED", "BW"):
-            for prefix in (f"D_{kind}_", f"REF_{kind}_"):
-                columns = [c for c in result.columns if c.startswith(prefix)]
-                if not columns:
-                    raise ValueError(f"Missing {prefix} output columns")
-                values = result[columns].to_numpy().ravel()
-                if np.isinf(values).any():
-                    raise ValueError(f"Infinite values in {prefix} outputs")
-                values = values[~np.isnan(values)]  # NaN marks a variant outside the track window
-                if values.size == 0:
-                    raise ValueError(f"All {prefix} outputs are NaN")
-                if prefix.startswith("REF_") and not ((values >= 0) & (values <= 1)).all():
-                    raise ValueError(f"{prefix} probabilities outside [0, 1]")
-                if prefix.startswith("D_") and not values.any():
-                    raise ValueError(f"All {prefix} deltas are zero: ref and alt windows identical")
-                print(f"  {prefix}: range [{values.min():.6f}, {values.max():.6f}]")
+        for prefix in ("D_BED_", "REF_BED_", "D_BW_", "REF_BW_", "LFC_", "WIN_"):
+            columns = [c for c in result.columns if c.startswith(prefix)]
+            if not columns:
+                if prefix in ("LFC_", "WIN_"):  # absent from older outputs
+                    continue
+                raise ValueError(f"Missing {prefix} output columns")
+            frame = result[columns].select_dtypes("number") if prefix == "LFC_" else result[columns]  # LFC_top_track
+            values = frame.to_numpy().ravel()
+            if np.isinf(values).any():
+                raise ValueError(f"Infinite values in {prefix} outputs")
+            values = values[~np.isnan(values)]  # NaN marks a variant outside the track window
+            if values.size == 0:
+                raise ValueError(f"All {prefix} outputs are NaN")
+            if prefix.startswith("REF_") and not ((values >= 0) & (values <= 1)).all():
+                raise ValueError(f"{prefix} probabilities outside [0, 1]")
+            if prefix.startswith("D_") and not values.any():
+                raise ValueError(f"All {prefix} deltas are zero: ref and alt windows identical")
+            print(f"  {prefix}: range [{values.min():.6f}, {values.max():.6f}]")
 
         print(f"Smoke test passed: {base.OUTPUT_RESULTS_FILE}")
         return True

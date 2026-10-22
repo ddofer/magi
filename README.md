@@ -108,7 +108,7 @@ python smoke_test.py --mode snp --model-size 100M
 python smoke_test.py --mode indel --model-size 100M
 ```
 
-Smoke outputs stay under `scratch/smoke_snp/` or `scratch/smoke_indel/`. These checks use an 8K window; the indel run also exercises embeddings. They check output structure and probability bounds; they do not validate biological accuracy.
+Smoke outputs stay under `scratch/smoke_snp/` or `scratch/smoke_indel/`. These checks use an 8K window; the indel run also exercises embeddings. They check output structure and probability bounds, and that any `LFC_` and `WIN_` columns are not all NaN or infinite; they do not validate biological accuracy.
 
 ## Dependencies
 

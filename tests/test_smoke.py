@@ -92,6 +92,19 @@ class SmokeTest(unittest.TestCase):
         self.run_smoke(result, mode="snp")
         self.assertFalse(self.use_embeddings)
 
+    def test_lfc_win_outputs(self):
+        tracks = {
+            "D_BED_exon": [0.1, 0.2], "REF_BED_exon": [0.4, 0.3],
+            "D_BW_track": [-0.2, 0.1], "REF_BW_track": [0.7, 0.2],
+        }
+        lfc_win = {
+            "LFC_max_abs": [0.5, -0.3], "LFC_top_track": ["t1", None],
+            "WIN_splice_donor_gain": [0.0, 0.1], "WIN_splice_donor_gain_pos": [float("nan")] * 2,
+        }
+        self.assertTrue(self.run_smoke(pd.DataFrame(tracks | lfc_win)))
+        self.assertFalse(self.run_smoke(pd.DataFrame(tracks | lfc_win | {"LFC_max_abs": [float("nan")] * 2})))
+        self.assertFalse(self.run_smoke(pd.DataFrame(tracks | lfc_win | {"WIN_splice_donor_gain": [float("inf"), 0.0]})))
+
     def test_empty_output_fails(self):
         self.assertFalse(self.run_smoke(pd.DataFrame()))
 

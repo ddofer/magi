@@ -72,7 +72,7 @@ python3 scripts/run_figures.py --fig all
 
 Optional LLM re-runs: `scripts/04_run_llm_parallel.py`, `scripts/05_run_llm_batch.py`.
 
-**Rule table (supplement).** Run `python3 scripts/export_rule_table.py [--out PATH]`. It writes one row per rule condition, for SNVs and indels, to `output/mechanisms/rule_table.csv`.
+**Rule table (supplement).** Run `python3 scripts/export_rule_table.py [--out PATH]`. It writes one row per rule condition, for SNVs and indels, to `output/mechanisms/rule_table.csv`. `scripts/07_assign_mechanisms.py` writes the same file next to the mechanism CSVs.
 - Columns: tier, order within the tier (the tie-break used), primary (OR) or secondary (AND) role, feature, operator and threshold.
 - `can_be_primary` flags rules that a higher-priority rule always pre-empts. It compares conditions on the same feature only, so it can miss blocking through correlated features.
 
@@ -85,6 +85,7 @@ Optional LLM re-runs: `scripts/04_run_llm_parallel.py`, `scripts/05_run_llm_batc
 
 **Frozen benign background.** `compute_impact_frame(df, background="gradio_app/data/magi_baseline_stats.csv")` z-scores against the stored per-type benign mean and SD. Use it instead of the cohort's own benign rows for sets without labels, such as gnomAD or saturation mutagenesis.
 - `tools/build_background.py SNV.parquet INDEL.parquet -o out.csv` rebuilds that file (population SD, NaN ignored). Run it through srun with about 4 CPUs and 48 GB.
+- `scripts/06_compute_impact_scores.py --background PATH` uses it and writes `*_deltas_impact_frozen_bg.parquet`, so the paper figures keep reading the default files. Without the flag, script 06 uses the cohort's own benign rows, as in the paper.
 - Rebuilt from the paper deltas, it matches the tracked file byte for byte.
 - Background keys are lower-case ClinVar types: snp, deletion, insertion and indel.
 

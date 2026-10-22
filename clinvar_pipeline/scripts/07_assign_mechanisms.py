@@ -18,6 +18,7 @@ elif str(REPO_ROOT) not in sys.path:
 
 from config import PATHS
 from nt_mechanism_assignment import run_assignment
+from export_rule_table import write_rule_table
 
 
 def main() -> None:
@@ -35,6 +36,7 @@ def main() -> None:
         PATHS["indel_mechanisms_csv"],
         "indel",
     )
+    write_rule_table()
     print("\n✓ Mechanism assignment complete.")
 
 
