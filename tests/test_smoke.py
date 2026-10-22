@@ -17,7 +17,7 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class SmokeTest(unittest.TestCase):
-    def run_smoke(self, result):
+    def run_smoke(self, result, **kwargs):
         scratch = ROOT / "scratch"
         scratch.mkdir(exist_ok=True)
         original_cwd = Path.cwd()
@@ -26,13 +26,18 @@ class SmokeTest(unittest.TestCase):
             with tempfile.TemporaryDirectory(dir=scratch) as work:
                 os.chdir(work)
                 input_df = pd.DataFrame({"label": ["Benign"] * 200})
+
+                def fake_main():
+                    self.use_embeddings = smoke_test.base.USE_EMBEDDINGS
+                    return result
+
                 with (
                     patch.object(pd, "read_parquet", return_value=input_df),
                     patch.object(pd.DataFrame, "to_parquet"),
-                    patch.object(smoke_test.base, "main", return_value=result),
+                    patch.object(smoke_test.base, "main", fake_main),
                     redirect_stdout(StringIO()),
                 ):
-                    return smoke_test.run_smoke_test()
+                    return smoke_test.run_smoke_test(**kwargs)
         finally:
             os.chdir(original_cwd)
             for name, value in original_config.items():
@@ -61,6 +66,31 @@ class SmokeTest(unittest.TestCase):
             "D_BW_track": [-0.2, 0.0], "REF_BW_track": [0.7, 0.2],
         })
         self.assertTrue(self.run_smoke(result))
+
+    def test_all_zero_delta_column_fails(self):
+        # Every delta zero means ref and alt windows were identical (e.g. all-N sequence).
+        result = pd.DataFrame({
+            "D_BED_exon": [0.0, 0.0], "REF_BED_exon": [0.4, 0.3],
+            "D_BW_track": [-0.2, 0.1], "REF_BW_track": [0.7, 0.2],
+        })
+        self.assertFalse(self.run_smoke(result))
+
+    def test_infinite_output_fails(self):
+        result = pd.DataFrame({
+            "D_BED_exon": [float("inf")], "REF_BED_exon": [0.4],
+            "D_BW_track": [-0.2], "REF_BW_track": [0.7],
+        })
+        self.assertFalse(self.run_smoke(result))
+
+    def test_indel_mode_enables_embeddings(self):
+        result = pd.DataFrame({
+            "D_BED_exon": [0.1], "REF_BED_exon": [0.4],
+            "D_BW_track": [-0.2], "REF_BW_track": [0.7],
+        })
+        self.run_smoke(result, mode="indel")
+        self.assertTrue(self.use_embeddings)
+        self.run_smoke(result, mode="snp")
+        self.assertFalse(self.use_embeddings)
 
     def test_empty_output_fails(self):
         self.assertFalse(self.run_smoke(pd.DataFrame()))

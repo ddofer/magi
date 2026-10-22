@@ -48,4 +48,3 @@ python3 scripts/run_figures.py --fig all
 
 - [../ARTIFACTS.md](../ARTIFACTS.md)
 - [../clinvar/README.md](../clinvar/README.md)
-- [../output/README.md](../output/README.md)

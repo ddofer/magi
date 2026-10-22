@@ -80,10 +80,6 @@ python3 tools/run_validation.py
 
 This command refreshes inputs and rewrites derived outputs. Run individual numbered stages to prepare cohorts or extract signals.
 
-### Notebooks
-
-- [`notebooks/variant_rationale_lookup.ipynb`](notebooks/variant_rationale_lookup.ipynb) — inspect ClinVar rationales for any variant by locus
-
 ## Outputs
 
 Publication figures are written to `output/figures/`:

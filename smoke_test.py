@@ -4,6 +4,7 @@
 import argparse
 from pathlib import Path
 import sys
+import traceback
 
 import numpy as np
 import pandas as pd
@@ -12,22 +13,20 @@ import inference as base
 
 
 def run_smoke_test(mode="snp", model_size="100M"):
-    """Run a tiny inference check with an 8K window and no embeddings."""
+    """Run a tiny inference check with an 8K window; embeddings on for indels, as in inference_indel.py."""
     work_dir = Path.cwd() / "scratch" / f"smoke_{mode}"
     work_dir.mkdir(parents=True, exist_ok=True)
-    base.DEBUG_MODE = False
     base.CONTEXT_LEN = 8 * 1024
-    base.BATCH_SIZE = 2
     base.USE_BED = True
     base.USE_BIGWIGS = True
     base.USE_KL_DIVERGENCE = True
-    base.USE_EMBEDDINGS = False
+    base.USE_EMBEDDINGS = mode == "indel"
     base.MODEL_NAME = f"InstaDeepAI/NTv3_{model_size}_post"
     base.OUTPUT_RESULTS_FILE = str(work_dir / "deltas.parquet")
     input_file = "clinvar_input.parquet" if mode == "snp" else "clinvar_indel.parquet"
 
     try:
-        df = pd.read_parquet(input_file).head(2).copy()
+        df = pd.read_parquet(input_file).head(2)
         if df.empty:
             raise ValueError("Input contains no variants")
         base.INPUT_DATA_FILE = str(work_dir / "input.parquet")
@@ -50,11 +49,14 @@ def run_smoke_test(mode="snp", model_size="100M"):
                     raise ValueError(f"All {prefix} outputs are NaN")
                 if prefix.startswith("REF_") and not ((values >= 0) & (values <= 1)).all():
                     raise ValueError(f"{prefix} probabilities outside [0, 1]")
+                if prefix.startswith("D_") and not values.any():
+                    raise ValueError(f"All {prefix} deltas are zero: ref and alt windows identical")
                 print(f"  {prefix}: range [{values.min():.6f}, {values.max():.6f}]")
 
         print(f"Smoke test passed: {base.OUTPUT_RESULTS_FILE}")
         return True
     except Exception as exc:
+        traceback.print_exc()
         print(f"Smoke test failed: {exc}")
         return False
 

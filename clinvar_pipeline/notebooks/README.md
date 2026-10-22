@@ -2,7 +2,6 @@
 
 | Notebook | Description |
 |----------|-------------|
-| [`variant_rationale_lookup.ipynb`](variant_rationale_lookup.ipynb) | Look up ClinVar submission rationales for any variant by locus |
 | [`analysis_v2 animals.ipynb`](analysis_v2%20animals.ipynb) | Legacy reference for OMIA animal analysis (superseded by scripts 08–10) |
 | [`animals_result_analysis.ipynb`](animals_result_analysis.ipynb) | OMIA LLM concordance plots (source for supplementary Fig S1) |
 

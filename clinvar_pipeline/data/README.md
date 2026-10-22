@@ -44,4 +44,3 @@ python3 tools/gather_canonical_llm.py --force
 ## Related docs
 
 - [../ARTIFACTS.md](../ARTIFACTS.md)
-- [../output/README.md](../output/README.md)
