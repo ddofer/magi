@@ -293,6 +293,9 @@ def to_track_probabilities(track_values):
 def load_model_and_tokenizer(model_name, device="cuda"):
     """Load NTv3 model + tokenizer."""
     print(f" Loading {model_name} on {device}...")
+    # TF32 matmuls on Ampere+ (fp32 accumulate, ~1e-3 relative input rounding): not byte-exact
+    # with the paper's fp32 runs, but far below the benign-background noise of the deltas.
+    torch.set_float32_matmul_precision("high")
     model = (
         AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device).eval()
     )

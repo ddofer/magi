@@ -583,6 +583,7 @@ def load_model_and_resources(device: str = "cuda"):
         print("⚠️  HF_TOKEN not set; model loading may fail if the model is gated")
 
     print(f"🧠 Loading NTv3 model '{MODEL_NAME}' on {device}...")
+    torch.set_float32_matmul_precision("high")  # TF32 matmuls on GPU; fp32 accumulate, heads stay fp32
 
     try:
         model = (
