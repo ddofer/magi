@@ -78,3 +78,18 @@ class RegionPlotTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SlimProfilesTest(unittest.TestCase):
+    def test_slim_keeps_only_ranked_tracks_and_plots_the_same(self):
+        full = fake_profiles("chr7", 117559590, "ATCT", "A")
+        full["bed_names"] = ["exon", "intron", "ORF"]
+        full["bed_ref"] = np.tile([0.1, 0.2, 0.3], (40, 1))
+        full["bed_alt"] = np.tile([0.5, 0.6, 0.7], (40, 1))
+        ranked = [{"track_id": "ORF", "track_type": "BED", "display_name": "ORF", "delta": 0.4}]
+        slim = tracks.slim_profiles(full, ranked)
+        self.assertEqual(slim["bed_names"], ["ORF"])
+        self.assertEqual(slim["bed_ref"].shape, (40, 1))
+        self.assertEqual(float(slim["bed_alt"][0, 0]), 0.7)
+        fig = tracks.generate_region_tracks_plot(ranked_tracks=ranked, visible_radius_bp=10, profiles=slim)
+        self.assertIn("chr7:117,559,590 ATCT>A", fig._suptitle.get_text())

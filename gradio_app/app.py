@@ -70,7 +70,7 @@ from analysis import (
     make_fingerprint_plot,
     format_summary_table,
 )
-from tracks import generate_region_tracks_plot, get_track_view_bounds
+from tracks import generate_region_tracks_plot, get_track_view_bounds, slim_profiles
 from interpretation import build_signal_interpretation
 
 # Suppress warnings for cleaner UI
@@ -205,8 +205,6 @@ def predict_single_variant_ui(species, chrom, pos, ref, alt, zoom_bp=DEFAULT_ZOO
         mlm_md,
         plot_state,
     ) = result
-    if not isinstance(plot_state, dict):  # error path
-        plot_state = None
 
     tracks_png_path = None
     try:
@@ -457,10 +455,33 @@ def _cached_inference(species: str, chrom: str, pos: int, ref: str, alt: str):
         err = df["fetch_error"].iloc[0]
         if isinstance(err, str) and err:
             raise RuntimeError(err)
-    profiles = _inference._LAST_TRACK_PROFILES  # set by predict_variants for this variant
+    profiles = _inference._LAST_TRACK_PROFILES  # process global; another thread may have overwritten it
+    if (profiles.get("chrom"), profiles.get("pos"), profiles.get("ref"), profiles.get("alt")) != (chrom, int(pos), ref, alt):
+        profiles = {}
     df = _apply_species_annotations(df, species)
     df = compute_impact_scores(df)
-    return df, profiles
+    ranked = _rank_tracks(df.iloc[0], species)
+    # Keep only the ranked tracks' profiles: the full set is ~360 MB per variant and this is cached.
+    return df, ranked, slim_profiles(profiles, ranked) if profiles else {}
+
+
+def _rank_tracks(row, species):
+    bed_names = _MODEL_CACHE.get("bed_names", [])
+    bw_names_selected = _MODEL_CACHE.get("selected_bw_indices", [])
+    bw_names_all = _MODEL_CACHE.get("bigwig_names", [])
+    bw_names_filtered = (
+        [bw_names_all[i] for i in bw_names_selected]
+        if _is_human_species(species) and bw_names_selected and bw_names_all
+        else None
+    )
+    return rank_top_disrupted_tracks(
+        row,
+        bed_names,
+        bw_names_filtered,
+        metadata_df=TRACK_METADATA,
+        metadata_dict=TRACK_META_DICT,
+        top_k=None,
+    )
 
 
 # ----------------------------------------------------------------------------
@@ -571,7 +592,7 @@ def predict_single_variant(
         species = str(species).strip()
         print(f"🔬 Predicting {species} {chrom}:{pos} {ref_clean}>{alt_clean}...")
         try:
-            results_df, profiles = _cached_inference(
+            results_df, ranked, profiles = _cached_inference(
                 species, str(chrom), int(pos), ref_clean, alt_clean
             )
         except RuntimeError as fetch_err:
@@ -639,24 +660,6 @@ def predict_single_variant(
             context_tags = "Intergenic (no annotated features)"
 
         # === 1. Unified ranking → fingerprint, table, region tracks ===
-        bed_names = _MODEL_CACHE.get("bed_names", [])
-        bw_names_selected = _MODEL_CACHE.get("selected_bw_indices", [])
-        bw_names_all = _MODEL_CACHE.get("bigwig_names", [])
-        bw_names_filtered = (
-            [bw_names_all[i] for i in bw_names_selected]
-            if _is_human_species(species) and bw_names_selected and bw_names_all
-            else None
-        )
-
-        ranked = rank_top_disrupted_tracks(
-            row,
-            bed_names,
-            bw_names_filtered,
-            metadata_df=TRACK_METADATA,
-            metadata_dict=TRACK_META_DICT,
-            top_k=None,
-        )
-
         top_table_df = build_top_track_table(
             ranked,
             max_rows=50,
@@ -714,7 +717,7 @@ def predict_single_variant(
 
         # === 2. BED Table (all 21 elements) ===
         bed_table = []
-        for name in bed_names:
+        for name in _MODEL_CACHE.get("bed_names", []):
             ref_col = f"REF_BED_{name}"
             delta_col = f"D_BED_{name}"
             if ref_col in row.index and delta_col in row.index:
@@ -874,7 +877,7 @@ def predict_batch(species, file):
         input_df = input_df.copy()
         input_df["chrom"] = input_df["chrom"].astype(str).str.strip()
         for col in ("ref", "alt"):
-            input_df[col] = input_df[col].astype(str).str.strip().str.upper()
+            input_df[col] = input_df[col].fillna("").astype(str).str.strip().str.upper()
         bad = ~(input_df["ref"].map(_validate_allele) & input_df["alt"].map(_validate_allele))
         if bad.any():
             rows = ", ".join(str(i + 1) for i in input_df.index[bad])
@@ -887,7 +890,7 @@ def predict_batch(species, file):
         print(f"🔬 Processing batch of {len(input_df)} variants for {species}...")
 
         # Run inference
-        results_df = predict_variants(input_df, device=DEVICE, species=species)
+        results_df = predict_variants(input_df, device=DEVICE, species=species, cache_profiles=False)
 
         # Annotate
         results_df = _apply_species_annotations(results_df, species)

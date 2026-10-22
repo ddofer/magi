@@ -39,6 +39,20 @@ def _profiles_or_last(profiles):
     return profiles
 
 
+def slim_profiles(profiles: Dict, ranked_tracks: List[Dict], max_tracks: int = 50) -> Dict:
+    """Copy of *profiles* holding only the ranked tracks' columns (~MBs instead of ~360 MB)."""
+    slim = dict(profiles)
+    for kind, key in (("BED", "bed"), ("BigWig", "bw")):
+        names = profiles[f"{key}_names" if key == "bed" else "bigwig_names"]
+        ref, alt = profiles.get(f"{key}_ref"), profiles.get(f"{key}_alt")
+        wanted = [t["track_id"] for t in ranked_tracks[:max_tracks] if t["track_type"] == kind]
+        idx = [names.index(t) for t in wanted if t in names]
+        slim["bed_names" if key == "bed" else "bigwig_names"] = [names[i] for i in idx]
+        if ref is not None:
+            slim[f"{key}_ref"], slim[f"{key}_alt"] = ref[:, idx], alt[:, idx]
+    return slim
+
+
 def get_track_view_bounds(profiles: Optional[Dict] = None) -> Dict[str, Optional[int]]:
     """Return the symmetric track-view bounds available for *profiles* (default: last variant run)."""
     profiles = _profiles_or_last(profiles)
