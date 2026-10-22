@@ -48,7 +48,8 @@ def load_background(background: str | Path | pd.DataFrame) -> dict[str, pd.DataF
     bg = bg.assign(variant_type=bg["variant_type"].str.strip().str.lower())
     # The CSV lists "indel" twice: first all benign indels pooled, then ClinVar's "Indel"
     # (delins) subtype. Keep the last, so "Indel" rows get the same subtype background
-    # that the recomputed path uses.
+    # that the recomputed path uses. gradio_app/analysis.py load_magi_baseline deliberately
+    # keeps the first (pooled) block; do not align them.
     bg = bg.drop_duplicates(["variant_type", "delta_col"], keep="last")
     return {vt: g.set_index("delta_col") for vt, g in bg.groupby("variant_type")}
 

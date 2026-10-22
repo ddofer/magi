@@ -512,11 +512,7 @@ def _implies(a, b):
     """True if condition a passing means condition b passes (same feature and direction only)."""
     if a['feature'] != b['feature'] or a['direction'] != b['direction']:
         return False
-    if a['direction'] == 'negative':
-        return a['threshold'] <= b['threshold']
-    if a['direction'] == 'positive':
-        return a['threshold'] >= b['threshold']
-    return abs(a['threshold']) >= abs(b['threshold'])
+    return bool(_check_condition_vec(pd.Series([a['threshold']]), b['threshold'], b['direction']).iat[0])
 
 
 def _always_fires(conds, rules):
@@ -544,13 +540,14 @@ def rule_table(variant_type="snp"):
         higher = [r for _, r in ordered[:i]]
         secondary = rules.get('secondary', [])
         blocked = all(any(_always_fires([p] + secondary, h) for h in higher) for p in rules['primary'])
+        order = sum(r['priority'] == rules['priority'] for r in higher)
         for role, conds in (("primary (OR)", rules['primary']), ("secondary (AND)", secondary)):
             for c in conds:
                 rows.append({
                     "variant_type": variant_type,
                     "mechanism": name,
                     "tier": rules['priority'],
-                    "order_within_tier": sum(r['priority'] == rules['priority'] for r in higher),
+                    "order_within_tier": order,
                     "condition_role": role,
                     "feature": c['feature'],
                     "direction": c['direction'],
@@ -585,14 +582,14 @@ def _get_column_safe(df, feature):
     return pd.Series(0, index=df.index, dtype=float)
 
 
-def _rule_text(df, rules):
+def _rule_text(df, rules, rows):
     """Assigned rule per row: primary conditions that fired (OR), then secondary conditions (AND), with observed values."""
     def part(cond):
-        col = _get_column_safe(df, cond['feature'])
+        col = _get_column_safe(df, cond['feature'])[rows]
         text = _cond_label(cond) + ' [obs ' + col.map('{:.3f}'.format) + ']'
         return text, _check_condition_vec(col, cond['threshold'], cond['direction'])
 
-    out = pd.Series('', index=df.index)
+    out = pd.Series('', index=df.index[rows])
     for cond in rules['primary']:
         text, hit = part(cond)
         out = out.where(~hit, out.where(out == '', out + ' OR ') + text)
@@ -714,7 +711,7 @@ def assign_mechanisms_vectorized(df, hypothesis_logic):
             nt_description[new_primary] = desc
             nt_trigger[new_primary] = tfeat[new_primary] + '=' + tval[new_primary].map(lambda v: f"{v:.3f}")
             nt_tier[new_primary] = prio
-            nt_rule[new_primary] = _rule_text(df.loc[new_primary], hypothesis_logic[mname])
+            nt_rule[new_primary] = _rule_text(df, hypothesis_logic[mname], new_primary)
             has_primary = has_primary | new_primary
     
     df['NT_Mechanism'] = nt_mechanism

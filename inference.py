@@ -297,10 +297,9 @@ def lfc_summary(lfc, track_ids, groups):
     LFC_mean_abs: mean |lfc|; LFC_max_abs_<group>: LFC_max_abs within each track_groups group.
     """
     top, i = _signed_max_abs(lfc)
-    n = (~np.isnan(lfc)).sum(1)
     out = {
         "LFC_max_abs": top,
-        "LFC_mean_abs": np.nansum(np.abs(lfc), 1) / np.where(n > 0, n, np.nan),
+        "LFC_mean_abs": np.nanmean(np.abs(lfc), 1),
         "LFC_top_track": np.where(np.isnan(top), None, np.asarray(track_ids, object)[i]),
     }
     for g, idx in groups.items():
@@ -614,21 +613,23 @@ def _score_rows(rows, model, ntm, lut, pad_id, cfg):
             if track_rows and heads:
                 x, n = torch.cat(track_rows), [len(t) for t in track_rows]
                 raw = [h(x) for h in heads]
-                out = [to_track_probabilities(r) for r in raw]
+                out = [to_track_probabilities(r) for r in raw]  # before selecting: a 2-track slice would read as BED
+
+                def span_means(t):
+                    return torch.stack([m.mean(0) for m in t.split(n)]).cpu()
+
                 if c["bw_head"] is not None:
                     out[-1] = out[-1][:, c["bw_sel"]]
-                    bw_raw = torch.stack([m.mean(0) for m in raw[-1][:, c["bw_sel"]].split(n)]).cpu()
-                    for read, m in zip(track_reads, bw_raw):
+                    for read, m in zip(track_reads, span_means(raw[-1][:, c["bw_sel"]])):
                         read["bw_raw"] = m  # softplus signal, for LFC_
-                means = torch.stack([m.mean(0) for m in torch.cat(out, -1).split(n)]).cpu()
-                for read, m in zip(track_reads, means):
+                for read, m in zip(track_reads, span_means(torch.cat(out, -1))):
                     read["tracks"] = m
             if win_rows:  # its own head call, so the track values above stay as they were
                 # standard probability (softmax over the 2 classes), not MAGI's sigmoid (AGENTS.md)
-                w = c["bed_head"](torch.cat(win_rows))[:, c["win_el"]].softmax(-1)[..., 1].cpu().numpy()
-                for read, part in zip(win_reads, np.split(w, np.cumsum([r["win_ok"].sum() for r in win_reads])[:-1])):
+                w = c["bed_head"](torch.cat(win_rows))[:, c["win_el"]].softmax(-1)[..., 1].cpu()
+                for read, part in zip(win_reads, w.split([len(t) for t in win_rows])):
                     read["win"] = np.full((len(read["win_ok"]), w.shape[1]), np.nan)
-                    read["win"][read["win_ok"]] = part
+                    read["win"][read["win_ok"]] = part.numpy()
 
     tr_ref = np.full((len(rows), c["n_tracks"]), np.nan)
     tr_d = np.full((len(rows), c["n_tracks"]), np.nan)
