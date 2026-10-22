@@ -566,6 +566,22 @@ def compute_mlm_features(
 # ============================================================================
 # MODEL LOADING AND CACHING
 # ============================================================================
+def _single_species_bigwig(head):
+    """Run only the batch's species head: the stock MultiSpeciesHead runs all 24 and merges them.
+
+    Same values for the batch's species (only width changes: no zero padding to 7362 columns).
+    """
+    stock = head.forward
+
+    def forward(x, head_idx, output_track=False):
+        ids = torch.as_tensor(head_idx).unique()
+        if ids.numel() == 1:
+            return head.species_heads[int(ids)](x)
+        return stock(x, head_idx, output_track)
+
+    head.forward = forward
+
+
 def load_model_and_resources(device: str = "cuda"):
     """
     Load model, tokenizer, genome, and metadata once at startup.
@@ -593,6 +609,8 @@ def load_model_and_resources(device: str = "cuda"):
             .to(device)
             .eval()
         )
+        if getattr(model.core, "bigwig_head", None) is not None:
+            _single_species_bigwig(model.core.bigwig_head)
         tokenizer = AutoTokenizer.from_pretrained(
             MODEL_NAME, trust_remote_code=True, token=hf_token
         )
@@ -820,21 +838,11 @@ def predict_variants(
         # Forward pass
         with torch.no_grad():
             sp = torch.tensor([species_id], device=device)
-            if USE_EMBEDDINGS:
-                try:
-                    out_r = model(**inp_r, species_ids=sp, output_hidden_states=True)
-                    out_a = model(**inp_a, species_ids=sp, output_hidden_states=True)
-                    for o in (out_r, out_a):
-                        if getattr(o, "last_hidden_state", None) is None and hasattr(
-                            o, "hidden_states"
-                        ):
-                            o.last_hidden_state = o.hidden_states[-1]
-                except TypeError:
-                    out_r = model(**inp_r, species_ids=sp)
-                    out_a = model(**inp_a, species_ids=sp)
-            else:
-                out_r = model(**inp_r, species_ids=sp)
-                out_a = model(**inp_a, species_ids=sp)
+            out_r = model(**inp_r, species_ids=sp)
+            out_a = model(**inp_a, species_ids=sp)
+            for o in (out_r, out_a):
+                # The final embedding is hidden_states[-1]; no need to keep every layer's states.
+                o.last_hidden_state = getattr(o, "embedding", None)
 
         # Build result
         res = {c: row[c] for c in df.columns}

@@ -31,8 +31,9 @@ Usage
     python inference_omia.py --species dog cat --sample-size 50
         # sample inference: selected species with custom sample size
 
-    CUDA_VISIBLE_DEVICES=2,3 python inference_omia.py --full
-        # full inference (all variants for run species) on GPUs 2 and 3
+    srun -n 1 -p low -w sblxa123c --gres=gpu:1 -c 4 --mem=32G -t 4:00:00 \
+        uv run --no-sync python inference_omia.py --full
+        # full inference (all variants for run species), through SLURM
 
   python inference_omia.py --species dog cat     # specific species
   python inference_omia.py --fetch-only          # download data + genomes
@@ -51,16 +52,13 @@ Output Format
         Feature columns include REF_BED_*, D_BED_* (42 total), LLR, and MLM_* columns.
         Full output is typically 66 columns:
             13 metadata + 42 BED + 1 LLR + 7 MLM + 3 convenience fields.
-        Note: BigWig columns are NOT produced for non-human species.
-            The NTv3 MultiSpeciesHead uses ZeroHead for species without
-            BigWig training data, yielding constant sigmoid(0)=0.5 outputs.
+        Note: BigWig columns are off by default (USE_BIGWIGS). Each species has its
+            own BigWig head; among these species only mouse has one (2450 tracks).
 
 Gotchas
   1. NTv3 BED tracks (21 genomic elements) work for all species (shared head).
-     BigWig tracks (7k) are **human-only by architecture**: the MultiSpeciesHead
-     uses a separate LinearHead per species, and non-human species get ZeroHead
-     (returns 0-dim tensors, padded to max tracks → logit=0 → sigmoid=0.5).
-     Ref and alt both get 0.5, so deltas are always 0.0.  USE_BIGWIGS=False.
+     BigWig tracks come from a per-species head. Dog, cat, chicken, zebrafish and
+     rat have none (an empty head), so they never get BigWig columns.
   2. Ensembl chroms use NO 'chr' prefix (1, 2, X, A1, etc.).
      OMIA data sometimes includes 'chr' — we strip it.
   3. Mouse NTv3 token is 'mouse' (not 'mus_musculus').
@@ -77,7 +75,6 @@ import argparse
 import io
 import re
 import subprocess
-import warnings
 from pathlib import Path
 from typing import Optional
 
@@ -108,9 +105,7 @@ MODEL_SIZE = "650M"  # '100M' or '650M'
 CONTEXT_LEN = 16 * 1024  # smaller than human (64K) for speed in animal runs
 BATCH_SIZE = 2
 USE_BED = True
-USE_BIGWIGS = False  # BigWig head uses species-specific LinearHead/ZeroHead;
-# non-human species get ZeroHead → sigmoid(0)=0.5 constant
-# outputs, making deltas always 0.  Human-only by architecture.
+USE_BIGWIGS = False  # per-species BigWig heads: of these species only mouse has one (2450 tracks)
 USE_KL_DIVERGENCE = True
 USE_EMBEDDINGS = False  # set True for INDEL-heavy species
 METADATA_FILE = (
@@ -860,9 +855,7 @@ def run_species_inference(
     calls base.run_inference() with the correct species token.
 
     BED names come from the shared model config (21 elements, all species).
-    BigWig is disabled for non-human species: the NTv3 MultiSpeciesHead
-    uses a ZeroHead per non-human species, producing logit=0 → sigmoid=0.5
-    constant for both ref and alt, so all deltas would be 0.0.
+    BigWig names come from the species' own head (USE_BIGWIGS; only mouse has one).
 
     Returns:
       DataFrame of inference results, or None on error.
@@ -896,21 +889,19 @@ def run_species_inference(
                 f"   📂 Genome loaded: {fa_path.name} ({len(genome.keys())} sequences)"
             )
         except Exception as e:
-            warnings.warn(f"Failed to load genome {fa_path}: {e}")
-            genome = None
+            # No fallback: without a genome, inference.py would fetch hg38 at these coordinates.
+            print(f"   ❌ Failed to load genome {fa_path}: {e} — refusing to run inference")
+            return None
     else:
         print(f"   ❌ Genome not found at {fa_path} — refusing to run inference")
         return None
 
     # BED names: shared across all species (21 elements in model config).
-    # BigWig names: only defined for 'human' in model config; the head itself
-    # runs for any species, so we pull human names and apply the same subset
-    # filter (ChIP-seq key marks + ATAC/DNase + CAGE/FANTOM5/GTEx) as a
-    # cross-species regulatory proxy.
-    _bw_lookup_species = "human" if USE_BIGWIGS else token
+    # BigWig names: the species' own head. Of the OMIA species only mouse has one
+    # (2450 tracks); the others have none, so they get no BigWig columns.
     bed_names, bw_names = base.extract_feature_names(
         model,
-        target_species=_bw_lookup_species,
+        target_species=token,
         use_bed=USE_BED,
         use_bigwigs=USE_BIGWIGS,
     )

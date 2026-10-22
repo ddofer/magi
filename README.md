@@ -32,7 +32,18 @@ python inference.py          # clinvar_input.parquet -> clinvar_new_deltas.parqu
 
 Loads NTv3, extracts reference/alternate windows, computes annotation-element and track deltas plus sequence-model metrics (LLR, KL, optional embeddings), and writes a parquet with metadata and features.
 
-Input parquet needs at least `chrom`, `pos`, `ref`, `alt`, `label`; other columns are carried through.
+Input parquet needs at least `chrom`, `pos`, `ref`, `alt`; `label` and other columns are carried through.
+
+Other variant sets use the same script with flags (`python inference.py --help`):
+
+```bash
+python inference.py --input my_variants.parquet --output my_deltas.parquet --compile --share-windows
+```
+
+- `--compile`: `torch.compile` the model. About 1.5x faster after a one-minute compile. Values differ from eager runs by about 0.3% on the largest deltas.
+- `--share-windows`: nearby variants share one reference pass. Only variants at the same position within a 128-letter model token can share, because a 1-letter window shift changes NTv3's track deltas by about 37%. The saving is about 25% of passes for saturation mutagenesis, 14% for ClinVar indels and 2% for ClinVar SNVs. Shared variants sit off the window centre by whole tokens. That changed SNV features by about 1-4%, and moved 2 test indels by about 10%. Do not mix the two modes in one cohort.
+- Results are written in chunks to `<output>.parts/`. A run that is stopped resumes from there; the folder is removed when the output is written.
+- `inference.sbatch` runs this on a SLURM GPU, for example `sbatch inference.sbatch --input my_variants.parquet --output my_deltas.parquet`.
 
 ### Indel inference
 

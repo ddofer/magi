@@ -11,20 +11,23 @@ Public repo (github.com/ddofer/magi). Layout, usage and citation are in README.m
 ## SLURM
 
 Heavy work goes through SLURM, **low priority** for this repo: `-p low` on every `srun`/`sbatch` (preemptible; see the cluster policy for the SIGTERM/requeue pattern on long runs).
+**Always add `-w sblxa123c`**: this repo lives under `/opt/hpc`, which is not mounted on B300, so a job routed there dies before writing its log.
 GPU (`--gres=gpu:1`, even for a quick check): `inference.py`, `inference_indel.py`, `inference_omia.py`, `smoke_test.py`, `gradio_app/app.py`, `paper_figures/regen_magi_app_panels.py`.
 CPU only (still SLURM if over 4 cores, 16 GB or 10 min): `analysis.py`, `clinvar_pipeline/`, `paper_figures/regen_fig2_de_panels.py`, `rebuttal/analyses/`, notebooks in `analyses/`.
-No `.sbatch` scripts exist yet; write one next to the script you run, logs under `logs/` (gitignored). Throwaway output goes in `scratch/` (gitignored).
+`inference.sbatch` is the template (srun inside, open-mode append, `HF_HUB_OFFLINE=1`: the cached model loads without a token); write others next to the script you run, logs under `logs/` (gitignored). Throwaway output goes in `scratch/` (gitignored).
 
 Example:
 
 ```bash
-srun -n 1 -p low --gres=gpu:1 -c 4 --mem=32G -t 0:20:00 uv run --no-sync python smoke_test.py --mode snp --model-size 100M
+srun -n 1 -p low -w sblxa123c --gres=gpu:1 -c 4 --mem=32G -t 0:20:00 uv run --no-sync python smoke_test.py --mode snp --model-size 100M
 ```
 
 ## Configuration
 
-- `inference.py` and `inference_indel.py` have no CLI flags. Settings are module constants near the top (`MODEL_NAME`, `INPUT_DATA_FILE`, `CONTEXT_LEN`, `BATCH_SIZE`, `USE_*`). `smoke_test.py` overrides them by monkeypatching. Only `inference_omia.py` has argparse.
+- `inference.py` settings are module constants near the top (`MODEL_NAME`, `INPUT_DATA_FILE`, `CONTEXT_LEN`, `BATCH_SIZE`, `USE_*`, `SHARE_WINDOWS`, `COMPILE`); its CLI flags only set those constants. `smoke_test.py` and `inference_indel.py` monkeypatch them. Run new variant sets with `sbatch inference.sbatch --input ... --output ...`.
 - `paper_figures/` scripts find the repo from their own path; set `MAGI_ROOT` only when data lives elsewhere.
+- GPU speed (A100, 64 kb, measured 2026-10-22). Tried and dropped for no gain: SDPA attention, compiling single blocks, max-autotune. bf16 needs the config `*_compute_dtype` fields (an outer autocast does nothing) and gave ~8% error on large BigWig deltas.
+- The NTv3 stock forward runs all 24 species' BigWig heads; root `forward_trunk` skips them, `gradio_app/inference.py` patches the head to run only the batch's species.
 
 ## Private material (gitignored, present on disk)
 
