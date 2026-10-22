@@ -12,9 +12,6 @@ import sys
 import os
 import requests
 
-# These are CLI checks; pytest collection must not access the network or models.
-__test__ = False
-
 
 def check_dependencies():
     """Check if all required packages are importable"""
@@ -51,30 +48,30 @@ def check_data_files():
     """Check if required data files exist (local genome optional)."""
     print("🔍 Checking data files...")
 
+    # (parquet, csv) pairs: the parquet is tracked; the csv is optional and converted on first run.
     required_files = [
-        ("data/MANE_processed.csv", "MANE transcripts", 200_000_000),  # ~235 MB
-        ("data/Promoter_processed.csv", "Promoter annotations", 10_000_000),  # ~11 MB
-        (
-            "data/functional_tracks_metadata_human.csv",
-            "BigWig metadata",
-            500_000,
-        ),  # ~519 KB
+        (("data/MANE_processed.parquet", 20_000_000), ("data/MANE_processed.csv", 200_000_000), "MANE transcripts"),
+        (("data/Promoter_processed.parquet", 3_000_000), ("data/Promoter_processed.csv", 10_000_000), "Promoter annotations"),
+        (("data/functional_tracks_metadata_human.csv", 500_000), None, "BigWig metadata"),
     ]
 
     all_present = True
-    for file_path, description, min_size in required_files:
-        if os.path.exists(file_path):
-            size = os.path.getsize(file_path)
-            size_mb = size / 1_000_000
-            if size >= min_size:
-                print(f"  ✓ {description} ({size_mb:.1f} MB)")
-            else:
-                print(
-                    f"  ⚠ {description} exists but may be corrupted ({size_mb:.1f} MB < {min_size / 1_000_000:.1f} MB expected)"
-                )
-                all_present = False
+    for primary, fallback, description in required_files:
+        found = next(
+            (f for f in (primary, fallback) if f and os.path.exists(f[0])), None
+        )
+        if found is None:
+            print(f"  ✗ {description} (missing: {primary[0]})")
+            all_present = False
+            continue
+        file_path, min_size = found
+        size_mb = os.path.getsize(file_path) / 1_000_000
+        if os.path.getsize(file_path) >= min_size:
+            print(f"  ✓ {description} ({file_path}, {size_mb:.1f} MB)")
         else:
-            print(f"  ✗ {description} (missing: {file_path})")
+            print(
+                f"  ⚠ {description} exists but may be corrupted ({size_mb:.1f} MB < {min_size / 1_000_000:.1f} MB expected)"
+            )
             all_present = False
 
     local_fa = os.path.exists("data/hg38.fa")

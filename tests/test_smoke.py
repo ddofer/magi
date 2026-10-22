@@ -55,10 +55,17 @@ class SmokeTest(unittest.TestCase):
     def test_missing_track_outputs_fail(self):
         self.assertFalse(self.run_smoke(pd.DataFrame({"LLR": [0.1]})))
 
+    def test_partial_nan_track_output_passes(self):
+        result = pd.DataFrame({
+            "D_BED_exon": [float("nan"), 0.1], "REF_BED_exon": [float("nan"), 0.4],
+            "D_BW_track": [-0.2, 0.0], "REF_BW_track": [0.7, 0.2],
+        })
+        self.assertTrue(self.run_smoke(result))
+
     def test_empty_output_fails(self):
         self.assertFalse(self.run_smoke(pd.DataFrame()))
 
-    def test_non_finite_track_output_fails(self):
+    def test_all_nan_track_output_fails(self):
         result = pd.DataFrame({
             "D_BED_exon": [float("nan")], "REF_BED_exon": [0.4],
             "D_BW_track": [-0.2], "REF_BW_track": [0.7],

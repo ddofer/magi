@@ -13,7 +13,7 @@ import inference as base
 
 def run_smoke_test(mode="snp", model_size="100M"):
     """Run a tiny inference check with an 8K window and no embeddings."""
-    work_dir = Path(__file__).resolve().parent / "scratch" / f"smoke_{mode}"
+    work_dir = Path.cwd() / "scratch" / f"smoke_{mode}"
     work_dir.mkdir(parents=True, exist_ok=True)
     base.DEBUG_MODE = False
     base.CONTEXT_LEN = 8 * 1024
@@ -43,8 +43,11 @@ def run_smoke_test(mode="snp", model_size="100M"):
                 if not columns:
                     raise ValueError(f"Missing {prefix} output columns")
                 values = result[columns].to_numpy().ravel()
-                if not np.isfinite(values).all():
-                    raise ValueError(f"Non-finite values in {prefix} outputs")
+                if np.isinf(values).any():
+                    raise ValueError(f"Infinite values in {prefix} outputs")
+                values = values[~np.isnan(values)]  # NaN marks a variant outside the track window
+                if values.size == 0:
+                    raise ValueError(f"All {prefix} outputs are NaN")
                 if prefix.startswith("REF_") and not ((values >= 0) & (values <= 1)).all():
                     raise ValueError(f"{prefix} probabilities outside [0, 1]")
                 print(f"  {prefix}: range [{values.min():.6f}, {values.max():.6f}]")

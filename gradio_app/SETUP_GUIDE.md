@@ -7,7 +7,7 @@ MAGI is a variant interpretation app that scores genomic variants using the NTv3
 Current runtime configuration:
 
 - Model: `InstaDeepAI/NTv3_650M_post`
-- Sequence window: `32768` bp (32 kb)
+- Sequence window: `16384` bp (16 kb) by default; set `NTV3_CONTEXT_LEN=32768` to match the paper's baseline
 - Batch limit: `10` variants
 - Reference genome: local `data/hg38.fa` when available for human, otherwise UCSC / Ensembl fallback
 
@@ -17,7 +17,7 @@ Current runtime configuration:
 2. Select the `Gradio` SDK and `zero-a10` hardware.
 3. Upload the contents of this directory.
    - **Important:** `data/hg38.fa` is ~915 MB. Do **not** commit it to the Space repo without Git LFS — instead rely on the UCSC API fallback (the app does this automatically when the file is absent).
-   - `data/MANE_processed.csv` (~235 MB) and `data/MANE_processed.parquet` (~24 MB) should be committed; the parquet is auto-generated from the CSV on first run.
+   - `data/MANE_processed.parquet` (~24 MB) is committed and is all the app needs; the ~235 MB CSV is optional and gitignored (if present, it is converted to parquet on first run).
 4. Set the `HF_TOKEN` Space secret so the app can access the gated `NTv3_650M_post` model weights.
 5. Start the Space.
 
@@ -38,7 +38,7 @@ Notes:
 ### Install dependencies
 
 ```bash
-cd ntv3_gradio_app
+cd gradio_app
 pip install -r requirements.txt
 ```
 

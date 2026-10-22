@@ -43,8 +43,6 @@ LLM pipeline inputs/LLM pipeline inputs/variant_summary.txt.gz
 # Gradio app heavy reference data (rebuilt at runtime / downloaded)
 gradio_app/data/MANE_processed.csv
 gradio_app/data/hg38.fa
-ntv3_gradio_app/data/MANE_processed.csv
-ntv3_gradio_app/data/hg38.fa
 
 # Per-file size cap: tracked CSVs over ~50 MB belong outside the repo
 analyses/generated_tables/snp_results_with_mechanism.csv
