@@ -15,7 +15,6 @@ Usage:
 """
 
 import os
-import time
 import warnings
 from pathlib import Path
 from typing import Optional, Tuple, List, Any, Dict, cast
@@ -386,6 +385,7 @@ def get_track_indices(
         return list(range(len(bigwig_names))), bigwig_names
 
     metadata = pd.read_csv(metadata_file)
+    metadata_lookup = metadata.drop_duplicates("file_id").set_index("file_id").to_dict("index")
 
     key_marks = {
         "H3K4me3",
@@ -399,10 +399,9 @@ def get_track_indices(
     sel_idx, sel_names = [], []
 
     for i, tid in enumerate(bigwig_names):
-        rows = metadata[metadata["file_id"] == tid]
-        if rows.empty:
+        r = metadata_lookup.get(tid)
+        if r is None:
             continue
-        r = rows.iloc[0]
         assay = str(r.get("assay", ""))
         target = str(r.get("experiment_target", ""))
         dataset = str(r.get("dataset", ""))

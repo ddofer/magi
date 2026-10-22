@@ -8,9 +8,9 @@ Refactored ClinVar / NT-v3 analysis pipeline for the [MAGI](https://github.com/d
 clinvar_pipeline/
 ├── config.py           # PATHS, impact columns, thresholds
 ├── data/               # Inputs + canonical LLM parquets (see data/README.md)
-├── output/             # Generated parquets, figures, validation (see output/README.md)
+├── output/             # Generated parquets, figures, validation
 ├── clinvar/            # Python library (see clinvar/README.md)
-├── scripts/            # Numbered pipeline stages (00–07) + run_figures.py
+├── scripts/            # Numbered pipeline stages (00–10) + run_figures.py
 ├── figures/            # Figure modules (see figures/README.md)
 ├── tools/              # sync_inputs, gather LLM, validation, compare_outputs
 ├── requirements.txt
@@ -78,16 +78,16 @@ Flat outputs under `output/figures/`:
 
 All publication PNGs live directly under `output/figures/` (no subfolders).
 
-## OMIA animals (notebook workflow)
+## OMIA animals
 
-Separate from the ClinVar numbered scripts. Documented in [`notebooks/README.md`](notebooks/README.md).
+Stages 08–10 prepare signals, prompts, and optional LLM evaluations. The original notebooks remain as research references; see [`notebooks/README.md`](notebooks/README.md).
 
-| Stage | Location | Rows (current) |
+| Stage | Location | Rows in recorded run |
 |-------|----------|----------------|
 | NT deltas | `data/parquet/deltas_animals_{snp,indel}.parquet` | 372 / 208 |
-| Signaled | `output/parquet/animals_*_signaled.parquet` | same (produced by notebook) |
+| Signaled | `output/parquet/animals_*_signaled.parquet` | same (stage 08) |
 | LLM eval | `data/llm/animals_*_evaluation_results*.parquet` | same |
-| Fig S1 | `output/figures/figs1.png` | per-species SNP vs indel accuracy (from `animals_result_analysis.ipynb`) |
+| Fig S1 | `output/figures/figs1.png` | per-species SNP vs indel accuracy (`scripts/run_figures.py --fig s1`) |
 
 ## Tools
 
@@ -113,5 +113,4 @@ pip install -r requirements.txt
 
 - [clinvar/README.md](clinvar/README.md) — library modules and data flow  
 - [figures/README.md](figures/README.md) — figure scripts and inputs  
-- [output/README.md](output/README.md) — generated paths and regeneration commands  
 - [data/README.md](data/README.md) — input layout and sync

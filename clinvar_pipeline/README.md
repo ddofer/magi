@@ -30,7 +30,7 @@ pip install -r requirements.txt
 
 ## Data
 
-Large inputs are **not** stored in this repository (see [`.gitignore`](.gitignore)). Populate `data/` before running the pipeline:
+Large inputs are **not** stored in this repository (see [`.gitignore`](../.gitignore)). Populate `data/` before running the pipeline:
 
 | Input | Description |
 |-------|-------------|
@@ -72,7 +72,13 @@ python3 scripts/run_figures.py --fig all
 
 Optional LLM re-runs: `scripts/04_run_llm_parallel.py`, `scripts/05_run_llm_batch.py`.
 
-End-to-end validation: `python3 tools/run_validation.py`
+Regenerate impact scores, mechanisms, and figures from existing cohorts, then validate:
+
+```bash
+python3 tools/run_validation.py
+```
+
+This command refreshes inputs and rewrites derived outputs. Run individual numbered stages to prepare cohorts or extract signals.
 
 ### Notebooks
 
@@ -89,14 +95,14 @@ Publication figures are written to `output/figures/`:
 | `fig2b.png` | Global impact density (SNP / indel / combined) |
 | `fig3a`–`fig3e*.png` | LLM concordance and mechanism panels |
 
-See [figures/README.md](figures/README.md) and [output/README.md](output/README.md).
+See [figures/README.md](figures/README.md) and [ARTIFACTS.md](ARTIFACTS.md).
 
 ## Repository layout
 
 ```
 clinvar_pipeline/
 ├── clinvar/          # Core library
-├── scripts/          # Pipeline stages 00–07, run_figures.py
+├── scripts/          # Pipeline stages 00–10, run_figures.py
 ├── figures/          # Publication figure modules
 ├── tools/            # Input sync, validation, LLM gather
 ├── vendor/           # Bundled mechanism-assignment logic
@@ -112,7 +118,6 @@ clinvar_pipeline/
 - [clinvar/README.md](clinvar/README.md) — library modules  
 - [figures/README.md](figures/README.md) — figure scripts and inputs  
 - [data/README.md](data/README.md) — input directory layout  
-- [output/README.md](output/README.md) — generated outputs  
 
 ## License
 

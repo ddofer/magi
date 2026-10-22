@@ -83,45 +83,6 @@ def prepare_batch_jsonl(
     return output_path
 
 
-def prepare_batch_jsonl_simple(
-    df_with_prompts: pd.DataFrame,
-    system_prompt: str,
-    output_path: str
-) -> str:
-    """
-    Simpler JSONL format - just the essentials.
-    Adjust based on actual Gemini Batch API requirements.
-    """
-    with open(output_path, 'w') as f:
-        for idx, row in df_with_prompts.iterrows():
-            variation_id = str(row.get('#VariationID', row.name))
-            user_prompt = row.get('llm_prompt', '')
-
-            if not user_prompt:
-                continue
-
-            entry = {
-                "custom_id": variation_id,
-                "body": {
-                    "contents": [
-                        {"role": "user", "parts": [{"text": user_prompt}]}
-                    ],
-                    "systemInstruction": {
-                        "parts": [{"text": system_prompt}]
-                    },
-                    "generationConfig": {
-                        "temperature": 0.1,
-                        "maxOutputTokens": 1024
-                    }
-                }
-            }
-
-            f.write(json.dumps(entry) + '\n')
-
-    print(f"Created batch file: {output_path}")
-    return output_path
-
-
 # =============================================================================
 # BATCH JOB MANAGEMENT
 # =============================================================================
@@ -131,7 +92,7 @@ def upload_and_submit_batch(
     display_name: str,
     api_key: str = None,
     model: str = "gemini-3-flash-preview"
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Upload JSONL file and submit batch job.
 
@@ -155,7 +116,7 @@ def upload_and_submit_batch(
     print(f"Uploaded: {uploaded_file.name}")
 
     # Create batch job
-    print(f"Creating batch job...")
+    print("Creating batch job...")
     batch_job = client.batches.create(
         model=model,
         src=uploaded_file.name,
@@ -177,7 +138,7 @@ def upload_and_submit_batch(
 def check_batch_status(
     job_name: str,
     api_key: str = None
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Check status of a batch job.
 
@@ -214,7 +175,7 @@ def wait_for_batch_completion(
     api_key: str = None,
     poll_interval: int = 60,
     timeout: int = 7200  # 2 hours
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Wait for batch job to complete, polling periodically.
 
@@ -252,15 +213,15 @@ def wait_for_batch_completion(
 
         # Check completion states
         if state in ['JobState.JOB_STATE_SUCCEEDED', 'JOB_STATE_SUCCEEDED', 'SUCCEEDED', 'STATE_SUCCEEDED']:
-            print(f"\n✓ Batch job completed successfully!")
+            print("\n✓ Batch job completed successfully!")
             return status
 
         if state in ['JOB_STATE_FAILED', 'FAILED', 'STATE_FAILED']:
-            print(f"\n✗ Batch job failed!")
+            print("\n✗ Batch job failed!")
             return status
 
         if state in ['JOB_STATE_CANCELLED', 'CANCELLED', 'STATE_CANCELLED']:
-            print(f"\n✗ Batch job was cancelled!")
+            print("\n✗ Batch job was cancelled!")
             return status
 
         # Check timeout

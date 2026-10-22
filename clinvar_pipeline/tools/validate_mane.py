@@ -11,7 +11,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
 from clinvar.mane_build import build_mane_tables
-from config import DATA_ROOT, PATHS, PROJECT_ROOT
+from config import PATHS, PROJECT_ROOT
 
 
 def _feature_counts(mane: pd.DataFrame) -> dict[str, int]:

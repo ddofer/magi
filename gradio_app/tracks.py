@@ -108,7 +108,6 @@ def generate_region_tracks_plot(
     vcenter = profiles["variant_center"]
     bed_names = profiles["bed_names"]
     bigwig_names = profiles["bigwig_names"]
-    selected_bw = profiles["selected_bw_indices"]
 
     # ── Build per-track rendering list ──────────────────────────────────
     all_tracks: List[dict] = []

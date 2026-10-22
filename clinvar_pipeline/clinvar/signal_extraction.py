@@ -298,7 +298,6 @@ def extract_signals_comprehensive_fast(
     Returns:
         DataFrame with signal columns to join back
     """
-    n_rows = len(df)
     result_df = pd.DataFrame(index=df.index)
 
     # -----------------------------------------------------------------
@@ -362,7 +361,6 @@ def extract_signals_comprehensive_fast(
     if bw_delta_cols:
         metadata_lookup = _build_metadata_lookup(metadata_df)
         bw_descriptions = _build_bw_descriptions(bw_delta_cols, metadata_lookup)
-        bw_ref_cols = [c.replace('D_BW_', 'REF_BW_') for c in bw_delta_cols]
 
         bw_matrix = df[bw_delta_cols].fillna(0).values.astype(np.float64)
 

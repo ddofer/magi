@@ -8,7 +8,6 @@ Only runs if hg38.fa doesn't already exist (3GB download).
 Usage:
     python download_hg38.py
 """
-import os
 import urllib.request
 import gzip
 import shutil

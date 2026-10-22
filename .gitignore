@@ -110,6 +110,7 @@ logs/
 flagged/
 
 # Temporary files
+scratch/
 tmp/
 temp/
 *.tmp

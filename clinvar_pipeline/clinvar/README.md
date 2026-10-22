@@ -9,11 +9,10 @@ Python package for ClinVar variant preparation, NT delta integration, signal ext
 | `pipeline.py` | Orchestrates stage 1 (prep) and stage 2 (signal extraction) |
 | `variant_prep.py` | Load delta parquets, ClinVar ID mapping, rationale merge, strict filter, deferred BED/BW attach |
 | `clinvar_enrichment.py` | Submission-summary rationale aggregation and quality filtering |
-| `rationale_lookup.py` | Ad-hoc ClinVar rationale lookup by locus (no cohort filter) |
 | `region_annotation.py` | MANE-based genomic region labels on strict cohorts |
 | `mane_build.py` | Build `MANE_processed.csv` / `Promoter_processed.csv` from MANE GFF |
 | `signal_extraction_threshold.py` | Threshold-gated top-k BED/BW/MLM signals (default stage 2 path) |
-| `signal_extraction.py` | Alternate signal extraction utilities |
+| `signal_extraction.py` | Vectorized signal extraction used by the OMIA animal pipeline |
 | `impact_scoring.py` | Benign-referenced z-scores and global impact columns |
 | `prompts.py` | Render per-variant LLM prompts from signaled rows |
 | `llm_results.py` | Canonical column lists for gathered LLM parquets |
@@ -50,9 +49,9 @@ Large delta parquets use **deferred track loading**: slim rows are filtered firs
 - Aggregate to `Global_z_sum_log`, `Composite_*`, etc.
 - `attach_impact_to_signaled()` joins score columns onto signaled parquets at figure time (no duplicate merged parquet)
 
-## External dependency
+## Mechanism assignment
 
-Mechanism assignment (`../scripts/07_assign_mechanisms.py`) imports `nt_mechanism_assignment.py` from the parent ClinVar repository root (hypothesis rules over BED/BW/MLM features).
+`../scripts/07_assign_mechanisms.py` uses the bundled `../vendor/nt_mechanism_assignment.py` (hypothesis rules over BED/BW/MLM features).
 
 ## OMIA animals (stages 8–10)
 
@@ -72,5 +71,4 @@ System prompts: `prompts/system_prompt_animals_snp.txt`, `system_prompt_animals_
 ## Related docs
 
 - [../ARTIFACTS.md](../ARTIFACTS.md) — repository layout overview
-- [../output/README.md](../output/README.md) — generated parquet and figure paths
 - [../figures/README.md](../figures/README.md) — publication figure scripts

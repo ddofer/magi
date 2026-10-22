@@ -308,11 +308,7 @@ def annotate_clinvar(ClinVar, MANE_raw, Promoter_raw, use_parallel=False, n_work
     all_ptsets = []
 
     if use_parallel:
-        from concurrent.futures import ProcessPoolExecutor
-        import functools
-
-        # For true parallelism, partition by chromosome to avoid sharing state
-        # But for simplicity, use ThreadPoolExecutor (GIL-bound but avoids pickle)
+        # Threads share the precomputed chromosome lookups without pickling.
         from concurrent.futures import ThreadPoolExecutor
 
         if n_workers is None:

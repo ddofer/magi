@@ -84,7 +84,12 @@ This checks:
 - Python dependencies
 - Required annotation and metadata files
 - Sequence access through the local genome or UCSC fallback
-- Model loading
+
+Model loading is optional and may download the 650M model:
+
+```bash
+python test_installation.py --load-model
+```
 
 ### Run the app
 

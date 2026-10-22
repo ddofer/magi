@@ -7,31 +7,10 @@ from typing import Optional
 
 import numpy as np
 import pandas as pd
-import heapq
 
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 # helpers
 # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-
-################################################################################
-# thresholds access getters
-################################################################################
-
-# --- helpers (fast + safe) ---
-def _thr_row(thresholds, track_id, ref="benign", stat="std"):
-    # returns Series with ["lo","hi"]
-    return thresholds.loc[(track_id, ref, stat), ["lo", "hi"]]
-
-def thr_hi(thresholds, track_id, ref="benign", stat="std"):
-    return float(_thr_row(thresholds, track_id, ref, stat)["hi"])
-
-def thr_lo(thresholds, track_id, ref="benign", stat="std"):
-    return float(_thr_row(thresholds, track_id, ref, stat)["lo"])
-
-def thr_mag(thresholds, track_id, ref="benign", stat="std"):
-    r = _thr_row(thresholds, track_id, ref, stat)
-    lo = float(r["lo"]); hi = float(r["hi"])
-    return max(abs(lo), abs(hi))
 
 ################################################################################
 # build threshold maps

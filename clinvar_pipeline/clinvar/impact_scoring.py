@@ -34,7 +34,7 @@ def _harmonize_labels(df: pd.DataFrame) -> pd.DataFrame:
     if out["label"].dtype == bool:
         out["label"] = out["label"].map({True: "Pathogenic", False: "Benign"})
     elif out["label"].dtype in (np.int64, np.int32, float):
-        out["label"] = out["label"].map({1: "Pathogenic", 0: "Benign", True: "Pathogenic", False: "Benign"})
+        out["label"] = out["label"].map({1: "Pathogenic", 0: "Benign"})
     return out
 
 

@@ -6,9 +6,14 @@ The local genome is optional. If `data/hg38.fa` is absent, the app can fall back
 to UCSC sequence retrieval.
 """
 
+import argparse
+from pathlib import Path
 import sys
 import os
 import requests
+
+# These are CLI checks; pytest collection must not access the network or models.
+__test__ = False
 
 
 def check_dependencies():
@@ -205,14 +210,16 @@ def test_model_loading():
 
 def main():
     """Run all validation tests"""
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--load-model", action="store_true", help="Also load the 650M model (may download it)"
+    )
+    args = parser.parse_args()
     print("\n" + "=" * 60)
     print("  MAGI Gradio App - Installation Validation")
     print("=" * 60 + "\n")
 
-    # Change to app directory if needed
-    if os.path.exists("ntv3_gradio_app"):
-        os.chdir("ntv3_gradio_app")
-        print("📁 Working directory: ntv3_gradio_app/\n")
+    os.chdir(Path(__file__).resolve().parent)
 
     # Run checks
     results = []
@@ -220,8 +227,7 @@ def main():
     results.append(("Data Files", check_data_files()))
     results.append(("Sequence Access", test_sequence_access()))
 
-    # Model test is optional (downloads ~400MB if not cached)
-    if all(r[1] for r in results):
+    if args.load_model and all(r[1] for r in results):
         try:
             results.append(("Model Loading", test_model_loading()))
         except KeyboardInterrupt:

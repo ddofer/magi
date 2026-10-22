@@ -7,7 +7,7 @@ single-variant outputs into a short interpretation panel without depending on
 notebook code or outer-folder runtime imports.
 """
 
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Tuple
 
 import numpy as np
 import pandas as pd

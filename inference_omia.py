@@ -75,10 +75,8 @@ Authors: Dan Ofer / Michal Linial Lab (based on inference.py)
 
 import argparse
 import io
-import os
 import re
 import subprocess
-import sys
 import warnings
 from pathlib import Path
 from typing import Optional
@@ -999,7 +997,6 @@ def main(
     ensure_dirs()
 
     # Determine which species to run
-    supported = [k for k, v in SPECIES_CONFIG.items() if not v.get("unsupported")]
     requested = species_keys if species_keys else DEFAULT_RUN_SPECIES
     # Warn about unsupported
     for k in species_keys or []:

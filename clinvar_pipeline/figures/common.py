@@ -34,7 +34,7 @@ def normalize_label_series(s: pd.Series) -> pd.Series:
     if s.dtype == bool:
         return s.map({True: "Pathogenic", False: "Benign"})
     if pd.api.types.is_numeric_dtype(s):
-        return s.map({1: "Pathogenic", 0: "Benign", True: "Pathogenic", False: "Benign"})
+        return s.map({1: "Pathogenic", 0: "Benign"})
     out = s.astype(str)
     out = out.replace({"True": "Pathogenic", "False": "Benign", "1": "Pathogenic", "0": "Benign"})
     return out

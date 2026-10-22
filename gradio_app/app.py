@@ -51,7 +51,6 @@ import torch
 import gradio as gr
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
 # Import our modules
 from inference import (
@@ -61,16 +60,13 @@ from inference import (
     _MODEL_CACHE,
     SUPPORTED_UI_SPECIES,
 )
-from annotation import annotate_dataframe, load_mane_data, _MANE_CACHE
+from annotation import annotate_dataframe, load_mane_data
 from analysis import (
     rank_top_disrupted_tracks,
     build_top_track_table,
     compute_impact_scores,
     extract_top_summary_signals,
-    summarize_variant,
-    get_top_bigwig_descriptions,
     make_fingerprint_plot,
-    identify_delta_columns,
     format_summary_table,
 )
 from tracks import generate_region_tracks_plot, get_track_view_bounds
@@ -548,18 +544,6 @@ def predict_single_variant(
                     f"{ref_clean}>{alt_clean}"
                 )
                 return cached
-
-        # Create input DataFrame
-        input_df = pd.DataFrame(
-            [
-                {
-                    "chrom": chrom,
-                    "pos": int(pos),
-                    "ref": ref_clean,
-                    "alt": alt_clean,
-                }
-            ]
-        )
 
         # Run inference (cached by exact variant tuple — examples and repeat
         # lookups return instantly)
