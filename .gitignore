@@ -42,6 +42,7 @@ LLM pipeline inputs/LLM pipeline inputs/variant_summary.txt.gz
 
 # Gradio app heavy reference data (rebuilt at runtime / downloaded)
 gradio_app/data/MANE_processed.csv
+gradio_app/data/Promoter_processed.csv
 gradio_app/data/hg38.fa
 
 # Per-file size cap: tracked CSVs over ~50 MB belong outside the repo
