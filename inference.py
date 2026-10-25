@@ -39,7 +39,8 @@ Method notes
 Quick start
     - SNPs:   python inference.py
     - INDELs: python inference_indel.py
-    - Any set: python inference.py --input x.parquet --output y.parquet [--compile] [--share-windows]
+    - Any set: python inference.py --input x.parquet --output y.parquet [--share-windows]
+    - Every SNV in a region: python inference.py --region chr17:43044295-43045000 --output y.parquet
       (SLURM: sbatch inference.sbatch --input ...)
 
 Examples
@@ -147,8 +148,10 @@ MLM_WINDOW = (
 WIN_LETTERS = 50  # WIN_ columns: annotation elements read this many letters each side of the variant
 WIN_ELEMENTS = ("splice_donor", "splice_acceptor", "start_codon", "stop_codon")
 LFC_PSEUDOCOUNT = 1.0  # LFC_ columns: log2(signal + 1) as in Borzoi's logSED; damps near-zero signal
-SHARE_WINDOWS = False  # nearby variants share one reference pass (see run_inference)
-COMPILE = False  # torch.compile the whole model (~1.5x after a ~1 min compile; README)
+SHARE_WINDOWS = False  # nearby variants share one reference pass (see run_inference); the CLI turns it on for REGION
+COMPILE = "auto"  # torch.compile the whole model (~1.5x after a ~1 min compile; README); "auto": main() decides
+COMPILE_MIN_VARIANTS = 1000  # "auto" compiles inputs of at least this many variants, where it pays for itself
+REGION = None  # "chr:start-end" (1-based, inclusive): score every SNV in the region instead of INPUT_DATA_FILE
 CHUNK_ROWS = 1024  # variants per checkpointed part (main writes OUTPUT_RESULTS_FILE.parts/)
 SPECIES = "human"
 
@@ -337,8 +340,8 @@ def to_track_probabilities(track_values):
 # ============================================================================
 # MODEL LOADING
 # ============================================================================
-def load_model_and_tokenizer(model_name, device="cuda"):
-    """Load NTv3 model + tokenizer; with COMPILE, torch.compile the whole model."""
+def load_model_and_tokenizer(model_name, device="cuda", compile=False):
+    """Load NTv3 model + tokenizer; with compile, torch.compile the whole model."""
     print(f" Loading {model_name} on {device}...")
     # TF32 matmuls on Ampere+ (fp32 accumulate, ~1e-3 relative input rounding): not byte-exact
     # with the paper's fp32 runs, but far below the benign-background noise of the deltas.
@@ -346,7 +349,7 @@ def load_model_and_tokenizer(model_name, device="cuda"):
     model = (
         AutoModel.from_pretrained(model_name, trust_remote_code=True).to(device).eval()
     )
-    if COMPILE and str(device).startswith("cuda"):
+    if compile and str(device).startswith("cuda"):
         # One eager pass fills the lazy rotary cache; otherwise the second batch compiles again.
         with torch.inference_mode():
             model(input_ids=torch.full((1, CONTEXT_LEN), 10, device=device), species_ids=model.encode_species(["human"]).to(device))
@@ -884,6 +887,17 @@ def validate_output(df):
     print("=" * 80)
 
 
+def saturation_variants(genome, region):
+    """Every SNV (3 alternate letters per position) in region "chr:start-end", 1-based inclusive."""
+    chrom, span = region.split(":")
+    start, end = (int(x.replace(",", "")) for x in span.split("-"))
+    seq = _fetch(genome, chrom, start - 1, end)
+    if not seq:
+        raise ValueError(f"No sequence for {region}")
+    rows = [(chrom, start + i, r, a) for i, r in enumerate(seq) if r in "ACGT" for a in "ACGT" if a != r]
+    return pd.DataFrame(rows, columns=["chrom", "pos", "ref", "alt"])
+
+
 # ============================================================================
 # MAIN
 # ============================================================================
@@ -896,13 +910,19 @@ def main():
         print(f"  GPU: {torch.cuda.get_device_name(0)}")
 
     print(f"  DEBUG={DEBUG_MODE}  KL={USE_KL_DIVERGENCE}  EMB={USE_EMBEDDINGS}  shared windows={SHARE_WINDOWS}")
-    print(f"  Input: {INPUT_DATA_FILE}   Output: {OUTPUT_RESULTS_FILE}")
+    print(f"  Input: {REGION or INPUT_DATA_FILE}   Output: {OUTPUT_RESULTS_FILE}")
 
-    if not os.path.exists(INPUT_DATA_FILE):
+    genome = Fasta(GENOME_FILE) if os.path.exists(GENOME_FILE) else None
+    if genome is None and SPECIES != "human":  # the fallback fetches hg38 from UCSC
+        print(f"❌ Not found: {GENOME_FILE} (needed for species {SPECIES})")
+        return
+    if REGION:
+        df = saturation_variants(genome, REGION)
+    elif os.path.exists(INPUT_DATA_FILE):
+        df = pd.read_parquet(INPUT_DATA_FILE)
+    else:
         print(f"❌ Not found: {INPUT_DATA_FILE}")
         return
-
-    df = pd.read_parquet(INPUT_DATA_FILE)
     labels = dict(df["label"].value_counts()) if "label" in df.columns else "no label column"
     print(f"  {len(df)} variants | {labels}")
 
@@ -916,11 +936,8 @@ def main():
         df = df.head(33)
         print(f"🐞 DEBUG: {len(df)} variants")
 
-    genome = Fasta(GENOME_FILE) if os.path.exists(GENOME_FILE) else None
-    if genome is None and SPECIES != "human":  # the fallback fetches hg38 from UCSC
-        print(f"❌ Not found: {GENOME_FILE} (needed for species {SPECIES})")
-        return
-    model, tokenizer = load_model_and_tokenizer(MODEL_NAME, device)
+    compile_ = len(df) >= COMPILE_MIN_VARIANTS if COMPILE == "auto" else COMPILE
+    model, tokenizer = load_model_and_tokenizer(MODEL_NAME, device, compile=compile_)
     bed_names, bw_names = extract_feature_names(
         model, target_species=SPECIES, use_bed=USE_BED, use_bigwigs=USE_BIGWIGS and SPECIES != "auto"
     )
@@ -962,6 +979,7 @@ if __name__ == "__main__":
 
     p = argparse.ArgumentParser(description="NTv3 variant inference. Defaults are the module constants.")
     p.add_argument("--input", default=INPUT_DATA_FILE)
+    p.add_argument("--region", default=REGION, help="chr:start-end: score every SNV there (shares windows by default)")
     p.add_argument("--output", default=OUTPUT_RESULTS_FILE)
     p.add_argument("--model", default=MODEL_NAME)
     p.add_argument("--genome", default=GENOME_FILE)
@@ -970,13 +988,16 @@ if __name__ == "__main__":
     p.add_argument("--batch-size", type=int, default=BATCH_SIZE)
     p.add_argument("--embeddings", action=argparse.BooleanOptionalAction, default=USE_EMBEDDINGS)
     p.add_argument("--bigwigs", action=argparse.BooleanOptionalAction, default=USE_BIGWIGS)
-    p.add_argument("--share-windows", action=argparse.BooleanOptionalAction, default=SHARE_WINDOWS)
-    p.add_argument("--compile", action=argparse.BooleanOptionalAction, default=COMPILE)
+    p.add_argument("--share-windows", action=argparse.BooleanOptionalAction, default=None)
+    p.add_argument("--compile", action=argparse.BooleanOptionalAction, default=None,
+                   help=f"default: compile for {COMPILE_MIN_VARIANTS}+ variants")
     p.add_argument("--debug", action="store_true", default=DEBUG_MODE)
     a = p.parse_args()
     if a.species != "human" and a.genome == GENOME_FILE:
         p.error(f"--species {a.species} needs --genome (the default {GENOME_FILE} is human)")
     INPUT_DATA_FILE, OUTPUT_RESULTS_FILE, MODEL_NAME, GENOME_FILE = a.input, a.output, a.model, a.genome
     SPECIES, CONTEXT_LEN, BATCH_SIZE, USE_EMBEDDINGS = a.species, a.context_len, a.batch_size, a.embeddings
-    USE_BIGWIGS, SHARE_WINDOWS, COMPILE, DEBUG_MODE = a.bigwigs, a.share_windows, a.compile, a.debug
+    USE_BIGWIGS, DEBUG_MODE, REGION = a.bigwigs, a.debug, a.region
+    SHARE_WINDOWS = bool(REGION) if a.share_windows is None else a.share_windows
+    COMPILE = COMPILE if a.compile is None else a.compile
     main()

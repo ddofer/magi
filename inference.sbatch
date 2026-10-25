@@ -1,6 +1,7 @@
 #!/bin/bash
 # NTv3 variant inference on one GPU, preemptible. Extra arguments go to inference.py, e.g.
-#   sbatch inference.sbatch --input my_variants.parquet --output my_deltas.parquet --share-windows --compile
+#   sbatch inference.sbatch --input my_variants.parquet --output my_deltas.parquet
+#   sbatch inference.sbatch --region chr17:43044295-43045000 --output brca1_snvs.parquet
 #   sbatch inference.sbatch --input clinvar_indel.parquet --output clinvar_indel_deltas.parquet --embeddings
 # A preempted run is requeued and resumes from <output>.parts/ (finished chunks are kept).
 # Submit from the repo root; logs/ must exist (mkdir -p logs) or SLURM cannot write the log.

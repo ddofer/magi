@@ -37,11 +37,12 @@ Input parquet needs at least `chrom`, `pos`, `ref`, `alt`; `label` and other col
 Other variant sets use the same script with flags (`python inference.py --help`):
 
 ```bash
-python inference.py --input my_variants.parquet --output my_deltas.parquet --compile --share-windows
+python inference.py --input my_variants.parquet --output my_deltas.parquet
+python inference.py --region chr17:43044295-43045000 --output brca1_snvs.parquet   # every SNV in a region
 ```
 
-- `--compile`: `torch.compile` the model. About 1.5x faster after a one-minute compile. Values differ from eager runs by about 0.3% on the largest deltas.
-- `--share-windows`: nearby variants share one reference pass. Only variants at the same position within a 128-letter model token can share, because a 1-letter window shift changes NTv3's track deltas by about 37%. The saving is about 25% of passes for saturation mutagenesis, 14% for ClinVar indels and 2% for ClinVar SNVs. Shared variants sit off the window centre by whole tokens. That changed SNV features by about 1-4%, and moved 2 test indels by about 10%. Do not mix the two modes in one cohort.
+- Compile: inputs of 1,000 or more variants are run through `torch.compile`, which is about 1.5x faster after a one-minute compile. Values differ from uncompiled runs by about 0.3% on the largest deltas. Force it either way with `--compile` / `--no-compile`.
+- `--share-windows`: nearby variants share one reference pass. Only variants at the same position within a 128-letter model token can share, because a 1-letter window shift changes NTv3's track deltas by about 37%. The saving is about 25% of passes for saturation mutagenesis, 14% for ClinVar indels and 2% for ClinVar SNVs. Shared variants sit off the window centre by whole tokens. That changed SNV features by about 1-4%, and moved 2 test indels by about 10%. Do not mix the two modes in one cohort. On by default with `--region` (dense saturation scans), off otherwise.
 - Results are written in chunks to `<output>.parts/`. A run that is stopped resumes from there; the folder is removed when the output is written.
 - `inference.sbatch` runs this on a SLURM GPU, for example `sbatch inference.sbatch --input my_variants.parquet --output my_deltas.parquet`.
 
@@ -112,7 +113,7 @@ Smoke outputs stay under `scratch/smoke_snp/` or `scratch/smoke_indel/`. These c
 
 ## Dependencies
 
-`torch`, `transformers`, `pandas`, `numpy`, `pyfaidx`, `tqdm`, `requests`. OMIA workflows also need `samtools`. A GPU is recommended for full NTv3 inference. LLM stages read `GEMINI_API_KEY` from the environment.
+`torch`, `transformers`, `pandas`, `numpy`, `pyfaidx`, `tqdm`, `requests`. A GPU is recommended for full NTv3 inference. LLM stages read `GEMINI_API_KEY` from the environment.
 
 ## Citation
 

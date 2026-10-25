@@ -530,17 +530,19 @@ def rule_table(variant_type="snp"):
     assignment sorts by tier with a stable sort, so ties keep the order the
     rules are written in (shared rules, then the tier 5 rules).
     can_be_primary: False when a higher-priority rule always fires whenever
-    this rule fires, so this rule can never be the assigned mechanism.
+    this rule fires, so this rule can never be the assigned mechanism;
+    pre_empted_by names the rule(s) that win instead.
     Limit: the check only compares conditions on the same feature and
     direction, so it misses blocking through other features.
     """
     ordered = sorted(get_hypothesis_logic(variant_type).items(), key=lambda x: x[1]['priority'])
     rows = []
     for i, (name, rules) in enumerate(ordered):
-        higher = [r for _, r in ordered[:i]]
+        higher = ordered[:i]
         secondary = rules.get('secondary', [])
-        blocked = all(any(_always_fires([p] + secondary, h) for h in higher) for p in rules['primary'])
-        order = sum(r['priority'] == rules['priority'] for r in higher)
+        blocked = all(any(_always_fires([p] + secondary, h) for _, h in higher) for p in rules['primary'])
+        blockers = [hn for hn, h in higher if any(_always_fires([p] + secondary, h) for p in rules['primary'])]
+        order = sum(h['priority'] == rules['priority'] for _, h in higher)
         for role, conds in (("primary (OR)", rules['primary']), ("secondary (AND)", secondary)):
             for c in conds:
                 rows.append({
@@ -555,6 +557,7 @@ def rule_table(variant_type="snp"):
                     "threshold": c['threshold'],
                     "description": rules.get('description', ''),
                     "can_be_primary": not blocked,
+                    "pre_empted_by": ", ".join(blockers) if blocked else "",
                 })
     return pd.DataFrame(rows)
 
