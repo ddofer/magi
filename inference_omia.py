@@ -74,6 +74,7 @@ Authors: Dan Ofer / Michal Linial Lab (based on inference.py)
 import argparse
 import gzip
 import io
+import os
 import re
 import shutil
 import urllib.request
@@ -290,10 +291,12 @@ def download_genome(species_key: str) -> Optional[Path]:
     if not gz_path.exists() and not fa_path.exists():
         print(f"   📥 Downloading {cfg['common_name']} genome (~1-3 GB)...")
         print(f"      URL: {cfg['genome_url']}")
+        part = gz_path.with_name(gz_path.name + ".part")  # renamed when complete: a killed run leaves no short file
         try:
-            urllib.request.urlretrieve(cfg["genome_url"], gz_path)
+            urllib.request.urlretrieve(cfg["genome_url"], part)
+            os.replace(part, gz_path)
         except Exception as e:
-            gz_path.unlink(missing_ok=True)
+            part.unlink(missing_ok=True)
             print(
                 f"   ❌ Download failed for {species_key}: {e}. "
                 f"Try manually: wget -c {cfg['genome_url']}"
@@ -303,11 +306,15 @@ def download_genome(species_key: str) -> Optional[Path]:
     # Decompress (keeps the .gz)
     if not fa_path.exists() and gz_path.exists():
         print(f"   📦 Decompressing {gz_path.name}...")
+        part = fa_path.with_name(fa_path.name + ".part")
         try:
-            with gzip.open(gz_path, "rb") as f_in, open(fa_path, "wb") as f_out:
+            with gzip.open(gz_path, "rb") as f_in, open(part, "wb") as f_out:
                 shutil.copyfileobj(f_in, f_out)
+            os.replace(part, fa_path)
         except Exception as e:
-            fa_path.unlink(missing_ok=True)
+            part.unlink(missing_ok=True)
+            if isinstance(e, (EOFError, gzip.BadGzipFile)):
+                gz_path.unlink(missing_ok=True)  # a corrupt download would otherwise block every later run
             print(f"   ❌ Decompression failed for {gz_path}: {e}")
             return None
 
@@ -714,10 +721,8 @@ def validate_reference_bases(
 
     with Fasta(str(fasta_path)) as genome:
         for _, row in snp_df.iterrows():
-            chrom, pos = str(row["chrom"]), int(row["pos"])
-            if chrom not in genome:
-                continue
-            fasta_ref = genome[chrom][pos - 1 : pos].seq.upper()
+            pos = int(row["pos"])
+            fasta_ref = base._fetch(genome, row["chrom"], pos - 1, pos)
             if not fasta_ref:
                 continue
             if fasta_ref == row["ref"].upper():

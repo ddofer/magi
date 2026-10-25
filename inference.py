@@ -148,7 +148,7 @@ MLM_WINDOW = (
 WIN_LETTERS = 50  # WIN_ columns: annotation elements read this many letters each side of the variant
 WIN_ELEMENTS = ("splice_donor", "splice_acceptor", "start_codon", "stop_codon")
 LFC_PSEUDOCOUNT = 1.0  # LFC_ columns: log2(signal + 1) as in Borzoi's logSED; damps near-zero signal
-SHARE_WINDOWS = False  # nearby variants share one reference pass (see run_inference); the CLI turns it on for REGION
+SHARE_WINDOWS = None  # nearby variants share one reference pass (see run_inference); None: main() shares for REGION only
 COMPILE = "auto"  # torch.compile the whole model (~1.5x after a ~1 min compile; README); "auto": main() decides
 COMPILE_MIN_VARIANTS = 1000  # "auto" compiles inputs of at least this many variants, where it pays for itself
 REGION = None  # "chr:start-end" (1-based, inclusive): score every SNV in the region instead of INPUT_DATA_FILE
@@ -729,7 +729,7 @@ def run_inference(
         mlm_window=MLM_WINDOW if mlm_window is None else mlm_window,
         use_kl=USE_KL_DIVERGENCE if use_kl is None else use_kl,
         use_embeddings=USE_EMBEDDINGS if use_embeddings is None else use_embeddings,
-        share_windows=SHARE_WINDOWS if share_windows is None else share_windows,
+        share_windows=bool(SHARE_WINDOWS) if share_windows is None else share_windows,
         bed_head=bed_head,
         bw_head=bw_head,
         bw_sel=torch.as_tensor(selected_bw_indices, dtype=torch.long, device=device),
@@ -909,7 +909,8 @@ def main():
     if device == "cuda":
         print(f"  GPU: {torch.cuda.get_device_name(0)}")
 
-    print(f"  DEBUG={DEBUG_MODE}  KL={USE_KL_DIVERGENCE}  EMB={USE_EMBEDDINGS}  shared windows={SHARE_WINDOWS}")
+    share = bool(REGION) if SHARE_WINDOWS is None else SHARE_WINDOWS
+    print(f"  DEBUG={DEBUG_MODE}  KL={USE_KL_DIVERGENCE}  EMB={USE_EMBEDDINGS}  shared windows={share}")
     print(f"  Input: {REGION or INPUT_DATA_FILE}   Output: {OUTPUT_RESULTS_FILE}")
 
     genome = Fasta(GENOME_FILE) if os.path.exists(GENOME_FILE) else None
@@ -963,6 +964,7 @@ def main():
         extra_cols=extra,
         species=SPECIES,
         parts_dir=parts_dir,
+        share_windows=share,
         lfc_groups=groups,
     )
     validate_output(rdf)
@@ -988,16 +990,17 @@ if __name__ == "__main__":
     p.add_argument("--batch-size", type=int, default=BATCH_SIZE)
     p.add_argument("--embeddings", action=argparse.BooleanOptionalAction, default=USE_EMBEDDINGS)
     p.add_argument("--bigwigs", action=argparse.BooleanOptionalAction, default=USE_BIGWIGS)
-    p.add_argument("--share-windows", action=argparse.BooleanOptionalAction, default=None)
-    p.add_argument("--compile", action=argparse.BooleanOptionalAction, default=None,
+    p.add_argument("--share-windows", action=argparse.BooleanOptionalAction, default=SHARE_WINDOWS)
+    p.add_argument("--compile", action=argparse.BooleanOptionalAction, default=COMPILE,
                    help=f"default: compile for {COMPILE_MIN_VARIANTS}+ variants")
     p.add_argument("--debug", action="store_true", default=DEBUG_MODE)
     a = p.parse_args()
+    if a.region and a.output == OUTPUT_RESULTS_FILE:
+        p.error("--region needs --output (the default output is the ClinVar deltas file)")
     if a.species != "human" and a.genome == GENOME_FILE:
         p.error(f"--species {a.species} needs --genome (the default {GENOME_FILE} is human)")
     INPUT_DATA_FILE, OUTPUT_RESULTS_FILE, MODEL_NAME, GENOME_FILE = a.input, a.output, a.model, a.genome
     SPECIES, CONTEXT_LEN, BATCH_SIZE, USE_EMBEDDINGS = a.species, a.context_len, a.batch_size, a.embeddings
     USE_BIGWIGS, DEBUG_MODE, REGION = a.bigwigs, a.debug, a.region
-    SHARE_WINDOWS = bool(REGION) if a.share_windows is None else a.share_windows
-    COMPILE = COMPILE if a.compile is None else a.compile
+    SHARE_WINDOWS, COMPILE = a.share_windows, a.compile
     main()

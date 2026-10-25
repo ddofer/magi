@@ -39,7 +39,7 @@ class RuleLayerTest(unittest.TestCase):
         for vt in ("snp", "indel"):
             table = rule_table(vt).drop_duplicates("mechanism").set_index("mechanism")
             self.assertEqual(len(table), len(get_hypothesis_logic(vt)))
-            self.assertEqual(list(table.index[table["can_be_primary"] == False]),
+            self.assertEqual(list(table.index[table["can_be_assigned"] == False]),
                              ["RECIPROCAL_EXON_GAIN_INTRON_LOSS"])
             self.assertEqual(table.loc[["SPLICE_SITE_DESTROYED", "START_LOSS", "STOP_CODON_DISRUPTION"],
                                        "order_within_tier"].tolist(), [0, 1, 2])

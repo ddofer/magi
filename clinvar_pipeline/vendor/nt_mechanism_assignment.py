@@ -529,7 +529,7 @@ def rule_table(variant_type="snp"):
     order_within_tier: 0-based position among rules of the same tier. The
     assignment sorts by tier with a stable sort, so ties keep the order the
     rules are written in (shared rules, then the tier 5 rules).
-    can_be_primary: False when a higher-priority rule always fires whenever
+    can_be_assigned: False when a higher-priority rule always fires whenever
     this rule fires, so this rule can never be the assigned mechanism;
     pre_empted_by names the rule(s) that win instead.
     Limit: the check only compares conditions on the same feature and
@@ -556,7 +556,7 @@ def rule_table(variant_type="snp"):
                     "operator": _OPS[c['direction']],
                     "threshold": c['threshold'],
                     "description": rules.get('description', ''),
-                    "can_be_primary": not blocked,
+                    "can_be_assigned": not blocked,
                     "pre_empted_by": ", ".join(blockers) if blocked else "",
                 })
     return pd.DataFrame(rows)

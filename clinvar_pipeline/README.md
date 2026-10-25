@@ -72,16 +72,21 @@ python3 scripts/run_figures.py --fig all
 
 Optional LLM re-runs: `scripts/04_run_llm_parallel.py`, `scripts/05_run_llm_batch.py`.
 
-**Rule table (supplement).** Run `python3 scripts/export_rule_table.py [--out PATH]`. It writes `output/mechanisms/rule_table.csv` (one row per condition, machine-readable) and `rule_table_paper.csv` (one row per rule, conditions written out such as "Δ splice donor ≤ -0.2", rules shared by SNVs and indels merged; the supplement table). `scripts/07_assign_mechanisms.py` writes both next to the mechanism CSVs.
-- Columns: tier, order within the tier (the tie-break used), primary (OR) or secondary (AND) role, feature, operator and threshold.
-- `can_be_primary` flags rules that a higher-priority rule always pre-empts. It compares conditions on the same feature only, so it can miss blocking through correlated features.
+**Rule table (supplement).** Run `python3 scripts/export_rule_table.py [--out PATH]`; `scripts/07_assign_mechanisms.py` also writes it. Both files are generated from the rule definitions in `vendor/nt_mechanism_assignment.py`, so a rule change only needs a rerun.
+- `output/mechanisms/rule_table_paper.csv`: the supplement table. One row per rule, in the order the rules are checked, with conditions written out ("Δ splice donor ≤ −0.2"). Rules that are the same for SNVs and indels appear once. The last row is the label for variants where no rule fires.
+- `output/mechanisms/rule_table.csv`: one row per condition, for scripts.
+- `can_be_assigned` is False for a rule that a rule checked earlier always pre-empts. The check compares conditions on the same feature only, so it can miss blocking through other features.
+
+Draft caption for the paper table:
+
+> **Rule layer.** Each rule tests Δ = Alt − Ref in NTv3's predicted score for an annotation element at the variant (a 0–1 sigmoid score, not a calibrated probability; for indels, the mean over the letters of the longer allele). Tier 5 rules use sequence-model metrics instead. A rule fires when at least one "Any of" condition and every "All of" condition hold; limits are inclusive, and a missing value counts as 0, so it never meets a condition. Rules are checked from the top and the first one that fires is assigned; all rules that fire are kept in NT_All_Mechanisms. A variant where no rule fires is labelled UNCERTAIN_SIGNIFICANCE, which is not a ClinVar VUS. LLR and the reference-letter probability come from the model's prediction at the variant letter in the reference sequence, without masking. The indel log-probability change is a z-score over all scored indels, before the ClinVar quality filter. UTR element names (5UTR+, 5UTR−, 3UTR+, 3UTR−) are NTv3's own. Mechanism names describe patterns in the model's predicted annotations, not observed molecular events.
 
 **Rule provenance.** Mechanism assignment adds three columns next to `NT_Mechanism`:
 - `NT_Tier`: tier of the assigned rule, or −1 when no rule fired.
 - `NT_Rule`: the conditions that fired, with the observed values. A missing input prints as 0, as the rule sees it.
 - `NT_Scored`: False when all of a variant's rule inputs are missing.
 
-`analyses/nt_mechanism_assignment.py` is a byte copy of `vendor/`. Copy it again after any edit.
+`analyses/nt_mechanism_assignment.py` is a symlink to `vendor/` (rebuttal scripts import it from there).
 
 **Frozen benign background.** `compute_impact_frame(df, background="gradio_app/data/magi_baseline_stats.csv")` z-scores against the stored per-type benign mean and SD. Use it instead of the cohort's own benign rows for sets without labels, such as gnomAD or saturation mutagenesis.
 - `tools/build_background.py SNV.parquet INDEL.parquet -o out.csv` rebuilds that file (population SD, NaN ignored). Run it through srun with about 4 CPUs and 48 GB.
