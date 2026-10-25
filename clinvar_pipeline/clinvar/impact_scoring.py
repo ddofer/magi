@@ -205,18 +205,3 @@ def attach_impact_to_signaled(
     merge_cols = [c for c in IMPACT_MERGE_KEYS if c in signaled.columns and c in impact.columns]
     score_cols = [c for c in IMPACT_SCORE_COLS if c in impact.columns]
     return signaled.merge(impact[merge_cols + score_cols], on=merge_cols, how="left")
-
-
-def merge_impact_onto_signaled(
-    signaled_path: str,
-    impact_slim: pd.DataFrame,
-) -> pd.DataFrame:
-    """Deprecated alias — prefer ``attach_impact_to_signaled``."""
-    signaled = pd.read_parquet(signaled_path)
-    merge_cols = [c for c in IMPACT_MERGE_KEYS if c in signaled.columns]
-    score_cols = [c for c in IMPACT_SCORE_COLS if c in impact_slim.columns]
-    return signaled.merge(
-        impact_slim[merge_cols + score_cols],
-        on=merge_cols,
-        how="left",
-    )

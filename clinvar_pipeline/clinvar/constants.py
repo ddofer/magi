@@ -19,12 +19,6 @@ SUBMISSION_COLS = [
     "ReviewStatus",
 ]
 
-ALLOWED_OTHER_STATUS = {
-    "no assertion criteria provided",
-    "no classification provided",
-}
-CRITERIA_SINGLE = "criteria provided, single submitter"
-
 FEATURE_PRIORITY = [
     "start_codon",
     "stop_codon",

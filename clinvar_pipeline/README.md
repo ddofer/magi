@@ -72,7 +72,7 @@ python3 scripts/run_figures.py --fig all
 
 Optional LLM re-runs: `scripts/04_run_llm_parallel.py`, `scripts/05_run_llm_batch.py`.
 
-**Rule table (supplement).** Run `python3 scripts/export_rule_table.py [--out PATH]`. It writes one row per rule condition, for SNVs and indels, to `output/mechanisms/rule_table.csv`. `scripts/07_assign_mechanisms.py` writes the same file next to the mechanism CSVs.
+**Rule table (supplement).** Run `python3 scripts/export_rule_table.py [--out PATH]`. It writes `output/mechanisms/rule_table.csv` (one row per condition, machine-readable) and `rule_table_paper.csv` (one row per rule, conditions written out such as "Δ splice donor ≤ -0.2", rules shared by SNVs and indels merged; the supplement table). `scripts/07_assign_mechanisms.py` writes both next to the mechanism CSVs.
 - Columns: tier, order within the tier (the tie-break used), primary (OR) or secondary (AND) role, feature, operator and threshold.
 - `can_be_primary` flags rules that a higher-priority rule always pre-empts. It compares conditions on the same feature only, so it can miss blocking through correlated features.
 

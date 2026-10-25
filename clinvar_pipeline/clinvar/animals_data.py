@@ -139,17 +139,3 @@ def per_species_accuracy_table(res: pd.DataFrame | None = None) -> pd.DataFrame:
             }
         )
     return pd.DataFrame(rows)
-
-
-def concordance_counts_by_variant_type(df: pd.DataFrame | None = None) -> pd.DataFrame:
-    if df is None:
-        df = load_animals_eval_res()
-    counts = (
-        df.groupby(["variant_type", "concordance"], dropna=False)
-        .size()
-        .rename("count")
-        .reset_index()
-    )
-    totals = counts.groupby("variant_type")["count"].transform("sum")
-    counts["fraction"] = counts["count"] / totals
-    return counts.sort_values(["variant_type", "concordance"]).reset_index(drop=True)

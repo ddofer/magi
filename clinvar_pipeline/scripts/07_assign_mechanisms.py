@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Assign NT signal mechanisms (uses vendor/ or repo-root nt_mechanism_assignment.py)."""
+"""Assign NT signal mechanisms (uses vendor/nt_mechanism_assignment.py)."""
 
 from __future__ import annotations
 
@@ -8,13 +8,9 @@ import sys
 from pathlib import Path
 
 PIPELINE_ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = PIPELINE_ROOT.parent
 VENDOR_ROOT = PIPELINE_ROOT / "vendor"
 sys.path.insert(0, str(PIPELINE_ROOT))
-if (VENDOR_ROOT / "nt_mechanism_assignment.py").exists():
-    sys.path.insert(0, str(VENDOR_ROOT))
-elif str(REPO_ROOT) not in sys.path:
-    sys.path.append(str(REPO_ROOT))
+sys.path.insert(0, str(VENDOR_ROOT))
 
 from config import PATHS
 from nt_mechanism_assignment import run_assignment

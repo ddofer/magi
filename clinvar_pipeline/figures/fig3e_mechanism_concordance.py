@@ -8,10 +8,8 @@ from pathlib import Path
 import pandas as pd
 
 PIPELINE_ROOT = Path(__file__).resolve().parents[1]
-REPO_ROOT = PIPELINE_ROOT.parent
 sys.path.insert(0, str(PIPELINE_ROOT))
-if str(REPO_ROOT) not in sys.path:
-    sys.path.append(str(REPO_ROOT))
+sys.path.insert(0, str(PIPELINE_ROOT / "vendor"))
 
 from config import PATHS
 from figures.common import ensure_dirs

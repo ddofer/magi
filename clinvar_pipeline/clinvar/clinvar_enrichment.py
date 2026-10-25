@@ -7,8 +7,6 @@ from typing import Optional
 import pandas as pd
 
 from clinvar.constants import (
-    ALLOWED_OTHER_STATUS,
-    CRITERIA_SINGLE,
     PLACEHOLDER_RATIONALES,
     SUBMISSION_COLS,
 )
@@ -36,40 +34,6 @@ def _combine_rationale(row: pd.Series) -> str:
     if row.get("ExplanationOfInterpretation"):
         parts.append(f"EXPL: {row['ExplanationOfInterpretation']}")
     return "\n".join(parts) if parts else "No detailed rationale provided."
-
-
-def aggregate_review_status(sub_df: pd.DataFrame) -> pd.Series:
-    """Per-VariationID review-status aggregation (legacy; not used in strict filter)."""
-    tmp = (
-        sub_df[["#VariationID", "ReviewStatus"]]
-        .dropna(subset=["#VariationID"])
-        .copy()
-    )
-    tmp["#VariationID"] = tmp["#VariationID"].astype("Int64")
-    tmp["ReviewStatus"] = tmp["ReviewStatus"].astype(str).str.strip().str.lower()
-
-    allowed_all = {CRITERIA_SINGLE} | ALLOWED_OTHER_STATUS
-
-    def _agg(s: pd.Series):
-        vals = s.dropna().tolist()
-        n = len(vals)
-        if n == 0:
-            return pd.NA
-        if n == 1 and vals[0] == "reviewed by expert panel":
-            return "reviewed_by_expert_panel"
-        if n <= 1:
-            return pd.NA
-        if any(v not in allowed_all for v in vals):
-            return pd.NA
-        n_criteria = sum(v == CRITERIA_SINGLE for v in vals)
-        if n_criteria < 1:
-            return pd.NA
-        n_other = n - n_criteria
-        if n_criteria >= 2 or n_other >= 1:
-            return "criteria_provided,_multiple_submitters,_no_conflicts"
-        return pd.NA
-
-    return tmp.groupby("#VariationID")["ReviewStatus"].apply(_agg)
 
 
 def load_submission_summary(path: str) -> pd.DataFrame:

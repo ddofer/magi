@@ -90,34 +90,6 @@ def preprocess(MANE_raw, Promoter_raw):
 
 
 # ---------------------------------------------------------------------------
-# 2. Fast overlap query using sorted arrays + searchsorted
-# ---------------------------------------------------------------------------
-def build_interval_index(df, start_col='Start', end_col='End'):
-    """
-    Returns (starts, ends, indices) sorted by start for searchsorted.
-    """
-    starts = df[start_col].values
-    ends = df[end_col].values
-    order = np.argsort(starts)
-    return starts[order], ends[order], df.index.values[order]
-
-
-def query_overlaps(starts_sorted, ends_sorted, idx_sorted, pos):
-    """
-    Find all intervals containing pos.
-    intervals where start <= pos AND end >= pos.
-    """
-    # All intervals that start <= pos
-    right = np.searchsorted(starts_sorted, pos, side='right')  # first index where start > pos
-    # Among those (0..right-1), filter end >= pos
-    if right == 0:
-        return np.array([], dtype=np.int64)
-    candidate_ends = ends_sorted[:right]
-    mask = candidate_ends >= pos
-    return idx_sorted[:right][mask]
-
-
-# ---------------------------------------------------------------------------
 # 3. Per-variant annotation (operates on dicts, not pd.Series)
 # ---------------------------------------------------------------------------
 def annotate_variant(chrom, pos, mane_by_chrom, promoter_by_chrom, mane_parent_idx):

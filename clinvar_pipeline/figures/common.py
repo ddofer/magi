@@ -19,8 +19,6 @@ CONCORDANCE_COLORS = {
     "NOT_APPLICABLE": "#bbbbbb",
 }
 
-DEFAULT_CONCORDANCE_ORDER = ("CONCORDANT", "PARTIAL", "DISCORDANT")
-
 
 def concordance_color_list(categories: list[str] | tuple[str, ...]) -> list[str]:
     return [CONCORDANCE_COLORS.get(c, "#999999") for c in categories]

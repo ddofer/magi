@@ -62,7 +62,7 @@ Gotchas
   2. Ensembl chroms use NO 'chr' prefix (1, 2, X, A1, etc.).
      OMIA data sometimes includes 'chr' — we strip it.
   3. Mouse NTv3 token is 'mouse' (not 'mus_musculus').
-  4. Chromosome validation uses samtools faidx for spot-checks.
+  4. Chromosome validation uses pyfaidx for spot-checks.
   5. OMIA 'Allele' column is often blank — extract from HGVS g. string.
   6. Only SNPs are supported for LLR feature; INDELs get KL/logprob features.
   7. Many REF mismatch warnings with expected N or '-' are normal for INDEL
@@ -72,15 +72,18 @@ Authors: Dan Ofer / Michal Linial Lab (based on inference.py)
 """
 
 import argparse
+import gzip
 import io
 import re
-import subprocess
+import shutil
+import urllib.request
 from pathlib import Path
 from typing import Optional
 
 import numpy as np
 import pandas as pd
 import requests
+from pyfaidx import Fasta
 
 import inference as base
 
@@ -134,7 +137,6 @@ SPECIES_CONFIG = {
             "Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa.gz"
         ),
         "genome_fa": "Canis_lupus_familiaris.CanFam3.1.dna.toplevel.fa",
-        "ucsc_build": "canFam3",
     },
     "cat": {
         "token": "felis_catus",
@@ -147,7 +149,6 @@ SPECIES_CONFIG = {
             "Felis_catus-GCA_018350175.1-unmasked.fa.gz"
         ),
         "genome_fa": "Felis_catus-GCA_018350175.1-unmasked.fa",
-        "ucsc_build": "felCat9",
     },
     "chicken": {
         "token": "gallus_gallus",
@@ -160,7 +161,6 @@ SPECIES_CONFIG = {
             "Gallus_gallus.GRCg6a.dna.toplevel.fa.gz"
         ),
         "genome_fa": "Gallus_gallus.GRCg6a.dna.toplevel.fa",
-        "ucsc_build": "galGal6",
     },
     "zebrafish": {
         "token": "danio_rerio",
@@ -172,7 +172,6 @@ SPECIES_CONFIG = {
             "Danio_rerio.GRCz11.dna.toplevel.fa.gz"
         ),
         "genome_fa": "Danio_rerio.GRCz11.dna.toplevel.fa",
-        "ucsc_build": "danRer11",
     },
     "rat": {
         "token": "rattus_norvegicus",
@@ -184,7 +183,6 @@ SPECIES_CONFIG = {
             "Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa.gz"
         ),
         "genome_fa": "Rattus_norvegicus.mRatBN7.2.dna.toplevel.fa",
-        "ucsc_build": "rn7",
     },
     "mouse": {
         "token": "mouse",  # NTv3 token is literally 'mouse', not 'mus_musculus'
@@ -196,7 +194,6 @@ SPECIES_CONFIG = {
             "Mus_musculus.GRCm39.dna.toplevel.fa.gz"
         ),
         "genome_fa": "Mus_musculus.GRCm39.dna.toplevel.fa",
-        "ucsc_build": "mm39",
     },
     # ---------- species NOT in NTv3 model config → skipped with warning ----------
     "cattle": {
@@ -269,8 +266,8 @@ def download_genome(species_key: str) -> Optional[Path]:
     """
     Download, decompress, and index reference genome from Ensembl FTP.
 
-    Uses wget -nc (no-clobber) so re-runs are safe.
-    Requires samtools and gunzip on PATH.
+    Skips files that already exist, so re-runs are safe.
+    pyfaidx builds the .fai index.
 
     Returns path to the .fa file, or None if download fails.
     """
@@ -293,43 +290,38 @@ def download_genome(species_key: str) -> Optional[Path]:
     if not gz_path.exists() and not fa_path.exists():
         print(f"   📥 Downloading {cfg['common_name']} genome (~1-3 GB)...")
         print(f"      URL: {cfg['genome_url']}")
-        result = subprocess.run(
-            [
-                "wget",
-                "-nc",
-                "-q",
-                "--show-progress",
-                "-P",
-                str(species_genome_dir),
-                cfg["genome_url"],
-            ],
-            check=False,
-        )
-        if result.returncode != 0:
+        try:
+            urllib.request.urlretrieve(cfg["genome_url"], gz_path)
+        except Exception as e:
+            gz_path.unlink(missing_ok=True)
             print(
-                f"   ❌ wget failed for {species_key}. "
+                f"   ❌ Download failed for {species_key}: {e}. "
                 f"Try manually: wget -c {cfg['genome_url']}"
             )
             return None
 
-    # Decompress
+    # Decompress (keeps the .gz)
     if not fa_path.exists() and gz_path.exists():
         print(f"   📦 Decompressing {gz_path.name}...")
-        result = subprocess.run(["gunzip", "-k", "-f", str(gz_path)], check=False)
-        if result.returncode != 0:
-            print(f"   ❌ gunzip failed for {gz_path}")
+        try:
+            with gzip.open(gz_path, "rb") as f_in, open(fa_path, "wb") as f_out:
+                shutil.copyfileobj(f_in, f_out)
+        except Exception as e:
+            fa_path.unlink(missing_ok=True)
+            print(f"   ❌ Decompression failed for {gz_path}: {e}")
             return None
 
     if not fa_path.exists():
         print(f"   ❌ FASTA not found after download: {fa_path}")
         return None
 
-    # Index with samtools
+    # Index with pyfaidx
     if not fai_path.exists():
-        print("   🔍 Indexing with samtools faidx...")
-        result = subprocess.run(["samtools", "faidx", str(fa_path)], check=False)
-        if result.returncode != 0:
-            print("   ⚠️  samtools faidx failed — coordinate validation will be skipped")
+        print("   🔍 Indexing with pyfaidx...")
+        try:
+            Fasta(str(fa_path)).close()
+        except Exception as e:
+            print(f"   ⚠️  Indexing failed ({e}) — coordinate validation will be skipped")
 
     print(f"   ✅ Genome ready: {fa_path}")
     return fa_path
@@ -694,7 +686,7 @@ def validate_reference_bases(
     max_checks: int = 50,
 ) -> float:
     """
-    Spot-check ref alleles against reference genome using samtools faidx.
+    Spot-check ref alleles against reference genome using pyfaidx.
 
     Returns the fraction of matches (1.0 = perfect).
     Skips if faidx index is missing.
@@ -720,16 +712,14 @@ def validate_reference_bases(
     matches = 0
     mismatches = []
 
-    for _, row in snp_df.iterrows():
-        region = f"{row['chrom']}:{row['pos']}-{row['pos']}"
-        result = subprocess.run(
-            ["samtools", "faidx", str(fasta_path), region],
-            capture_output=True,
-            text=True,
-        )
-        lines = result.stdout.strip().split("\n")
-        if len(lines) >= 2:
-            fasta_ref = lines[1].strip().upper()
+    with Fasta(str(fasta_path)) as genome:
+        for _, row in snp_df.iterrows():
+            chrom, pos = str(row["chrom"]), int(row["pos"])
+            if chrom not in genome:
+                continue
+            fasta_ref = genome[chrom][pos - 1 : pos].seq.upper()
+            if not fasta_ref:
+                continue
             if fasta_ref == row["ref"].upper():
                 matches += 1
             else:
@@ -881,8 +871,6 @@ def run_species_inference(
     # Load genome FASTA
     fa_path = _genome_path(species_key)
     if fa_path.exists():
-        from pyfaidx import Fasta
-
         try:
             genome = Fasta(str(fa_path))
             print(

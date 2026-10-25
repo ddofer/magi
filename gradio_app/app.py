@@ -97,7 +97,6 @@ CUSTOM_CSS = """
 # ============================================================================
 BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
-EXAMPLES_DIR = BASE_DIR / "examples"
 METADATA_FILE = DATA_DIR / "functional_tracks_metadata_human.csv"
 DEFAULT_ZOOM_BP = 128
 MIN_ZOOM_BP = 8

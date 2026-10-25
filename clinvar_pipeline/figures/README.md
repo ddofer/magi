@@ -11,7 +11,7 @@ Matplotlib modules that reproduce analysis figures from notebooks and `../script
 | `merge_eval.py` | Merge canonical LLM results with signaled cohort + impact scores |
 | `mechanism_canonicalize.py` | Regex buckets for free-text mechanism labels |
 | `fig1_pies.py` | Label + rationale panel → `fig1c.png` |
-| `benchmark_data.py` | Load combined SNP+indel benchmark deltas / impact frame |
+| `benchmark_data.py` | Load the impact-scored SNP+indel benchmark frame |
 | `fig2a_impact_vs_af.py` | Impact score vs gnomAD AF scatter → `fig2a.png` |
 | `fig2_densities.py` | Global impact density panel → `fig2b.png` |
 | `fig3_abc.py` | Variant-type concordance + Global_z quartiles → `fig3a`–`fig3c` |

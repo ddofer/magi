@@ -276,29 +276,3 @@ def run_evaluation_pipeline(
         print(f"CSV saved to: {csv_path}")
 
     return results_df
-
-
-def merge_evaluation_results(
-    original_df: pd.DataFrame,
-    results_df: pd.DataFrame,
-    on: str = "#VariationID",
-) -> pd.DataFrame:
-    merge_cols = [
-        on,
-        "concordance",
-        "explanation",
-        "signal_category",
-        "primary_mechanism",
-        "key_signals",
-        "rationale_mechanism",
-        "nt_missed",
-        "parse_success",
-    ]
-    if "embedding_impact" in results_df.columns:
-        merge_cols.append("embedding_impact")
-
-    results_slim = results_df[[c for c in merge_cols if c in results_df.columns]].copy()
-    original_df = original_df.copy()
-    original_df[on] = original_df[on].astype(str)
-    results_slim[on] = results_slim[on].astype(str)
-    return original_df.merge(results_slim, on=on, how="left", suffixes=("", "_eval"))

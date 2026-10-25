@@ -136,7 +136,6 @@ IMPACT_SCORE_COLS = [
     "Composite_top",
 ]
 
-MIN_GOLD_STARS = 2
 DEFAULT_TOP_K_SIGNALS = 5
 DEFAULT_ANIMALS_TOP_K_SIGNALS = 10
 DEFAULT_LLM_MODEL = "gemini-3-flash-preview"

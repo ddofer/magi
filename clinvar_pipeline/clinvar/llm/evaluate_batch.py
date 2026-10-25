@@ -216,11 +216,11 @@ def wait_for_batch_completion(
             print("\n✓ Batch job completed successfully!")
             return status
 
-        if state in ['JOB_STATE_FAILED', 'FAILED', 'STATE_FAILED']:
+        if state in ['JobState.JOB_STATE_FAILED', 'JOB_STATE_FAILED', 'FAILED', 'STATE_FAILED']:
             print("\n✗ Batch job failed!")
             return status
 
-        if state in ['JOB_STATE_CANCELLED', 'CANCELLED', 'STATE_CANCELLED']:
+        if state in ['JobState.JOB_STATE_CANCELLED', 'JOB_STATE_CANCELLED', 'CANCELLED', 'STATE_CANCELLED']:
             print("\n✗ Batch job was cancelled!")
             return status
 
@@ -485,53 +485,3 @@ def run_batch_evaluation_pipeline(
     print_evaluation_summary(results_df)
 
     return results_df
-
-
-# =============================================================================
-# UTILITY: Resume from job name
-# =============================================================================
-
-def resume_batch_evaluation(
-    job_name: str,
-    output_path: str,
-    variant_type: str = 'snp',
-    api_key: str = None,
-    wait_if_pending: bool = True
-) -> pd.DataFrame:
-    """
-    Resume/retrieve results from an existing batch job.
-
-    Useful if you submitted a job and closed your session.
-
-    Args:
-        job_name: Name of the batch job
-        output_path: Path to save results
-        variant_type: 'snp' or 'indel'
-        api_key: API key
-        wait_if_pending: If True, wait for completion if job is still running
-
-    Returns:
-        DataFrame with results
-    """
-    # Check status
-    status = check_batch_status(job_name, api_key)
-    print(f"Job: {job_name}")
-    print(f"State: {status['state']}\n")
-
-    if status['state'] not in ['JOB_STATE_SUCCEEDED', 'SUCCEEDED', 'STATE_SUCCEEDED']:
-        if wait_if_pending:
-            print("Job not complete. Waiting...")
-            status = wait_for_batch_completion(job_name, api_key)
-        else:
-            print("Job not complete yet.")
-            return None
-
-    # Download and parse
-    results_jsonl = output_path.replace('.parquet', '_raw.jsonl')
-    download_batch_results(job_name, results_jsonl, api_key)
-
-    results_df = parse_batch_results(results_jsonl, variant_type)
-    results_df.to_parquet(output_path)
-
-    return results_df
-
