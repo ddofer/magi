@@ -75,6 +75,7 @@ Optional LLM re-runs: `scripts/04_run_llm_parallel.py`, `scripts/05_run_llm_batc
 **Rule table (supplement).** Run `python3 scripts/export_rule_table.py [--out PATH]`; `scripts/07_assign_mechanisms.py` also writes it. Both files are generated from the rule definitions in `vendor/nt_mechanism_assignment.py`, so a rule change only needs a rerun.
 - `output/mechanisms/rule_table_paper.csv`: the supplement table. One row per rule, in the order the rules are checked, with conditions written out ("Δ splice donor ≤ −0.2"). Rules that are the same for SNVs and indels appear once. The last row is the label for variants where no rule fires.
 - `output/mechanisms/rule_table.csv`: one row per condition, for scripts.
+- A copy of both files is tracked in `supplement/` (`--out supplement/rule_table.csv`), so coauthors can open them on GitHub. Rerun the export after any rule change.
 - `can_be_assigned` is False for a rule that a rule checked earlier always pre-empts. The check compares conditions on the same feature only, so it can miss blocking through other features.
 
 Draft caption for the paper table:
