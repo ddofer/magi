@@ -12,6 +12,8 @@ Public repo (github.com/ddofer/magi). Layout, usage and citation are in README.m
 
 Heavy work goes through SLURM, **low priority** for this repo: `-p low` on every `srun`/`sbatch` (preemptible; see the cluster policy for the SIGTERM/requeue pattern on long runs).
 At most 3 GPUs in total across this repo's jobs. No MLflow logging for this repo (user decision, overrides the cluster default).
+The policy hook misreads `squeue -j <id>` as heavy work: use `squeue --me`. It also blocks even `--help` of GPU scripts outside SLURM: `srun -n 1 -p low -w sblxa123c -c 1 --mem=4G -t 0:05:00 ...`.
+Network: login and compute nodes reach Hugging Face and PyPI; compute nodes also reach GitHub and Zenodo. NCBI, Ensembl and Google are blocked, so get annotations from HF mirrors (e.g. the vepyr VEP 116 cache).
 **Always add `-w sblxa123c`**: this repo lives under `/opt/hpc`, which is not mounted on B300, so a job routed there dies before writing its log.
 GPU (`--gres=gpu:1`, even for a quick check): `inference.py`, `inference_indel.py`, `inference_omia.py`, `smoke_test.py`, `gradio_app/app.py`, `paper_figures/regen_magi_app_panels.py`.
 CPU only (still SLURM if over 4 cores, 16 GB or 10 min): `analysis.py`, `clinvar_pipeline/`, `paper_figures/regen_fig2_de_panels.py`, `rebuttal/analyses/`, notebooks in `analyses/`.
@@ -38,6 +40,8 @@ srun -n 1 -p low -w sblxa123c --gres=gpu:1 -c 4 --mem=32G -t 0:20:00 uv run --no
 
 - `gradio_app/inference.py` and `gradio_app/analysis.py` are separate copies, not imports of the root files. A fix in one does not reach the other.
 - `paper_figures/fig5/fig5b*`, `fig5c*`, `fig7/`, `fig8/` are finished vector files that cannot be rebuilt (upstream sources gone). Do not delete or regenerate them. See `paper_figures/RUNBOOK.md` before touching figures.
+- `inference_omia.py` writes to a relative `data/`: the tracked `data/*_variants.parquet` files and `data/results/`. For a rerun, cd into a separate folder that has symlinks to `data/omia_raw_variants.csv` and `data/genomes`, and set `PYTHONPATH=<repo>`. `--validate-only` parses and checks REF letters without the model. Animal runs use a 16 kb window; human runs use 64 kb.
+- `MLM_logprob_delta` is z-scored before the rules use it (`clinvar_pipeline/clinvar/variant_prep.py`). Label it as a z-score.
 - Paths with spaces and odd nesting exist: `LLM pipeline inputs/LLM pipeline inputs/` and `analyses/analyses/`. Quote paths.
 
 ## For a future full rerun (decided 2026-10-22: not before)
