@@ -26,7 +26,7 @@ NAMES = {  # feature labels; other annotation elements are written as "Δ <eleme
     "LLR": "LLR = ln(P alt / P ref)",
     "MLM_Prior": "Reference-letter probability",
     "MLM_KL_max": "Max KL(Alt ‖ Ref)",
-    "MLM_logprob_delta": "Log-probability change (z-score)",
+    "MLM_logprob_delta": "Mean log-probability change (alt − ref, z-score)",
     "EMB_cosine_dist": "Embedding cosine distance",
     "D_BED_always_on_exon": "Δ constitutive exon",
     "D_BED_protein_coding_gene": "Δ protein-coding gene",

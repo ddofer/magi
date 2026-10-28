@@ -65,8 +65,9 @@ Gotchas
   4. Chromosome validation uses pyfaidx for spot-checks.
   5. OMIA 'Allele' column is often blank — extract from HGVS g. string.
   6. Only SNPs are supported for LLR feature; INDELs get KL/logprob features.
-  7. Many REF mismatch warnings with expected N or '-' are normal for INDEL
-      placeholders; mismatches where expected REF is A/C/G/T should be reviewed.
+  7. INDELs are written VCF-style (anchor letter from the species genome), the format
+      inference.py expects. HGVS events with unknown letters (e.g. insN[226]), letters that
+      disagree with the genome, or spans longer than half the window are skipped and counted.
 
 Authors: Dan Ofer / Michal Linial Lab (based on inference.py)
 """
@@ -226,14 +227,11 @@ SPECIES_CONFIG = {
 # Pre-compiled HGVS → chrom/pos/ref/alt patterns
 # For RefSeq HGVS: NC_058375.1:g.147442389C>T
 _HGVS_G_FULL = re.compile(r"g\.(\d+)([ACGT])>([ACGT])", re.IGNORECASE)
-# HGVS insertion: g.147442389insACGT
-_HGVS_G_INS = re.compile(r"g\.(\d+)ins([ACGT]+)", re.IGNORECASE)
-# HGVS deletion: g.147442389del or g.147442389_147442391del
-_HGVS_G_DEL = re.compile(r"g\.(\d+)(?:_\d+)?del([ACGT]*)", re.IGNORECASE)
-# HGVS duplication: g.147442389dup or g.147442389dupC
-_HGVS_G_DUP = re.compile(r"g\.(\d+)(?:_\d+)?dup([ACGT]*)", re.IGNORECASE)
-# HGVS delins: g.147442389_147442390delinsAC
-_HGVS_G_DELINS = re.compile(r"g\.(\d+)(?:_\d+)?delins([ACGT]+)", re.IGNORECASE)
+# HGVS INDEL: g.<start>[_<end>]<del|dup|delins|ins>[ACGT letters]. The lookahead rejects
+# anything after the letters (N[226], legacy delAinsGG) rather than matching a shorter event.
+_HGVS_G_INDEL = re.compile(r"g\.(\d+)(?:_(\d+))?(delins|del|dup|ins)([ACGT]*)(?![A-Z\[\d])", re.IGNORECASE)
+# Any HGVS genomic indel, parseable or not: such rows are never read as SNVs.
+_HGVS_G_ANY_INDEL = re.compile(r"g\.\d+(?:_\d+)?(?:del|dup|ins)", re.IGNORECASE)
 # Generic SNP fallback: G>A or G/A
 _GENERIC_SNP = re.compile(r"\b([ACGT])>([ACGT])\b", re.IGNORECASE)
 # Numeric position standalone (last resort)
@@ -422,40 +420,51 @@ def _extract_snp_from_hgvs(g_str: str):
     return None, None, None
 
 
-def _extract_indel_from_hgvs(g_str: str):
+def _extract_indel_from_hgvs(g_str: str, genome, chrom: str):
     """
-    Try to extract (pos, ref, alt) for simple INDELs from HGVS.
+    VCF-style (pos, ref, alt) for an HGVS genomic INDEL, with letters from `genome`.
 
-    Returns (pos, ref, alt) or (None, None, None).
-      - insertion:  pos, "-", inserted_seq
-      - deletion:   pos, deleted_seq_or_"N", "-"
-      - duplication: pos, "-", duplicated_seq_or_"N"
-      - delins: pos, "N", inserted_seq
+    Deletions and duplications are anchored on the preceding / last letter, as in VCF.
+    Returns (None, None, None) when unparseable, the sequence is unknown or disagrees with the
+    genome, the span leaves the contig or is longer than half the window, or letters are not ACGT.
     """
-    m_ins = _HGVS_G_INS.search(g_str)
-    if m_ins:
-        return int(m_ins.group(1)), "-", m_ins.group(2).upper()
-    m_dup = _HGVS_G_DUP.search(g_str)
-    if m_dup:
-        dup_seq = m_dup.group(2).upper() if m_dup.group(2) else "N"
-        return int(m_dup.group(1)), "-", dup_seq
-    m_del = _HGVS_G_DEL.search(g_str)
-    if m_del:
-        deleted = m_del.group(2).upper() if m_del.group(2) else "N"
-        return int(m_del.group(1)), deleted, "-"
-    m_delins = _HGVS_G_DELINS.search(g_str)
-    if m_delins:
-        return int(m_delins.group(1)), "N", m_delins.group(2).upper()
-    return None, None, None
+    none = None, None, None
+    m = _HGVS_G_INDEL.search(g_str)
+    if not m or genome is None:
+        return none
+    start, end = int(m.group(1)), int(m.group(2) or m.group(1))
+    kind, seq = m.group(3).lower(), m.group(4).upper()
+    span = end - start + 1
+    if start < 2 or span < 1 or max(span, len(seq)) > CONTEXT_LEN // 2:
+        return none
+    fetch = lambda a, b: base._fetch(genome, chrom, a - 1, b) or ""  # 1-based inclusive
+    region = fetch(start, end)
+    if len(region) != span:
+        return none
+    if kind == "delins":
+        pos, ref, alt = start, region, seq
+    elif kind == "del":
+        pos, ref = start - 1, fetch(start - 1, start - 1) + region
+        alt = ref[:1]
+    elif kind == "dup":
+        pos, ref, alt = end, region[-1], region[-1] + region
+    else:  # ins between start and start+1
+        if m.group(2) and end != start + 1:
+            return none
+        pos, ref = start, region[:1]
+        alt = ref + seq
+    if kind in ("del", "dup") and seq and seq != region:
+        return none
+    if not alt or len(ref) < 1 or not set(ref + alt) <= set("ACGT"):
+        return none
+    return pos, ref, alt
 
 
 def _is_valid_allele(allele: str) -> bool:
-    """Accept only nucleotide strings (plus '-' for INDEL placeholder)."""
+    """Accept only nucleotide strings."""
     if not allele or allele in ("nan", "None", "."):
         return False
-    if allele == "-":
-        return True
-    return bool(re.match(r"^[ACGTN\-]+$", allele.upper()))
+    return bool(re.match(r"^[ACGT]+$", allele.upper()))
 
 
 def _norm_text(value: str) -> str:
@@ -484,6 +493,7 @@ def parse_omia_variants(
     df: pd.DataFrame,
     species_key: str,
     include_indels: bool = True,
+    genome=None,
 ) -> pd.DataFrame:
     """
     Filter OMIA dataframe to one species and parse into NTv3-compatible format.
@@ -567,9 +577,13 @@ def parse_omia_variants(
             return pd.DataFrame()
 
     records = []
+    n_indel_skipped = 0
+    if include_indels and genome is None:
+        print("   ⚠️  No genome: HGVS indels are skipped (their letters come from the genome)")
 
     for _, row in species_df.iterrows():
         chrom = str(row[chrom_col]).strip() if chrom_col else ""
+        clean_chrom = re.sub(r"^(?:chr|Chr|CHR)", "", chrom).strip()
         g_str = str(row[gm_col]).strip() if gm_col else ""
         c_str = str(row[cn_col]).strip() if cn_col else ""
         allele_str = str(row[allele_col]).strip() if allele_col else ""
@@ -580,8 +594,12 @@ def parse_omia_variants(
         pos, ref, alt = _extract_snp_from_hgvs(g_str)
 
         # --- Priority 2: HGVS INDEL (if SNP extraction failed) ---
-        if pos is None and include_indels:
-            pos, ref, alt = _extract_indel_from_hgvs(g_str)
+        if pos is None and _HGVS_G_ANY_INDEL.search(g_str):
+            if include_indels:
+                pos, ref, alt = _extract_indel_from_hgvs(g_str, genome, clean_chrom)
+            if pos is None:  # never fall back to reading an indel row as an SNV
+                n_indel_skipped += include_indels
+                continue
 
         # --- Priority 3: Try c./n. string + generic SNP pattern ---
         if pos is None:
@@ -604,8 +622,6 @@ def parse_omia_variants(
         # --- Skip if we still couldn't parse a variant ---
         if pos is None or pos <= 0:
             continue
-        if ref == "-" and alt == "-":
-            continue
         if not ref or not alt:
             continue
         # Skip clearly bad alleles (numeric garbage, etc.)
@@ -614,8 +630,6 @@ def parse_omia_variants(
         if chrom.lower() in ("", "nan", "none", "?"):
             continue
 
-        # --- Clean chromosome: strip 'chr' prefix for Ensembl format ---
-        clean_chrom = re.sub(r"^(?:chr|Chr|CHR)", "", chrom).strip()
         if not clean_chrom or clean_chrom.lower() in ("nan", "none"):
             continue
 
@@ -639,10 +653,7 @@ def parse_omia_variants(
         omia_id = str(row.get(omia_id_col, np.nan)) if omia_id_col else np.nan
 
         # --- Variant type ---
-        if ref == "-" or alt == "-" or len(ref) != len(alt):
-            v_type = "indel"
-        else:
-            v_type = "snp"
+        v_type = "snp" if len(ref) == len(alt) == 1 else "indel"
 
         records.append(
             {
@@ -662,6 +673,8 @@ def parse_omia_variants(
             }
         )
 
+    if n_indel_skipped:
+        print(f"   ⏭️  {n_indel_skipped} HGVS indels skipped (unknown or mismatched letters, too long, off-contig)")
     result_df = pd.DataFrame(records)
     if result_df.empty:
         print(f"   ⚠️  No parseable variants found for {cfg['common_name']}")
@@ -705,12 +718,8 @@ def validate_reference_bases(
         )
         return float("nan")
 
-    # Only validate SNPs with real nucleotides (skip N placeholders from indels)
-    snp_df = df[
-        (df["ref"].str.len() == 1)
-        & (df["ref"].str.upper().isin(["A", "C", "G", "T"]))
-        & (df["alt"] != "-")
-    ].head(max_checks)
+    # Only validate SNPs: INDEL ref letters were read from this genome, so they always match
+    snp_df = df[df["variant_type"] == "snp"].head(max_checks)
     if snp_df.empty:
         print("   ℹ️  No SNPs to validate (all indels?)")
         return float("nan")
@@ -1030,7 +1039,11 @@ def main(
     validation_scores = {}
     for sk in run_keys:
         print(f"\n  [{SPECIES_CONFIG[sk]['common_name']}]")
-        df_sp = parse_omia_variants(raw_df, sk, include_indels=include_indels)
+        gp = genome_paths.get(sk)
+        genome = Fasta(str(gp)) if gp and gp.exists() else None
+        df_sp = parse_omia_variants(raw_df, sk, include_indels=include_indels, genome=genome)
+        if genome is not None:
+            genome.close()
         if df_sp.empty:
             continue
 

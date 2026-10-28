@@ -11,6 +11,7 @@ Public repo (github.com/ddofer/magi). Layout, usage and citation are in README.m
 ## SLURM
 
 Heavy work goes through SLURM, **low priority** for this repo: `-p low` on every `srun`/`sbatch` (preemptible; see the cluster policy for the SIGTERM/requeue pattern on long runs).
+At most 3 GPUs in total across this repo's jobs. No MLflow logging for this repo (user decision, overrides the cluster default).
 **Always add `-w sblxa123c`**: this repo lives under `/opt/hpc`, which is not mounted on B300, so a job routed there dies before writing its log.
 GPU (`--gres=gpu:1`, even for a quick check): `inference.py`, `inference_indel.py`, `inference_omia.py`, `smoke_test.py`, `gradio_app/app.py`, `paper_figures/regen_magi_app_panels.py`.
 CPU only (still SLURM if over 4 cores, 16 GB or 10 min): `analysis.py`, `clinvar_pipeline/`, `paper_figures/regen_fig2_de_panels.py`, `rebuttal/analyses/`, notebooks in `analyses/`.

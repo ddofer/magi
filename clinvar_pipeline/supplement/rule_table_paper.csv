@@ -36,6 +36,6 @@
 35,4,UTR_CHANGE,Both,|Δ 5UTR+| ≥ 0.08; |Δ 5UTR-| ≥ 0.08; |Δ 3UTR+| ≥ 0.08; |Δ 3UTR-| ≥ 0.08,,Detectable change in UTR signal,
 36,4,GENE_CHANGE,Both,|Δ protein-coding gene| ≥ 0.08; |Δ lncRNA| ≥ 0.08,,Detectable change in gene-level signal,
 37,5,SEQUENCE_CONSTRAINED,SNV,LLR = ln(P alt / P ref) ≤ −1,Reference-letter probability ≥ 0.3,Position under sequence constraint — MLM confident in REF and strongly prefers it over ALT,
-38,5,SEQUENCE_CONSTRAINED,Indel,Log-probability change (z-score) ≤ −1; Max KL(Alt ‖ Ref) ≥ 2,,Sequence under constraint — MLM probability or distributional disruption detected,
+38,5,SEQUENCE_CONSTRAINED,Indel,"Mean log-probability change (alt − ref, z-score) ≤ −1; Max KL(Alt ‖ Ref) ≥ 2",,Sequence under constraint — MLM probability or distributional disruption detected,
 39,5,EMBEDDING_DISRUPTED,Indel,Embedding cosine distance ≥ 0.15,,Embedding-space disruption — MLM internal representation substantially altered by variant,
 ,—,UNCERTAIN_SIGNIFICANCE,Both,No rule above fires,,No rule fired (not a ClinVar VUS),
