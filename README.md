@@ -64,12 +64,12 @@ python inference_indel.py    # clinvar_indel.parquet -> clinvar_indel_deltas.par
 ### OMIA multi-species inference
 
 ```bash
-python inference_omia.py --validate-only
-python inference_omia.py --species dog cat --sample-size 50
-python inference_omia.py --full
+python inference_omia.py --validate-only                  # parse + check REF letters; writes nothing
+python inference_omia.py --species dog cat --sample-size 50 --out-dir runs/omia_sample
+python inference_omia.py --full --out-dir runs/omia_full
 ```
 
-Supported species: dog, cat, chicken, zebrafish, rat, mouse. Genomes are downloaded to `data/genomes/`, outputs written to `data/results/`. Track (BigWig) outputs are disabled for non-human species.
+Supported species: dog, cat, chicken, zebrafish, rat, mouse. Genomes are downloaded to `data/genomes/`. Without `--out-dir`, outputs are written to `data/` and `data/results/`, over the tracked variant files. The REF check covers 50 variants per species, and only species whose genome is present. Model runs need a GPU. Track (BigWig) outputs are disabled for non-human species.
 
 ### Downstream analysis
 

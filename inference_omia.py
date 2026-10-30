@@ -24,7 +24,11 @@ Supported Species (NTv3 model config species_to_token_id):
 
 Usage
     python inference_omia.py --validate-only
-        # validation-only: fetch + parse + coordinate checks, no model inference
+        # validation-only: fetch + parse + REF-letter check on 50 variants per
+        # species (only where the genome is in data/genomes); writes nothing
+
+    Any run that writes goes through SLURM and should pass --out-dir <folder>:
+    the default output folder is the repo's data/, which holds tracked files.
 
     python inference_omia.py
         # sample inference: default species, 30 variants/species
@@ -32,7 +36,7 @@ Usage
         # sample inference: selected species with custom sample size
 
     srun -n 1 -p low -w sblxa123c --gres=gpu:1 -c 4 --mem=32G -t 4:00:00 \
-        uv run --no-sync python inference_omia.py --full
+        uv run --no-sync python inference_omia.py --full --out-dir scratch/omia
         # full inference (all variants for run species), through SLURM
 
   python inference_omia.py --species dog cat     # specific species
@@ -93,11 +97,14 @@ import inference as base
 # CONFIGURATION
 # ============================================================================
 
-# Paths (all OMIA artifacts are kept under the project-level data/ folder)
-DATA_DIR = Path("data")
+# Inputs (OMIA cache, genomes) live in the repo's data/, wherever the script runs from.
+# Outputs (wrangled variants, results) go to OUT_DIR; --out-dir moves them, so a rerun
+# does not overwrite the tracked data/*_variants.parquet and data/results/.
+DATA_DIR = Path(__file__).resolve().parent / "data"
 GENOME_DIR = DATA_DIR / "genomes"
-RESULTS_DIR = DATA_DIR / "results"
 OMIA_CACHE_FILE = DATA_DIR / "omia_raw_variants.csv"
+OUT_DIR = DATA_DIR
+RESULTS_DIR = OUT_DIR / "results"
 OMIA_URL = (
     "https://www.omia.org/results/?search_type=advanced"
     "&result_type=variant&singlelocus=yes&limit=10000"
@@ -245,9 +252,8 @@ _POS_NUM = re.compile(r"\b(\d{4,})\b")
 
 def ensure_dirs():
     """Create required output directories."""
-    DATA_DIR.mkdir(exist_ok=True)
-    GENOME_DIR.mkdir(exist_ok=True)
-    RESULTS_DIR.mkdir(exist_ok=True)
+    GENOME_DIR.mkdir(parents=True, exist_ok=True)
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ============================================================================
@@ -966,6 +972,7 @@ def main(
     model_size: str = MODEL_SIZE,
     force_refresh: bool = False,
     include_indels: bool = True,
+    out_dir: Optional[str] = None,
 ):
     """
     Full OMIA pipeline: fetch → parse → validate → infer (sample or full).
@@ -985,9 +992,20 @@ def main(
     model_size : str
         '100M' or '650M'.
     force_refresh : bool
-        Re-download OMIA data even if cache exists.
+        Re-download OMIA data even if cache exists (overwrites data/omia_raw_variants.csv).
+    out_dir : str or None
+        Folder for wrangled variants and results. None = the repo's data/.
     """
-    ensure_dirs()
+    global OUT_DIR, RESULTS_DIR
+    if out_dir:
+        OUT_DIR = Path(out_dir).resolve()
+        RESULTS_DIR = OUT_DIR / "results"
+    if validate_only:
+        # Read-only: existing OMIA cache and genomes only, no downloads, no writes.
+        if force_refresh or not OMIA_CACHE_FILE.exists():
+            raise SystemExit("--validate-only needs data/omia_raw_variants.csv and no --force-refresh")
+    else:
+        ensure_dirs()
 
     # Determine which species to run
     requested = species_keys if species_keys else DEFAULT_RUN_SPECIES
@@ -1026,7 +1044,10 @@ def main(
     genome_paths = {}
     for sk in run_keys:
         print(f"  [{SPECIES_CONFIG[sk]['common_name']}]")
-        gp = download_genome(sk)
+        if validate_only:
+            gp = _genome_path(sk) if _genome_path(sk).exists() else None
+        else:
+            gp = download_genome(sk)
         genome_paths[sk] = gp
 
     if fetch_only:
@@ -1047,10 +1068,10 @@ def main(
         if df_sp.empty:
             continue
 
-        # Save wrangled parquet
-        out_path = DATA_DIR / f"{sk}_variants.parquet"
-        df_sp.to_parquet(out_path, index=False)
-        print(f"   💾 Saved wrangled variants: {out_path} ({len(df_sp)} rows)")
+        if not validate_only:
+            out_path = OUT_DIR / f"{sk}_variants.parquet"
+            df_sp.to_parquet(out_path, index=False)
+            print(f"   💾 Saved wrangled variants: {out_path} ({len(df_sp)} rows)")
 
         # EDA
         eda_summary(df_sp, sk)
@@ -1060,6 +1081,8 @@ def main(
         match_frac = float("nan")
         if gp:
             match_frac = validate_reference_bases(df_sp, gp, max_checks=50)
+        else:
+            print("   ⚠️  No genome: REF letters NOT checked for this species.")
         validation_scores[sk] = match_frac
         if not np.isnan(match_frac) and match_frac < 0.8:
             print(
@@ -1145,7 +1168,7 @@ def main(
     print("\n  Output files:")
     for sk in results_summary:
         suffix = "" if full_run else f"_sample{n_inference}"
-        print(f"    Variants : {DATA_DIR}/{sk}_variants.parquet")
+        print(f"    Variants : {OUT_DIR}/{sk}_variants.parquet")
         print(f"    Results  : {RESULTS_DIR}/{sk}_deltas{suffix}.parquet")
 
     print("=" * 70)
@@ -1201,7 +1224,14 @@ def _parse_args():
     parser.add_argument(
         "--validate-only",
         action="store_true",
-        help="Fetch + parse + coordinate-validate only; skip model inference",
+        help="Fetch + parse + check REF letters (50 per species, needs the genome); "
+        "writes nothing, skips model inference",
+    )
+    parser.add_argument(
+        "--out-dir",
+        default=None,
+        help="Folder for wrangled variants and results (default: the repo's data/, "
+        "which holds tracked files)",
     )
     parser.add_argument(
         "--force-refresh",
@@ -1227,4 +1257,5 @@ if __name__ == "__main__":
         model_size=args.model_size,
         force_refresh=args.force_refresh,
         include_indels=not args.no_indels,
+        out_dir=args.out_dir,
     )

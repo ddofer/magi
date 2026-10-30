@@ -107,7 +107,7 @@ published run had no such rows (its N Benign was the full 18,724).
 Published values: 10 are the **exact** figures printed in the notebook's stored
 cell-24 stdout (`results_df.head(10)`); the remaining 11 were recovered by
 pixel-digitising the notebook's own stored panel-d PNG (identical to
-`analyses/analyses/figures/fig-per_element_disruption_by_class.png`). The
+`analyses/figures/fig-per_element_disruption_by_class.png`). The
 digitiser was calibrated on the 7 y-gridlines and validated against the 10 exact
 values: **max residual 4·10⁻⁵**, RMS 2·10⁻⁵. (The `intron` Pathogenic bar top is
 hidden behind the legend box and was recovered from the legend's alpha-blended

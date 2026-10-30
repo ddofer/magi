@@ -85,7 +85,6 @@ def main() -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
 
     report_path = repo / "data" / "results" / "omia_post_inference_report.json"
-    summary_csv_path = repo / "data" / "results" / "omia_post_inference_summary.csv"
     merged_parquet_path = (
         repo / "data" / "results" / "omia_all_species_inferred_relevant.parquet"
     )
@@ -114,10 +113,6 @@ def main() -> None:
 
         coverage_df = pd.DataFrame(coverage_rows)
         coverage_df.to_csv(out_dir / "omia_coverage_summary.csv", index=False)
-
-    if summary_csv_path.exists():
-        summary_df = pd.read_csv(summary_csv_path)
-        summary_df.to_csv(out_dir / "omia_post_inference_summary_copy.csv", index=False)
 
     merged_df = summarize_from_merged_parquet(merged_parquet_path)
     if not merged_df.empty:

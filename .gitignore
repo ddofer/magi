@@ -131,3 +131,6 @@ desktop.ini
 # HuggingFace Spaces runtime artifacts
 .gradio/
 rebuttal/private/
+
+# Local archive of files removed from the public tree (2026-10-30); history keeps them too
+archive/
