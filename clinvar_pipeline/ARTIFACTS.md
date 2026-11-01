@@ -89,6 +89,8 @@ Stages 08–10 prepare signals, prompts, and optional LLM evaluations. The origi
 | LLM eval | `data/llm/animals_*_evaluation_results*.parquet` | same |
 | Fig S1 | `output/figures/figs1.png` | per-species SNP vs indel accuracy (`scripts/run_figures.py --fig s1`) |
 
+The recorded indel run (208 rows) passed `-` or `N` to the model in place of the inserted or deleted letters, so its indel evaluations do not score the real variants. `inference_omia.py` now builds VCF-style alleles from the species genome; a rerun scores 217 indels. Their judge results are in `analyses/generated_tables/omia_indel_judge_claude_sonnet_real_alleles.csv`: same prompts and system prompt as stage 10, judged by Claude Sonnet instead of Gemini (148 of 217 concordant). `rationale_names_mechanism` marks the 142 OMIA texts that name a mechanism; the system prompt counts weak signals plus no stated mechanism as concordant.
+
 ## Tools
 
 | Tool | Purpose |
