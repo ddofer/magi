@@ -12,7 +12,7 @@ inference_indel.py      # Indel wrapper around inference.py
 inference_omia.py       # OMIA multi-species (animal) inference
 analysis.py             # Impact scoring, statistics, fingerprint plots
 smoke_test.py           # Two-variant model check (writes to scratch/)
-analyses/               # Notebooks, figure scripts, generated tables, case studies
+analyses/               # Notebooks, figure scripts, generated tables, case studies, validation_20261028/ checks
 clinvar_pipeline/       # ClinVar cohort -> signals -> LLM concordance -> figures (see its README)
 gradio_app/             # MAGI web app (Hugging Face Space; see its README)
 paper_figures/          # Print-quality regeneration of manuscript panels (see RUNBOOK.md)

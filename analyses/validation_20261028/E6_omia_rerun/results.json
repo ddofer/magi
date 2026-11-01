@@ -1,0 +1,217 @@
+{
+ "rule_input": "rules = HEAD; MLM_logprob_delta z-scored within the animal set per variant type (animals_pipeline recipe): no effect on SNV calls, moves 12 indel SEQUENCE_CONSTRAINED calls",
+ "snv_gate": "372/372 primary calls equal omia_snv_rule_calls.csv; full call list differs for 1",
+ "snv_full_list_diffs": [
+  {
+   "species": "felis_catus",
+   "gene": "KRT71",
+   "chrom": "B4",
+   "pos": 78941699,
+   "ref": "C",
+   "alt": "T",
+   "NT_All_Mechanisms": "SPLICE_INDUCED_EXONIZATION(P1); CRYPTIC_ORF_GAIN_WITH_INTRON_LOSS(P3); SPLICE_CHANGE(P4); EXON_CHANGE(P4); ORF_CHANGE(P4); INTRON_CHANGE(P4)",
+   "NT_All_Mechanisms_saved": "SPLICE_INDUCED_EXONIZATION(P1); CRYPTIC_ORF_GAIN_WITH_INTRON_LOSS(P3); ABERRANT_EXON_INCLUSION(P3); SPLICE_CHANGE(P4); EXON_CHANGE(P4); ORF_CHANGE(P4); INTRON_CHANGE(P4)"
+  }
+ ],
+ "n_variants": {
+  "paper": 580,
+  "rerun": 589,
+  "paper_by_type": {
+   "snp": 372,
+   "indel": 208
+  },
+  "rerun_by_type": {
+   "snp": 372,
+   "indel": 217
+  }
+ },
+ "indel_reconcile": {
+  "both": 187,
+  "rerun_only": 30,
+  "paper_only": 21
+ },
+ "indel_same_primary_call_in_both": 108,
+ "skipped_by_reason": {
+  "no letters given or not a simple del/dup/ins/delins": 27,
+  "longer than half the window": 14,
+  "stated letters differ from the genome": 1,
+  "invalid span": 1,
+  "other (letters not ACGT, or ins span not adjacent)": 1
+ },
+ "skipped_by_species": {
+  "dog": 31,
+  "cat": 11,
+  "chicken": 2
+ },
+ "indel_primary_calls": {
+  "paper": {
+   "UNCERTAIN_SIGNIFICANCE": 204,
+   "SEQUENCE_CONSTRAINED": 3,
+   "EXON_CHANGE": 1
+  },
+  "rerun": {
+   "UNCERTAIN_SIGNIFICANCE": 129,
+   "EXON_CHANGE": 14,
+   "SEQUENCE_CONSTRAINED": 13,
+   "CODING_LOSS": 13,
+   "EXON_LOSS": 12,
+   "ORF_CHANGE": 8,
+   "REGULATORY_CHANGE": 7,
+   "SPLICE_CHANGE": 5,
+   "GENE_CHANGE": 3,
+   "GENE_ARCHITECTURE_DISRUPTION": 3,
+   "ORF_DISRUPTION": 3,
+   "SPLICE_INDUCED_EXONIZATION": 3,
+   "UTR3_DISRUPTION": 1,
+   "SPLICE_SITE_DESTROYED": 1,
+   "INTRON_CHANGE": 1,
+   "CONSTITUTIVE_EXON_LOSS": 1
+  }
+ },
+ "indel_splice_rates_by_effect": {
+  "paper": [
+   {
+    "effect": "frameshift",
+    "n": 117,
+    "strict": 0,
+    "loose": 1
+   },
+   {
+    "effect": "nan",
+    "n": 40,
+    "strict": 0,
+    "loose": 0
+   },
+   {
+    "effect": "deletion (in-frame)",
+    "n": 27,
+    "strict": 0,
+    "loose": 0
+   },
+   {
+    "effect": "splicing",
+    "n": 9,
+    "strict": 0,
+    "loose": 0
+   },
+   {
+    "effect": "nonsense (stop-gain)",
+    "n": 5,
+    "strict": 0,
+    "loose": 0
+   },
+   {
+    "effect": "regulatory",
+    "n": 5,
+    "strict": 0,
+    "loose": 0
+   },
+   {
+    "effect": "delins (in-frame)",
+    "n": 3,
+    "strict": 0,
+    "loose": 0
+   },
+   {
+    "effect": "duplication (in-frame)",
+    "n": 2,
+    "strict": 0,
+    "loose": 0
+   }
+  ],
+  "rerun": [
+   {
+    "effect": "frameshift",
+    "n": 141,
+    "strict": 20,
+    "loose": 41
+   },
+   {
+    "effect": "deletion (in-frame)",
+    "n": 27,
+    "strict": 1,
+    "loose": 3
+   },
+   {
+    "effect": "nan",
+    "n": 23,
+    "strict": 2,
+    "loose": 4
+   },
+   {
+    "effect": "splicing",
+    "n": 9,
+    "strict": 4,
+    "loose": 7
+   },
+   {
+    "effect": "nonsense (stop-gain)",
+    "n": 7,
+    "strict": 3,
+    "loose": 5
+   },
+   {
+    "effect": "delins (in-frame)",
+    "n": 3,
+    "strict": 0,
+    "loose": 0
+   },
+   {
+    "effect": "regulatory",
+    "n": 3,
+    "strict": 0,
+    "loose": 0
+   },
+   {
+    "effect": "insertion (in-frame)",
+    "n": 2,
+    "strict": 0,
+    "loose": 0
+   },
+   {
+    "effect": "duplication (in-frame)",
+    "n": 2,
+    "strict": 0,
+    "loose": 1
+   }
+  ]
+ },
+ "snv_splice_rates_by_effect": [
+  {
+   "effect": "missense",
+   "n": 225,
+   "strict": 3,
+   "loose": 4
+  },
+  {
+   "effect": "nonsense (stop-gain)",
+   "n": 82,
+   "strict": 13,
+   "loose": 30
+  },
+  {
+   "effect": "splicing",
+   "n": 49,
+   "strict": 8,
+   "loose": 31
+  },
+  {
+   "effect": "regulatory",
+   "n": 14,
+   "strict": 0,
+   "loose": 0
+  },
+  {
+   "effect": "extension (stop-lost)",
+   "n": 1,
+   "strict": 0,
+   "loose": 0
+  },
+  {
+   "effect": "nan",
+   "n": 1,
+   "strict": 0,
+   "loose": 0
+  }
+ ]
+}

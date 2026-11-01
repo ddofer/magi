@@ -1,0 +1,91 @@
+{
+ "n_lab_positive": 118,
+ "by_tool": {
+  "MAGI": 72,
+  "SpliceAI>=0.2": 95,
+  "VEP any splice term": 79,
+  "SpliceAI unscored": 0
+ },
+ "magi_x_spliceai": {
+  "false": {
+   "false": 20,
+   "true": 3
+  },
+  "true": {
+   "false": 26,
+   "true": 69
+  }
+ },
+ "annotation_silent": {
+  "n": 39,
+  "magi": 19,
+  "spliceai": 26,
+  "vep_mane": {
+   "missense_variant": 37,
+   "upstream_gene_variant": 1,
+   "downstream_gene_variant": 1
+  }
+ },
+ "spliceai_negative": {
+  "n": 23,
+  "magi": 3,
+  "cases": [
+   {
+    "id": 52241,
+    "GeneSymbol": "BRCA2",
+    "final": "SKIP",
+    "outcomes": "SKIP",
+    "primary": "SPLICE_INDUCED_INTRON_RETENTION",
+    "vep_mane_consequence": "missense_variant&splice_region_variant",
+    "sai_max_ds": 0.18,
+    "quote_A": "this variant causes skipping of exons 12 and 13"
+   },
+   {
+    "id": 100808,
+    "GeneSymbol": "RB1",
+    "final": "SKIP",
+    "outcomes": "SKIP",
+    "primary": "SPLICE_SITE_DESTROYED",
+    "vep_mane_consequence": "missense_variant&splice_region_variant",
+    "sai_max_ds": 0.12,
+    "quote_A": "RNA studies demonstrated this variant to result in exon 19 skipping"
+   },
+   {
+    "id": 232594,
+    "GeneSymbol": "PALB2",
+    "final": "SKIP",
+    "outcomes": "SKIP",
+    "primary": "SPLICE_SITE_DESTROYED",
+    "vep_mane_consequence": "missense_variant&splice_region_variant",
+    "sai_max_ds": 0.14,
+    "quote_A": "leading to exon 12 skipping"
+   }
+  ]
+ },
+ "normal_rna": {
+  "n": 18,
+  "magi": 0,
+  "spliceai": 1,
+  "vep_any_splice": 5,
+  "spliceai_scores": [
+   0.0,
+   0.08,
+   0.02,
+   0.02,
+   0.15,
+   0.09,
+   0.2,
+   0.01,
+   0.0,
+   0.0,
+   0.11,
+   0.14,
+   0.0,
+   0.01,
+   0.02,
+   0.09,
+   0.0,
+   0.0
+  ]
+ }
+}

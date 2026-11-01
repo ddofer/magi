@@ -1,0 +1,902 @@
+{
+ "n_clinvar_list": 13537,
+ "ref_mismatch_as_listed": 3255,
+ "strand_complemented": 3254,
+ "n_input": 13536,
+ "ref_mismatch_dropped_after_strand_fix": 0,
+ "n_scored_magi": 13536,
+ "spliceai_unscored_no_gene_entry": 435,
+ "comparator_rows_matched": 13536,
+ "n_magi_scored": 13536,
+ "n_evaluable": 13101,
+ "n_evaluable_note": "evaluable = MAGI scored and SpliceAI d50 scored (gene in SpliceAI's grch38 annotation)",
+ "spliceai_unscored": {
+  "n": 435,
+  "by_group": {
+   "synonymous": 296,
+   "intronic": 139
+  },
+  "top_genes": {
+   "SYNE1": 147,
+   "ALMS1": 21,
+   "RECQL4": 19,
+   "LTBP4": 16,
+   "APC": 16,
+   "SCN8A": 15,
+   "DNM1": 14,
+   "PTPRQ": 12,
+   "CHD2": 10,
+   "NR2E3": 8,
+   "SPEG": 8,
+   "VPS13D": 7,
+   "RBP3": 7,
+   "SHANK2": 7,
+   "C2CD3": 7
+  },
+  "magi_strict": 13,
+  "magi_loose": 50,
+  "d500_scored": 396,
+  "d500_ge_0.2": 110,
+  "magi_strict_and_d500_ge_0.2": 13,
+  "magi_strict_and_d500_lt_0.2_or_unscored": 0
+ },
+ "sensitivity_all_rows_unscored_coded_0": {
+  "all": {
+   "n": 13536,
+   "magi_strict": 739,
+   "magi_loose": 1865,
+   "spliceai_ge_0.2": 5113,
+   "both_strict": 692,
+   "magi_strict_only": 47,
+   "spliceai_only": 4421,
+   "neither": 8376,
+   "magi_loose_only": 198,
+   "both_loose": 1667
+  },
+  "by_group": {
+   "intronic": {
+    "n": 5322,
+    "magi_strict": 288,
+    "magi_loose": 1093,
+    "spliceai_ge_0.2": 2863,
+    "both_strict": 271,
+    "magi_strict_only": 17,
+    "spliceai_only": 2592,
+    "neither": 2442,
+    "magi_loose_only": 88,
+    "both_loose": 1005
+   },
+   "synonymous": {
+    "n": 8214,
+    "magi_strict": 451,
+    "magi_loose": 772,
+    "spliceai_ge_0.2": 2250,
+    "both_strict": 421,
+    "magi_strict_only": 30,
+    "spliceai_only": 1829,
+    "neither": 5934,
+    "magi_loose_only": 110,
+    "both_loose": 662
+   }
+  },
+  "agreement": {
+   "cohen_kappa": {
+    "value": 0.1559794482663184,
+    "ci95": [
+     0.14365727210161822,
+     0.16834259110378855
+    ]
+   },
+   "frac_magi_strict_also_spliceai": {
+    "value": 0.9364005412719891,
+    "ci95": [
+     0.9132662972061931,
+     0.9554960825884405
+    ]
+   },
+   "frac_spliceai_also_magi_strict": {
+    "value": 0.13534128691570507,
+    "ci95": [
+     0.1256259664164987,
+     0.1451121740390993
+    ]
+   }
+  }
+ },
+ "sensitivity_d50_with_d500_fallback_for_unscored": {
+  "unscored_by_both_coded_0": 39,
+  "all": {
+   "n": 13536,
+   "magi_strict": 739,
+   "magi_loose": 1865,
+   "spliceai_ge_0.2": 5223,
+   "both_strict": 705,
+   "magi_strict_only": 34,
+   "spliceai_only": 4518,
+   "neither": 8279,
+   "magi_loose_only": 153,
+   "both_loose": 1712
+  },
+  "by_group": {
+   "intronic": {
+    "n": 5322,
+    "magi_strict": 288,
+    "magi_loose": 1093,
+    "spliceai_ge_0.2": 2917,
+    "both_strict": 274,
+    "magi_strict_only": 14,
+    "spliceai_only": 2643,
+    "neither": 2391,
+    "magi_loose_only": 65,
+    "both_loose": 1028
+   },
+   "synonymous": {
+    "n": 8214,
+    "magi_strict": 451,
+    "magi_loose": 772,
+    "spliceai_ge_0.2": 2306,
+    "both_strict": 431,
+    "magi_strict_only": 20,
+    "spliceai_only": 1875,
+    "neither": 5888,
+    "magi_loose_only": 88,
+    "both_loose": 684
+   }
+  }
+ },
+ "intronic_group_check": {
+  "annot_region": {
+   "intronic": 5182,
+   "intergenic": 1
+  },
+  "clinvar_consequence": {
+   "intron variant": 5155,
+   ".": 11,
+   "non-coding transcript variant": 9,
+   "missense variant": 4,
+   "5 prime UTR variant": 2,
+   "nonsense": 2
+  }
+ },
+ "all": {
+  "n": 13101,
+  "magi_strict": 726,
+  "magi_loose": 1815,
+  "spliceai_ge_0.2": 5113,
+  "both_strict": 692,
+  "magi_strict_only": 34,
+  "spliceai_only": 4421,
+  "neither": 7954,
+  "magi_loose_only": 148,
+  "both_loose": 1667
+ },
+ "by_group": {
+  "intronic": {
+   "n": 5183,
+   "magi_strict": 285,
+   "magi_loose": 1069,
+   "spliceai_ge_0.2": 2863,
+   "both_strict": 271,
+   "magi_strict_only": 14,
+   "spliceai_only": 2592,
+   "neither": 2306,
+   "magi_loose_only": 64,
+   "both_loose": 1005
+  },
+  "synonymous": {
+   "n": 7918,
+   "magi_strict": 441,
+   "magi_loose": 746,
+   "spliceai_ge_0.2": 2250,
+   "both_strict": 421,
+   "magi_strict_only": 20,
+   "spliceai_only": 1829,
+   "neither": 5648,
+   "magi_loose_only": 84,
+   "both_loose": 662
+  }
+ },
+ "by_dist": {
+  "11-20": {
+   "n": 4324,
+   "magi_strict": 293,
+   "magi_loose": 878,
+   "spliceai_ge_0.2": 2331,
+   "both_strict": 278,
+   "magi_strict_only": 15,
+   "spliceai_only": 2053,
+   "neither": 1978,
+   "magi_loose_only": 60,
+   "both_loose": 818
+  },
+  "21-50": {
+   "n": 2813,
+   "magi_strict": 185,
+   "magi_loose": 341,
+   "spliceai_ge_0.2": 1016,
+   "both_strict": 177,
+   "magi_strict_only": 8,
+   "spliceai_only": 839,
+   "neither": 1789,
+   "magi_loose_only": 31,
+   "both_loose": 310
+  },
+  "51-200": {
+   "n": 2307,
+   "magi_strict": 91,
+   "magi_loose": 139,
+   "spliceai_ge_0.2": 610,
+   "both_strict": 86,
+   "magi_strict_only": 5,
+   "spliceai_only": 524,
+   "neither": 1692,
+   "magi_loose_only": 24,
+   "both_loose": 115
+  },
+  "<=10": {
+   "n": 2138,
+   "magi_strict": 153,
+   "magi_loose": 441,
+   "spliceai_ge_0.2": 1101,
+   "both_strict": 147,
+   "magi_strict_only": 6,
+   "spliceai_only": 954,
+   "neither": 1031,
+   "magi_loose_only": 23,
+   "both_loose": 418
+  },
+  ">200": {
+   "n": 1519,
+   "magi_strict": 4,
+   "magi_loose": 16,
+   "spliceai_ge_0.2": 55,
+   "both_strict": 4,
+   "magi_strict_only": 0,
+   "spliceai_only": 51,
+   "neither": 1464,
+   "magi_loose_only": 10,
+   "both_loose": 6
+  }
+ },
+ "by_group_dist": {
+  "intronic |d| 11-20": {
+   "n": 3390,
+   "magi_strict": 186,
+   "magi_loose": 723,
+   "spliceai_ge_0.2": 1954,
+   "both_strict": 177,
+   "magi_strict_only": 9,
+   "spliceai_only": 1777,
+   "neither": 1427,
+   "magi_loose_only": 48,
+   "both_loose": 675
+  },
+  "intronic |d| 21-50": {
+   "n": 409,
+   "magi_strict": 19,
+   "magi_loose": 52,
+   "spliceai_ge_0.2": 135,
+   "both_strict": 17,
+   "magi_strict_only": 2,
+   "spliceai_only": 118,
+   "neither": 272,
+   "magi_loose_only": 7,
+   "both_loose": 45
+  },
+  "intronic |d| <=10": {
+   "n": 1384,
+   "magi_strict": 80,
+   "magi_loose": 294,
+   "spliceai_ge_0.2": 774,
+   "both_strict": 77,
+   "magi_strict_only": 3,
+   "spliceai_only": 697,
+   "neither": 607,
+   "magi_loose_only": 9,
+   "both_loose": 285
+  },
+  "synonymous |d| 11-20": {
+   "n": 934,
+   "magi_strict": 107,
+   "magi_loose": 155,
+   "spliceai_ge_0.2": 377,
+   "both_strict": 101,
+   "magi_strict_only": 6,
+   "spliceai_only": 276,
+   "neither": 551,
+   "magi_loose_only": 12,
+   "both_loose": 143
+  },
+  "synonymous |d| 21-50": {
+   "n": 2404,
+   "magi_strict": 166,
+   "magi_loose": 289,
+   "spliceai_ge_0.2": 881,
+   "both_strict": 160,
+   "magi_strict_only": 6,
+   "spliceai_only": 721,
+   "neither": 1517,
+   "magi_loose_only": 24,
+   "both_loose": 265
+  },
+  "synonymous |d| 51-200": {
+   "n": 2307,
+   "magi_strict": 91,
+   "magi_loose": 139,
+   "spliceai_ge_0.2": 610,
+   "both_strict": 86,
+   "magi_strict_only": 5,
+   "spliceai_only": 524,
+   "neither": 1692,
+   "magi_loose_only": 24,
+   "both_loose": 115
+  },
+  "synonymous |d| <=10": {
+   "n": 754,
+   "magi_strict": 73,
+   "magi_loose": 147,
+   "spliceai_ge_0.2": 327,
+   "both_strict": 70,
+   "magi_strict_only": 3,
+   "spliceai_only": 257,
+   "neither": 424,
+   "magi_loose_only": 14,
+   "both_loose": 133
+  },
+  "synonymous |d| >200": {
+   "n": 1519,
+   "magi_strict": 4,
+   "magi_loose": 16,
+   "spliceai_ge_0.2": 55,
+   "both_strict": 4,
+   "magi_strict_only": 0,
+   "spliceai_only": 51,
+   "neither": 1464,
+   "magi_loose_only": 10,
+   "both_loose": 6
+  }
+ },
+ "agreement_strict_vs_spliceai_d50": {
+  "cohen_kappa": {
+   "value": 0.1550209234006222,
+   "ci95": [
+    0.14233646583020812,
+    0.16732130860740332
+   ]
+  },
+  "frac_magi_strict_also_spliceai": {
+   "value": 0.953168044077135,
+   "ci95": [
+    0.9366379357402536,
+    0.9695664184482344
+   ]
+  },
+  "frac_spliceai_also_magi_strict": {
+   "value": 0.13534128691570507,
+   "ci95": [
+    0.12495066150426473,
+    0.14513888388886967
+   ]
+  }
+ },
+ "strict_mechanism_counts": {
+  "CODING_LOSS;CONSTITUTIVE_EXON_LOSS;EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 183,
+  "CODING_LOSS;EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 104,
+  "SPLICE_INDUCED_EXONIZATION": 77,
+  "ABERRANT_EXON_INCLUSION;SPLICE_INDUCED_EXONIZATION": 72,
+  "CRYPTIC_SPLICE_GAIN": 65,
+  "CRYPTIC_EXON_INCLUSION;SPLICE_INDUCED_EXONIZATION": 45,
+  "CODING_LOSS;EXON_LOSS;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 23,
+  "CODING_LOSS;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 19,
+  "CRYPTIC_EXON_INCLUSION": 16,
+  "CODING_LOSS": 15,
+  "CODING_LOSS;EXON_LOSS": 15,
+  "INTRON_RETENTION": 13,
+  "CRYPTIC_SPLICE_GAIN;SPLICE_INDUCED_EXONIZATION": 11,
+  "CODING_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 10,
+  "CRYPTIC_EXON_INCLUSION;CRYPTIC_SPLICE_GAIN;SPLICE_INDUCED_EXONIZATION": 8,
+  "ABERRANT_EXON_INCLUSION;CRYPTIC_EXON_INCLUSION;SPLICE_INDUCED_EXONIZATION": 6,
+  "ABERRANT_EXON_INCLUSION;CRYPTIC_SPLICE_GAIN;SPLICE_INDUCED_EXONIZATION": 6,
+  "CODING_LOSS;CONSTITUTIVE_EXON_LOSS;EXON_LOSS;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 5,
+  "CODING_LOSS;CONSTITUTIVE_EXON_LOSS;EXON_LOSS": 4,
+  "SPLICE_SITE_DESTROYED": 4,
+  "CODING_LOSS;CONSTITUTIVE_EXON_LOSS;CRYPTIC_SPLICE_GAIN;EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 3,
+  "EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 3,
+  "CODING_LOSS;CONSTITUTIVE_EXON_LOSS;EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN;SPLICE_INDUCED_INTRON_RETENTION": 3,
+  "CONSTITUTIVE_EXON_LOSS;EXON_SKIPPING_INDUCED": 2,
+  "EXON_SKIPPING_INDUCED": 1,
+  "CODING_LOSS;EXON_LOSS;RECIPROCAL_EXON_LOSS_INTRON_GAIN;SPLICE_SITE_DESTROYED": 1,
+  "CRYPTIC_SPLICE_GAIN;INTRON_RETENTION": 1,
+  "CODING_LOSS;CRYPTIC_SPLICE_GAIN;EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 1,
+  "CODING_LOSS;EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN;SPLICE_INDUCED_INTRON_RETENTION": 1,
+  "CRYPTIC_EXON_INCLUSION;EXON_SKIPPING_INDUCED": 1,
+  "CODING_LOSS;CRYPTIC_SPLICE_GAIN;EXON_LOSS;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 1,
+  "CODING_LOSS;CRYPTIC_SPLICE_GAIN;EXON_LOSS": 1,
+  "CODING_LOSS;CRYPTIC_SPLICE_GAIN;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 1,
+  "CODING_LOSS;EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN;SPLICE_SITE_DESTROYED": 1,
+  "CODING_LOSS;CRYPTIC_SPLICE_GAIN": 1,
+  "CODING_LOSS;CONSTITUTIVE_EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 1,
+  "CODING_LOSS;CONSTITUTIVE_EXON_LOSS;EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN;SPLICE_INDUCED_INTRON_RETENTION;SPLICE_SITE_DESTROYED": 1,
+  "ABERRANT_EXON_INCLUSION;CRYPTIC_EXON_INCLUSION;CRYPTIC_SPLICE_GAIN;SPLICE_INDUCED_EXONIZATION": 1
+ },
+ "magi_strict_only_mechanism_counts": {
+  "CODING_LOSS;CONSTITUTIVE_EXON_LOSS;EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 9,
+  "ABERRANT_EXON_INCLUSION;SPLICE_INDUCED_EXONIZATION": 7,
+  "CODING_LOSS": 3,
+  "CODING_LOSS;EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 3,
+  "SPLICE_INDUCED_EXONIZATION": 2,
+  "CRYPTIC_EXON_INCLUSION;SPLICE_INDUCED_EXONIZATION": 2,
+  "INTRON_RETENTION": 1,
+  "CRYPTIC_SPLICE_GAIN": 1,
+  "EXON_SKIPPING_INDUCED": 1,
+  "EXON_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 1,
+  "CODING_LOSS;EXON_LOSS": 1,
+  "CODING_LOSS;INTRON_RETENTION;RECIPROCAL_EXON_LOSS_INTRON_GAIN": 1,
+  "CRYPTIC_EXON_INCLUSION;EXON_SKIPPING_INDUCED": 1,
+  "CONSTITUTIVE_EXON_LOSS;EXON_SKIPPING_INDUCED": 1
+ },
+ "exploratory_rate_by_stars": {
+  "1": {
+   "n": 12291,
+   "magi_strict_rate": 0.050850215604914165,
+   "spliceai_pos_rate": 0.37490846961191115
+  },
+  "2": {
+   "n": 674,
+   "magi_strict_rate": 0.14391691394658754,
+   "spliceai_pos_rate": 0.7195845697329377
+  },
+  "3": {
+   "n": 136,
+   "magi_strict_rate": 0.029411764705882353,
+   "spliceai_pos_rate": 0.14705882352941177
+  }
+ },
+ "spearman_magi_score_vs_spliceai_d50": 0.02449881814850768,
+ "vep_vs_plan_flag": {
+  "plan_flag_silent": 13101,
+  "vep_splice_donor_acceptor": 32,
+  "vep_splice_region": 96,
+  "vep_splice_minor": 3179,
+  "vep_any_splice": 3266,
+  "agree_silent_vep_region_or_site": 12976,
+  "splice_term_counts": {
+   "splice_polypyrimidine_tract_variant": 3131,
+   "splice_region_variant": 96,
+   "splice_donor_region_variant": 36,
+   "splice_acceptor_variant": 24,
+   "splice_donor_5th_base_variant": 12,
+   "splice_donor_variant": 8
+  },
+  "vep_most_severe_counts": {
+   "synonymous_variant": 7237,
+   "splice_polypyrimidine_tract_variant": 3016,
+   "intron_variant": 1961,
+   "missense_variant": 582,
+   "stop_gained": 68,
+   "splice_region_variant": 62,
+   "3_prime_UTR_variant": 46,
+   "splice_donor_region_variant": 28,
+   "splice_acceptor_variant": 24,
+   "5_prime_UTR_variant": 18,
+   "non_coding_transcript_exon_variant": 13,
+   "stop_retained_variant": 13,
+   "splice_donor_5th_base_variant": 12,
+   "stop_lost": 11,
+   "splice_donor_variant": 8,
+   "incomplete_terminal_codon_variant": 1,
+   "intergenic_variant": 1
+  }
+ },
+ "vep_silent_region_or_site": {
+  "all": {
+   "n": 12976,
+   "magi_strict": 713,
+   "magi_loose": 1790,
+   "spliceai_ge_0.2": 5029,
+   "both_strict": 680,
+   "magi_strict_only": 33,
+   "spliceai_only": 4349,
+   "neither": 7914,
+   "magi_loose_only": 147,
+   "both_loose": 1643
+  },
+  "by_group": {
+   "intronic": {
+    "n": 5139,
+    "magi_strict": 281,
+    "magi_loose": 1058,
+    "spliceai_ge_0.2": 2828,
+    "both_strict": 268,
+    "magi_strict_only": 13,
+    "spliceai_only": 2560,
+    "neither": 2298,
+    "magi_loose_only": 63,
+    "both_loose": 995
+   },
+   "synonymous": {
+    "n": 7837,
+    "magi_strict": 432,
+    "magi_loose": 732,
+    "spliceai_ge_0.2": 2201,
+    "both_strict": 412,
+    "magi_strict_only": 20,
+    "spliceai_only": 1789,
+    "neither": 5616,
+    "magi_loose_only": 84,
+    "both_loose": 648
+   }
+  }
+ },
+ "vep_silent_any_splice_term": {
+  "all": {
+   "n": 9835,
+   "magi_strict": 512,
+   "magi_loose": 1010,
+   "spliceai_ge_0.2": 3074,
+   "both_strict": 484,
+   "magi_strict_only": 28,
+   "spliceai_only": 2590,
+   "neither": 6733,
+   "magi_loose_only": 110,
+   "both_loose": 900
+  },
+  "by_group": {
+   "intronic": {
+    "n": 2097,
+    "magi_strict": 97,
+    "magi_loose": 302,
+    "spliceai_ge_0.2": 944,
+    "both_strict": 88,
+    "magi_strict_only": 9,
+    "spliceai_only": 856,
+    "neither": 1144,
+    "magi_loose_only": 29,
+    "both_loose": 273
+   },
+   "synonymous": {
+    "n": 7738,
+    "magi_strict": 415,
+    "magi_loose": 708,
+    "spliceai_ge_0.2": 2130,
+    "both_strict": 396,
+    "magi_strict_only": 19,
+    "spliceai_only": 1734,
+    "neither": 5589,
+    "magi_loose_only": 81,
+    "both_loose": 627
+   }
+  }
+ },
+ "spliceai_d500_sensitivity": {
+  "note": "Rows scored by d50; d50-vs-d500 comparisons use only rows also scored by d500. In the 'either' table a d500-unscored row counts as d500 < 0.2.",
+  "d50_scored_but_d500_unscored": 52,
+  "n_scored_by_both": 13049,
+  "d500_ge_0.2": 4899,
+  "d50_vs_d500_calls": {
+   "both": 4733,
+   "d50_only": 377,
+   "d500_only": 166,
+   "neither": 7773
+  },
+  "spearman_d50_vs_d500": 0.9164610012300264,
+  "table_using_d500": {
+   "n": 13049,
+   "magi_strict": 725,
+   "magi_loose": 1810,
+   "spliceai_ge_0.2": 4899,
+   "both_strict": 684,
+   "magi_strict_only": 41,
+   "spliceai_only": 4215,
+   "neither": 8109,
+   "magi_loose_only": 175,
+   "both_loose": 1635
+  },
+  "table_using_either_d50_or_d500": {
+   "n": 13101,
+   "magi_strict": 726,
+   "magi_loose": 1815,
+   "spliceai_ge_0.2": 5279,
+   "both_strict": 699,
+   "magi_strict_only": 27,
+   "spliceai_only": 4580,
+   "neither": 7795,
+   "magi_loose_only": 132,
+   "both_loose": 1683
+  },
+  "by_group_either": {
+   "intronic": {
+    "n": 5183,
+    "magi_strict": 285,
+    "magi_loose": 1069,
+    "spliceai_ge_0.2": 2967,
+    "both_strict": 274,
+    "magi_strict_only": 11,
+    "spliceai_only": 2693,
+    "neither": 2205,
+    "magi_loose_only": 56,
+    "both_loose": 1013
+   },
+   "synonymous": {
+    "n": 7918,
+    "magi_strict": 441,
+    "magi_loose": 746,
+    "spliceai_ge_0.2": 2312,
+    "both_strict": 425,
+    "magi_strict_only": 16,
+    "spliceai_only": 1887,
+    "neither": 5590,
+    "magi_loose_only": 76,
+    "both_loose": 670
+   }
+  }
+ },
+ "avi_descriptive": {
+  "note": "AlphaGenome AVI is a general variant-impact score, not a splice score; no truth exists for VUS, so no AUROC.",
+  "avi_phred_lo_by_cell": {
+   "both": {
+    "count": 692.0,
+    "mean": 22.092,
+    "std": 6.038,
+    "min": 0.003,
+    "25%": 20.351,
+    "50%": 23.564,
+    "75%": 25.34,
+    "max": 35.386
+   },
+   "magi_only": {
+    "count": 34.0,
+    "mean": 16.095,
+    "std": 7.403,
+    "min": 2.612,
+    "25%": 10.017,
+    "50%": 17.239,
+    "75%": 21.746,
+    "max": 31.248
+   },
+   "neither": {
+    "count": 7954.0,
+    "mean": 9.112,
+    "std": 6.891,
+    "min": 0.0,
+    "25%": 1.968,
+    "50%": 9.531,
+    "75%": 14.882,
+    "max": 26.383
+   },
+   "spliceai_only": {
+    "count": 4421.0,
+    "mean": 17.333,
+    "std": 7.108,
+    "min": 0.0,
+    "25%": 12.868,
+    "50%": 18.698,
+    "75%": 22.952,
+    "max": 33.671
+   }
+  },
+  "spearman_avi_vs_magi_score": 0.09227623572894646,
+  "spearman_avi_vs_spliceai_d50": 0.5731132140379306
+ },
+ "magi_only_by_group": {
+  "synonymous": 20,
+  "intronic": 14
+ },
+ "magi_only_d50_lt_0.2_d500_ge_0.2": 7,
+ "magi_only_d500_unscored": 1,
+ "magi_only_n": 34,
+ "magi_only_in_splice_mechanism_genes": 24,
+ "magi_only_also_d500_lt_0.2": 26,
+ "magi_only_vep_any_splice": 6,
+ "overlap": {
+  "mfass_taykhoom": 12,
+  "mfass_summary": {
+   "assay_positive": 1,
+   "assay_negative": 11,
+   "assay_label_missing": 0,
+   "magi_strict_assay_pos": 0,
+   "magi_strict_assay_neg": 1,
+   "spliceai_ge_0.2_assay_pos": 1,
+   "spliceai_ge_0.2_assay_neg": 3,
+   "spliceai_unscored": 0
+  },
+  "mfass_rows": [
+   {
+    "chrom": "chr12",
+    "pos": 48131303,
+    "ref": "A",
+    "alt": "G",
+    "gene": "PFKM",
+    "vcv": "VCV002178056",
+    "label": true,
+    "delta_psi": -0.8899077773094177,
+    "magi_strict": false,
+    "magi_score": 0.0,
+    "spliceai": 0.38,
+    "sai_scored": true,
+    "NT_All_Mechanisms": "ORF_CHANGE(P4); UTR_CHANGE(P4)"
+   },
+   {
+    "chrom": "chr12",
+    "pos": 57578090,
+    "ref": "G",
+    "alt": "A",
+    "gene": "KIF5A",
+    "vcv": "VCV000882112",
+    "label": false,
+    "delta_psi": 0.009134882129728794,
+    "magi_strict": false,
+    "magi_score": 0.0072623006999492645,
+    "spliceai": 0.0,
+    "sai_scored": true,
+    "NT_All_Mechanisms": ""
+   },
+   {
+    "chrom": "chr14",
+    "pos": 50916631,
+    "ref": "A",
+    "alt": "C",
+    "gene": "PYGL",
+    "vcv": "VCV000881073",
+    "label": false,
+    "delta_psi": 0.04039120301604271,
+    "magi_strict": false,
+    "magi_score": 0.07982903718948364,
+    "spliceai": 0.73,
+    "sai_scored": true,
+    "NT_All_Mechanisms": "SPLICE_CHANGE(P4); INTRON_CHANGE(P4)"
+   },
+   {
+    "chrom": "chr16",
+    "pos": 71734660,
+    "ref": "T",
+    "alt": "C",
+    "gene": "AP1G1",
+    "vcv": "VCV004077995",
+    "label": false,
+    "delta_psi": 0.0337715819478035,
+    "magi_strict": false,
+    "magi_score": 0.003189265727996826,
+    "spliceai": 0.0,
+    "sai_scored": true,
+    "NT_All_Mechanisms": ""
+   },
+   {
+    "chrom": "chr17",
+    "pos": 50196995,
+    "ref": "T",
+    "alt": "G",
+    "gene": "COL1A1",
+    "vcv": "VCV000892126",
+    "label": false,
+    "delta_psi": 0.036272890865802765,
+    "magi_strict": false,
+    "magi_score": 0.011259295046329498,
+    "spliceai": 0.0,
+    "sai_scored": true,
+    "NT_All_Mechanisms": "SEQUENCE_CONSTRAINED(P5)"
+   },
+   {
+    "chrom": "chr2",
+    "pos": 130176648,
+    "ref": "A",
+    "alt": "T",
+    "gene": "SMPD4",
+    "vcv": "VCV004850522",
+    "label": false,
+    "delta_psi": 0.0005981189315207303,
+    "magi_strict": false,
+    "magi_score": 0.0,
+    "spliceai": 0.0,
+    "sai_scored": true,
+    "NT_All_Mechanisms": ""
+   },
+   {
+    "chrom": "chr2",
+    "pos": 237353450,
+    "ref": "C",
+    "alt": "G",
+    "gene": "COL6A3",
+    "vcv": "VCV000094966",
+    "label": false,
+    "delta_psi": 0.013710063882172108,
+    "magi_strict": false,
+    "magi_score": 0.0,
+    "spliceai": 0.01,
+    "sai_scored": true,
+    "NT_All_Mechanisms": "SEQUENCE_CONSTRAINED(P5)"
+   },
+   {
+    "chrom": "chr4",
+    "pos": 113242098,
+    "ref": "T",
+    "alt": "G",
+    "gene": "ANK2",
+    "vcv": "VCV002203639",
+    "label": false,
+    "delta_psi": 0.07219281047582626,
+    "magi_strict": false,
+    "magi_score": 0.002223499119281769,
+    "spliceai": 0.23,
+    "sai_scored": true,
+    "NT_All_Mechanisms": "SEQUENCE_CONSTRAINED(P5)"
+   },
+   {
+    "chrom": "chr6",
+    "pos": 33170034,
+    "ref": "C",
+    "alt": "A",
+    "gene": "COL11A2",
+    "vcv": "VCV002915110",
+    "label": false,
+    "delta_psi": 0.02876717410981655,
+    "magi_strict": true,
+    "magi_score": 0.0,
+    "spliceai": 0.3,
+    "sai_scored": true,
+    "NT_All_Mechanisms": "SPLICE_INDUCED_EXONIZATION(P1); EXON_CHANGE(P4); ORF_CHANGE(P4); INTRON_CHANGE(P4)"
+   },
+   {
+    "chrom": "chr6",
+    "pos": 107893907,
+    "ref": "G",
+    "alt": "A",
+    "gene": "SEC63",
+    "vcv": "VCV000907580",
+    "label": false,
+    "delta_psi": 0.0762370303273201,
+    "magi_strict": false,
+    "magi_score": 0.02304081618785858,
+    "spliceai": 0.03,
+    "sai_scored": true,
+    "NT_All_Mechanisms": ""
+   },
+   {
+    "chrom": "chr8",
+    "pos": 41723116,
+    "ref": "A",
+    "alt": "G",
+    "gene": "ANK1",
+    "vcv": "VCV000363040",
+    "label": false,
+    "delta_psi": 0.04078273847699165,
+    "magi_strict": false,
+    "magi_score": 0.0,
+    "spliceai": 0.0,
+    "sai_scored": true,
+    "NT_All_Mechanisms": "SEQUENCE_CONSTRAINED(P5)"
+   },
+   {
+    "chrom": "chr8",
+    "pos": 41727292,
+    "ref": "C",
+    "alt": "T",
+    "gene": "ANK1",
+    "vcv": "VCV000363050",
+    "label": false,
+    "delta_psi": 0.032543476670980453,
+    "magi_strict": false,
+    "magi_score": 0.02338750660419464,
+    "spliceai": 0.0,
+    "sai_scored": true,
+    "NT_All_Mechanisms": "SEQUENCE_CONSTRAINED(P5)"
+   }
+  ],
+  "splicing_assay_test_parquet_(MFASS copy)": 12,
+  "sat_mut_mpra_(regulatory, not splice)": 0
+ },
+ "spliceai_positive_rate_vs_mfass": {
+  "vus_scored": {
+   "n": 13101,
+   "spliceai_ge_0.2": 5113,
+   "rate": 0.3902755514846195
+  },
+  "mfass_annotation_silent_scored": {
+   "n": 23873,
+   "spliceai_ge_0.2": 496,
+   "rate": 0.02077660955891593,
+   "unscored_excluded": 563,
+   "assay_positive_rate": 0.024169563942529216
+  }
+ }
+}

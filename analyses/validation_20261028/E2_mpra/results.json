@@ -1,0 +1,1456 @@
+{
+ "experiment": "E2_mpra",
+ "definitions_written": "2026-10-28, before mpra_deltas.parquet existed (inference job 3704 still queued)",
+ "data": "gonzalobenegas/sat_mut_mpra test.parquet, 4,141 SNVs, hg38 (REF matches hg38.fa 4141/4141; no liftover)",
+ "label_definition": {
+  "effect": "column 'label' (renamed mpra_effect): continuous, taken as log2 expression effect alt vs ref (positive = alt increases expression).",
+  "sign_check": "TERT element: the two largest positive effects are chr5:1295113 G>A (1.998) and chr5:1295135 G>A (1.423), the hg38 positions of the known gain-of-function TERT promoter mutations C228T/C250T (TERT on minus strand; canonical TSS chr5:1295068 in GENCODE v44). Positive = increased expression is therefore supported.",
+  "significance": "The file has no p-value. All 4,141 rows are treated as significant for H4 (the file is most likely Kircher 2019's pre-filtered significant subset; unverified). Sensitivity: |effect| >= 0.5 (n=1,360) and >= 1.0 (n=549).",
+  "h5_binary": "Significant vs non-significant cannot be formed. Substitute: AUROC for 'large effect' |effect| >= 0.5 vs |effect| < 0.5, plus Spearman of each score against |effect| (threshold-free)."
+ },
+ "h4_direction_mapping": {
+  "called_set": "variant has PROMOTER_DESTRUCTION, ENHANCER_DESTRUCTION, REGULATORY_GAIN or REGULATORY_CHANGE anywhere in NT_All_Mechanisms (primary or secondary).",
+  "rules": [
+   "PROMOTER_DESTRUCTION or ENHANCER_DESTRUCTION matched, REGULATORY_GAIN not matched -> loss -> expect effect < 0",
+   "REGULATORY_GAIN matched, no DESTRUCTION matched -> gain -> expect effect > 0",
+   "both a DESTRUCTION and REGULATORY_GAIN matched (conflict) -> sign of the dominant delta; conflicts counted",
+   "only REGULATORY_CHANGE matched -> sign of the dominant delta"
+  ],
+  "dominant_delta": "the one of D_BED_promoter_Tissue_specific, D_BED_promoter_Tissue_invariant, D_BED_enhancer_Tissue_specific, D_BED_enhancer_Tissue_invariant with the largest absolute value; negative -> loss, positive -> gain",
+  "agreement": "predicted sign == sign(effect); effect exactly 0 counted as disagreement (none expected)",
+  "pass": "agreement >= 0.65, lower 95% bound > 0.50, n called significant >= 20; CI = element-cluster bootstrap, 2,000 resamples"
+ },
+ "h5_score": {
+  "magi_unmatched": "|D_BED_promoter_Tissue_specific| + |D_BED_promoter_Tissue_invariant| + |D_BED_enhancer_Tissue_specific| + |D_BED_enhancer_Tissue_invariant|",
+  "magi_element_matched": "promoter elements: |promoter_Ts| + |promoter_Ti|; enhancer elements: |enhancer_Ts| + |enhancer_Ti|. Element classes from Kircher 2019 as recalled (not verified from the paper): promoters F9, GP1BA, HBB, HBG1, HNF4A, LDLR, MSMB, PKLR, TERT; enhancers IRF4, IRF6, MYCrs6983267, SORT1, TCF7L2, ZFAND3, ZRSh13.",
+  "comparator": "CADD v1.7 PHRED (tabix /storage/data/CADD/whole_genome_SNVs.tsv.gz), merged on chrom/pos/ref/alt"
+ },
+ "status": "computed",
+ "n_variants": {
+  "input": 4141,
+  "ref_mismatch_dropped": 0,
+  "scored": 4141,
+  "evaluable_h4_called": 403,
+  "evaluable_h5": 4141
+ },
+ "H4": {
+  "all_significant": {
+   "estimate": 0.6576,
+   "ci95": [
+    0.5296,
+    0.8078
+   ],
+   "n": 403,
+   "n_elements": 16,
+   "call_source_counts": {
+    "change_only": 362,
+    "destruction": 22,
+    "gain": 18,
+    "conflict": 1
+   },
+   "n_primary_call": 384,
+   "n_pred_loss": 205,
+   "n_pred_gain": 198,
+   "agreement_pred_loss": 0.8634,
+   "agreement_pred_gain": 0.4444,
+   "EXPLORATORY_baseline_always_loss": {
+    "estimate": 0.7122,
+    "ci95": [
+     0.5538,
+     0.8327
+    ],
+    "n": 403
+   },
+   "EXPLORATORY_tier2_only": {
+    "estimate": 0.7805,
+    "ci95": [
+     0.5652,
+     0.913
+    ],
+    "n": 41
+   },
+   "EXPLORATORY_change_only": {
+    "estimate": 0.6436,
+    "ci95": [
+     0.5248,
+     0.7839
+    ],
+    "n": 362
+   },
+   "EXPLORATORY_P_neg_given_pred_loss_minus_given_pred_gain": {
+    "estimate": 0.3079,
+    "ci95": [
+     0.1316,
+     0.5683
+    ],
+    "n": 403
+   },
+   "EXPLORATORY_within_element_permutation": {
+    "null_mean": 0.5082,
+    "p_one_sided": 0.0005,
+    "note": "pred_sign shuffled within element (keeps each element's loss/gain call mix and effect signs)"
+   },
+   "per_element": {
+    "F9": {
+     "n": 36,
+     "agreement": 0.917,
+     "frac_effect_negative": 0.861
+    },
+    "GP1BA": {
+     "n": 11,
+     "agreement": 0.727,
+     "frac_effect_negative": 0.636
+    },
+    "HBB": {
+     "n": 17,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.529
+    },
+    "HBG1": {
+     "n": 8,
+     "agreement": 0.25,
+     "frac_effect_negative": 0.875
+    },
+    "HNF4A": {
+     "n": 4,
+     "agreement": 0.5,
+     "frac_effect_negative": 0.75
+    },
+    "IRF4": {
+     "n": 32,
+     "agreement": 0.375,
+     "frac_effect_negative": 0.562
+    },
+    "IRF6": {
+     "n": 19,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.842
+    },
+    "LDLR": {
+     "n": 56,
+     "agreement": 0.357,
+     "frac_effect_negative": 0.839
+    },
+    "MSMB": {
+     "n": 23,
+     "agreement": 0.826,
+     "frac_effect_negative": 0.435
+    },
+    "MYCrs6983267": {
+     "n": 29,
+     "agreement": 0.931,
+     "frac_effect_negative": 0.655
+    },
+    "PKLR": {
+     "n": 78,
+     "agreement": 0.603,
+     "frac_effect_negative": 0.949
+    },
+    "SORT1": {
+     "n": 7,
+     "agreement": 0.857,
+     "frac_effect_negative": 0.857
+    },
+    "TCF7L2": {
+     "n": 19,
+     "agreement": 0.947,
+     "frac_effect_negative": 0.474
+    },
+    "TERT": {
+     "n": 14,
+     "agreement": 0.071,
+     "frac_effect_negative": 0.929
+    },
+    "ZFAND3": {
+     "n": 15,
+     "agreement": 0.867,
+     "frac_effect_negative": 0.733
+    },
+    "ZRSh13": {
+     "n": 35,
+     "agreement": 0.6,
+     "frac_effect_negative": 0.2
+    }
+   },
+   "EXPLORATORY_change_only_mixed_sign_frac": 0.3094,
+   "verdict": "pass",
+   "verdict_note": "Meets the preset PLAN rule under the declared direction convention (a). This is not plain validation: (1) the verdict depends on the convention for REGULATORY_CHANGE-only calls (362/403), which MAGI leaves undirected; 3/6 conventions meet the rule; (2) always predicting 'loss' scores higher on the same calls (0.7122 vs 0.6576), and predicted gains agree 0.4444; (3) evidence that the direction carries information is within-element only (permutation, P(neg|loss)-P(neg|gain)); (4) agreement falls as effects grow (0.558 at |effect|>=0.5, 0.4242 at >=1.0)."
+  },
+  "abs_effect_ge_0.5": {
+   "estimate": 0.558,
+   "ci95": [
+    0.3636,
+    0.7831
+   ],
+   "n": 181,
+   "n_elements": 14,
+   "call_source_counts": {
+    "change_only": 166,
+    "destruction": 8,
+    "gain": 7
+   },
+   "n_primary_call": 171,
+   "n_pred_loss": 88,
+   "n_pred_gain": 93,
+   "agreement_pred_loss": 0.9773,
+   "agreement_pred_gain": 0.1613,
+   "EXPLORATORY_baseline_always_loss": {
+    "estimate": 0.9061,
+    "ci95": [
+     0.7541,
+     0.9477
+    ],
+    "n": 181
+   },
+   "EXPLORATORY_tier2_only": {
+    "estimate": 0.6667,
+    "ci95": [
+     0.2,
+     0.8571
+    ],
+    "n": 15
+   },
+   "EXPLORATORY_change_only": {
+    "estimate": 0.5482,
+    "ci95": [
+     0.3799,
+     0.7767
+    ],
+    "n": 166
+   },
+   "EXPLORATORY_P_neg_given_pred_loss_minus_given_pred_gain": {
+    "estimate": 0.1386,
+    "ci95": [
+     0.0525,
+     0.4725
+    ],
+    "n": 181
+   },
+   "EXPLORATORY_within_element_permutation": {
+    "null_mean": 0.5048,
+    "p_one_sided": 0.0015,
+    "note": "pred_sign shuffled within element (keeps each element's loss/gain call mix and effect signs)"
+   },
+   "per_element": {
+    "F9": {
+     "n": 20,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.9
+    },
+    "GP1BA": {
+     "n": 1,
+     "agreement": 0.0,
+     "frac_effect_negative": 1.0
+    },
+    "HBB": {
+     "n": 1,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.0
+    },
+    "HBG1": {
+     "n": 6,
+     "agreement": 0.167,
+     "frac_effect_negative": 1.0
+    },
+    "IRF4": {
+     "n": 17,
+     "agreement": 0.235,
+     "frac_effect_negative": 0.824
+    },
+    "IRF6": {
+     "n": 6,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.667
+    },
+    "LDLR": {
+     "n": 43,
+     "agreement": 0.326,
+     "frac_effect_negative": 0.977
+    },
+    "MSMB": {
+     "n": 1,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.0
+    },
+    "PKLR": {
+     "n": 70,
+     "agreement": 0.614,
+     "frac_effect_negative": 0.971
+    },
+    "SORT1": {
+     "n": 6,
+     "agreement": 0.833,
+     "frac_effect_negative": 0.833
+    },
+    "TCF7L2": {
+     "n": 1,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.0
+    },
+    "TERT": {
+     "n": 5,
+     "agreement": 0.2,
+     "frac_effect_negative": 0.8
+    },
+    "ZFAND3": {
+     "n": 3,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.667
+    },
+    "ZRSh13": {
+     "n": 1,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.0
+    }
+   },
+   "EXPLORATORY_change_only_mixed_sign_frac": 0.3916
+  },
+  "abs_effect_ge_1.0": {
+   "estimate": 0.4242,
+   "ci95": [
+    0.3061,
+    0.5918
+   ],
+   "n": 99,
+   "n_elements": 8,
+   "call_source_counts": {
+    "change_only": 89,
+    "destruction": 7,
+    "gain": 3
+   },
+   "n_primary_call": 90,
+   "n_pred_loss": 38,
+   "n_pred_gain": 61,
+   "agreement_pred_loss": 0.9737,
+   "agreement_pred_gain": 0.082,
+   "EXPLORATORY_baseline_always_loss": {
+    "estimate": 0.9394,
+    "ci95": [
+     0.6667,
+     0.9703
+    ],
+    "n": 99
+   },
+   "EXPLORATORY_tier2_only": {
+    "estimate": 0.7,
+    "ci95": [
+     0.0,
+     0.875
+    ],
+    "n": 10
+   },
+   "EXPLORATORY_change_only": {
+    "estimate": 0.3933,
+    "ci95": [
+     0.32,
+     0.5789
+    ],
+    "n": 89
+   },
+   "EXPLORATORY_P_neg_given_pred_loss_minus_given_pred_gain": {
+    "estimate": 0.0557,
+    "ci95": [
+     -0.0895,
+     0.2597
+    ],
+    "n": 99
+   },
+   "EXPLORATORY_within_element_permutation": {
+    "null_mean": 0.4227,
+    "p_one_sided": 0.7111,
+    "note": "pred_sign shuffled within element (keeps each element's loss/gain call mix and effect signs)"
+   },
+   "per_element": {
+    "GP1BA": {
+     "n": 1,
+     "agreement": 0.0,
+     "frac_effect_negative": 1.0
+    },
+    "HBB": {
+     "n": 1,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.0
+    },
+    "IRF4": {
+     "n": 10,
+     "agreement": 0.2,
+     "frac_effect_negative": 0.9
+    },
+    "IRF6": {
+     "n": 1,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.0
+    },
+    "LDLR": {
+     "n": 42,
+     "agreement": 0.333,
+     "frac_effect_negative": 0.976
+    },
+    "PKLR": {
+     "n": 41,
+     "agreement": 0.512,
+     "frac_effect_negative": 0.976
+    },
+    "SORT1": {
+     "n": 2,
+     "agreement": 1.0,
+     "frac_effect_negative": 1.0
+    },
+    "TCF7L2": {
+     "n": 1,
+     "agreement": 1.0,
+     "frac_effect_negative": 0.0
+    }
+   },
+   "EXPLORATORY_change_only_mixed_sign_frac": 0.6292
+  },
+  "SENSITIVITY_direction_convention": {
+   "note": "Post hoc (audit). Same called set, all rows significant. (a) is the declared convention used for the verdict. (b) uses the feature named in NT_Trigger: for REGULATORY_CHANGE this is the first matching feature in rule-list order (enhancer_Ts first), not the largest. (e) keeps only calls where a MAGI rule states a direction (DESTRUCTION -> loss, REGULATORY_GAIN -> gain; the 1 conflict is excluded).",
+   "conventions": {
+    "a_declared_largest_abs_of_4_deltas": {
+     "estimate": 0.6576,
+     "ci95": [
+      0.5339,
+      0.8012
+     ],
+     "n": 403,
+     "n_elements": 16,
+     "meets_plan_rule": true,
+     "frac_pred_loss": 0.5087,
+     "baseline_always_loss": {
+      "estimate": 0.7122,
+      "ci95": [
+       0.5377,
+       0.8292
+      ],
+      "n": 403
+     },
+     "within_element_permutation_p_one_sided": 0.0005
+    },
+    "b1_sign_of_NT_Trigger_feature_fallback_a": {
+     "estimate": 0.6154,
+     "ci95": [
+      0.4633,
+      0.7835
+     ],
+     "n": 403,
+     "n_elements": 16,
+     "meets_plan_rule": false,
+     "frac_pred_loss": 0.4715,
+     "baseline_always_loss": {
+      "estimate": 0.7122,
+      "ci95": [
+       0.5494,
+       0.8296
+      ],
+      "n": 403
+     },
+     "within_element_permutation_p_one_sided": 0.0005
+    },
+    "b2_sign_of_NT_Trigger_feature_only_rows_with_regulatory_trigger": {
+     "estimate": 0.6021,
+     "ci95": [
+      0.4397,
+      0.7723
+     ],
+     "n": 387,
+     "n_elements": 16,
+     "meets_plan_rule": false,
+     "frac_pred_loss": 0.4677,
+     "baseline_always_loss": {
+      "estimate": 0.7158,
+      "ci95": [
+       0.5518,
+       0.844
+      ],
+      "n": 387
+     },
+     "within_element_permutation_p_one_sided": 0.0005
+    },
+    "c_sign_of_sum_of_4_deltas": {
+     "estimate": 0.6079,
+     "ci95": [
+      0.4319,
+      0.769
+     ],
+     "n": 403,
+     "n_elements": 16,
+     "meets_plan_rule": false,
+     "frac_pred_loss": 0.4839,
+     "baseline_always_loss": {
+      "estimate": 0.7122,
+      "ci95": [
+       0.55,
+       0.8269
+      ],
+      "n": 403
+     },
+     "within_element_permutation_p_one_sided": 0.0005
+    },
+    "d_largest_abs_delta_in_element_class": {
+     "estimate": 0.7345,
+     "ci95": [
+      0.597,
+      0.8644
+     ],
+     "n": 403,
+     "n_elements": 16,
+     "meets_plan_rule": true,
+     "frac_pred_loss": 0.6104,
+     "baseline_always_loss": {
+      "estimate": 0.7122,
+      "ci95": [
+       0.562,
+       0.8234
+      ],
+      "n": 403
+     },
+     "within_element_permutation_p_one_sided": 0.0005
+    },
+    "e_plan_literal_destruction_or_gain_only": {
+     "estimate": 0.775,
+     "ci95": [
+      0.5417,
+      0.9123
+     ],
+     "n": 40,
+     "n_elements": 10,
+     "meets_plan_rule": true,
+     "frac_pred_loss": 0.55,
+     "baseline_always_loss": {
+      "estimate": 0.625,
+      "ci95": [
+       0.2562,
+       0.9434
+      ],
+      "n": 40
+     },
+     "within_element_permutation_p_one_sided": 0.4053
+    }
+   },
+   "n_meet_plan_rule": "3/6"
+  },
+  "EXPLORATORY_weighting_and_near_null": {
+   "element_equal_mean_agreement": {
+    "estimate": 0.6768,
+    "ci95": [
+     0.5306,
+     0.8122
+    ],
+    "n": 403
+   },
+   "element_equal_mean_baseline_always_loss": {
+    "estimate": 0.6954,
+    "ci95": [
+     0.5872,
+     0.7868
+    ],
+    "n": 403
+   },
+   "frac_abs_effect_lt_0.1_by_element": {
+    "F9": 0.0,
+    "GP1BA": 0.0,
+    "HBB": 0.035,
+    "HBG1": 0.0,
+    "HNF4A": 0.387,
+    "IRF4": 0.008,
+    "IRF6": 0.0,
+    "LDLR": 0.01,
+    "MSMB": 0.288,
+    "MYCrs6983267": 0.073,
+    "PKLR": 0.0,
+    "SORT1": 0.004,
+    "TCF7L2": 0.056,
+    "TERT": 0.008,
+    "ZFAND3": 0.025,
+    "ZRSh13": 0.524
+   },
+   "drop_near_null_elements": {
+    "dropped": [
+     "ZRSh13",
+     "HNF4A",
+     "MSMB"
+    ],
+    "agreement": {
+     "estimate": 0.654,
+     "ci95": [
+      0.4989,
+      0.8249
+     ],
+     "n": 341
+    },
+    "baseline_always_loss": {
+     "estimate": 0.783,
+     "ci95": [
+      0.6577,
+      0.8694
+     ],
+     "n": 341
+    }
+   }
+  },
+  "n_scored": 4141,
+  "n_reg_call": 403,
+  "primary_mechanism_counts": {
+   "UNCERTAIN_SIGNIFICANCE": 2285,
+   "SEQUENCE_CONSTRAINED": 1211,
+   "REGULATORY_CHANGE": 346,
+   "EXON_CHANGE": 136,
+   "UTR_CHANGE": 28,
+   "SPLICE_CHANGE": 28,
+   "INTRON_CHANGE": 22,
+   "REGULATORY_GAIN": 18,
+   "ENHANCER_DESTRUCTION": 16,
+   "GENE_CHANGE": 11,
+   "START_LOSS": 10,
+   "UTR5_DISRUPTION": 9,
+   "ORF_CHANGE": 7,
+   "CRYPTIC_SPLICE_GAIN": 4,
+   "PROMOTER_DESTRUCTION": 4,
+   "POLYA_SIGNAL_LOSS": 3,
+   "CRYPTIC_EXON_INCLUSION": 1,
+   "EXON_LOSS": 1,
+   "SPLICE_INDUCED_EXONIZATION": 1
+  }
+ },
+ "H5": {
+  "n_evaluable": 4141,
+  "n_cadd_missing": 0,
+  "n_large": 1360,
+  "overall": {
+   "magi_reg_sum": {
+    "auroc_large_effect": {
+     "estimate": 0.5402,
+     "ci95": [
+      0.4322,
+      0.652
+     ],
+     "n": 4141
+    },
+    "spearman_abs_effect": {
+     "estimate": 0.0407,
+     "ci95": [
+      -0.1681,
+      0.2645
+     ],
+     "n": 4141
+    }
+   },
+   "magi_reg_matched": {
+    "auroc_large_effect": {
+     "estimate": 0.5267,
+     "ci95": [
+      0.4357,
+      0.6061
+     ],
+     "n": 4141
+    },
+    "spearman_abs_effect": {
+     "estimate": 0.029,
+     "ci95": [
+      -0.1473,
+      0.2025
+     ],
+     "n": 4141
+    }
+   },
+   "CADD_PHRED": {
+    "auroc_large_effect": {
+     "estimate": 0.5927,
+     "ci95": [
+      0.479,
+      0.7113
+     ],
+     "n": 4141
+    },
+    "spearman_abs_effect": {
+     "estimate": 0.1773,
+     "ci95": [
+      -0.0702,
+      0.3909
+     ],
+     "n": 4141
+    }
+   },
+   "avi_raw_score": {
+    "auroc_large_effect": {
+     "estimate": 0.666,
+     "ci95": [
+      0.6122,
+      0.7317
+     ],
+     "n": 4141
+    },
+    "spearman_abs_effect": {
+     "estimate": 0.2895,
+     "ci95": [
+      0.1709,
+      0.416
+     ],
+     "n": 4141
+    }
+   },
+   "auroc_diff_magi_sum_minus_cadd": {
+    "estimate": -0.0525,
+    "ci95": [
+     -0.1764,
+     0.0905
+    ],
+    "n": 4141
+   }
+  },
+  "per_element": {
+   "F9": {
+    "n": 139,
+    "n_large": 39,
+    "auroc_magi_reg_sum": 0.708,
+    "spearman_magi_reg_sum": 0.323,
+    "auroc_magi_reg_matched": 0.699,
+    "spearman_magi_reg_matched": 0.31,
+    "auroc_CADD_PHRED": 0.364,
+    "spearman_CADD_PHRED": -0.221,
+    "auroc_avi_raw_score": 0.622,
+    "spearman_avi_raw_score": 0.208
+   },
+   "GP1BA": {
+    "n": 178,
+    "n_large": 55,
+    "auroc_magi_reg_sum": 0.565,
+    "spearman_magi_reg_sum": 0.164,
+    "auroc_magi_reg_matched": 0.523,
+    "spearman_magi_reg_matched": 0.044,
+    "auroc_CADD_PHRED": 0.693,
+    "spearman_CADD_PHRED": 0.287,
+    "auroc_avi_raw_score": 0.789,
+    "spearman_avi_raw_score": 0.578
+   },
+   "HBB": {
+    "n": 85,
+    "n_large": 3,
+    "auroc_magi_reg_sum": 0.61,
+    "spearman_magi_reg_sum": 0.341,
+    "auroc_magi_reg_matched": 0.748,
+    "spearman_magi_reg_matched": 0.491,
+    "auroc_CADD_PHRED": 0.35,
+    "spearman_CADD_PHRED": 0.084,
+    "auroc_avi_raw_score": 0.386,
+    "spearman_avi_raw_score": 0.499
+   },
+   "HBG1": {
+    "n": 168,
+    "n_large": 75,
+    "auroc_magi_reg_sum": 0.677,
+    "spearman_magi_reg_sum": 0.249,
+    "auroc_magi_reg_matched": 0.586,
+    "spearman_magi_reg_matched": 0.114,
+    "auroc_CADD_PHRED": 0.812,
+    "spearman_CADD_PHRED": 0.508,
+    "auroc_avi_raw_score": 0.926,
+    "spearman_avi_raw_score": 0.77
+   },
+   "HNF4A": {
+    "n": 111,
+    "n_large": 3,
+    "auroc_magi_reg_sum": 0.698,
+    "spearman_magi_reg_sum": -0.07,
+    "auroc_magi_reg_matched": 0.769,
+    "spearman_magi_reg_matched": -0.064,
+    "auroc_CADD_PHRED": 0.662,
+    "spearman_CADD_PHRED": 0.144,
+    "auroc_avi_raw_score": 0.827,
+    "spearman_avi_raw_score": 0.176
+   },
+   "IRF4": {
+    "n": 645,
+    "n_large": 250,
+    "auroc_magi_reg_sum": 0.629,
+    "spearman_magi_reg_sum": 0.25,
+    "auroc_magi_reg_matched": 0.624,
+    "spearman_magi_reg_matched": 0.237,
+    "auroc_CADD_PHRED": 0.757,
+    "spearman_CADD_PHRED": 0.5,
+    "auroc_avi_raw_score": 0.783,
+    "spearman_avi_raw_score": 0.561
+   },
+   "IRF6": {
+    "n": 299,
+    "n_large": 107,
+    "auroc_magi_reg_sum": 0.564,
+    "spearman_magi_reg_sum": 0.175,
+    "auroc_magi_reg_matched": 0.535,
+    "spearman_magi_reg_matched": 0.126,
+    "auroc_CADD_PHRED": 0.676,
+    "spearman_CADD_PHRED": 0.347,
+    "auroc_avi_raw_score": 0.706,
+    "spearman_avi_raw_score": 0.443
+   },
+   "LDLR": {
+    "n": 381,
+    "n_large": 201,
+    "auroc_magi_reg_sum": 0.599,
+    "spearman_magi_reg_sum": 0.276,
+    "auroc_magi_reg_matched": 0.627,
+    "spearman_magi_reg_matched": 0.348,
+    "auroc_CADD_PHRED": 0.807,
+    "spearman_CADD_PHRED": 0.678,
+    "auroc_avi_raw_score": 0.812,
+    "spearman_avi_raw_score": 0.686
+   },
+   "MSMB": {
+    "n": 354,
+    "n_large": 4,
+    "auroc_magi_reg_sum": 0.651,
+    "spearman_magi_reg_sum": 0.205,
+    "auroc_magi_reg_matched": 0.719,
+    "spearman_magi_reg_matched": 0.213,
+    "auroc_CADD_PHRED": 0.39,
+    "spearman_CADD_PHRED": -0.029,
+    "auroc_avi_raw_score": 0.691,
+    "spearman_avi_raw_score": 0.205
+   },
+   "MYCrs6983267": {
+    "n": 82,
+    "n_large": 3,
+    "auroc_magi_reg_sum": 0.321,
+    "spearman_magi_reg_sum": 0.41,
+    "auroc_magi_reg_matched": 0.152,
+    "spearman_magi_reg_matched": 0.325,
+    "auroc_CADD_PHRED": 0.464,
+    "spearman_CADD_PHRED": 0.286,
+    "auroc_avi_raw_score": 0.456,
+    "spearman_avi_raw_score": 0.332
+   },
+   "PKLR": {
+    "n": 270,
+    "n_large": 202,
+    "auroc_magi_reg_sum": 0.706,
+    "spearman_magi_reg_sum": 0.501,
+    "auroc_magi_reg_matched": 0.717,
+    "spearman_magi_reg_matched": 0.503,
+    "auroc_CADD_PHRED": 0.628,
+    "spearman_CADD_PHRED": 0.478,
+    "auroc_avi_raw_score": 0.767,
+    "spearman_avi_raw_score": 0.629
+   },
+   "SORT1": {
+    "n": 745,
+    "n_large": 337,
+    "auroc_magi_reg_sum": 0.548,
+    "spearman_magi_reg_sum": 0.078,
+    "auroc_magi_reg_matched": 0.536,
+    "spearman_magi_reg_matched": 0.054,
+    "auroc_CADD_PHRED": 0.442,
+    "spearman_CADD_PHRED": -0.153,
+    "auroc_avi_raw_score": 0.56,
+    "spearman_avi_raw_score": 0.076
+   },
+   "TCF7L2": {
+    "n": 125,
+    "n_large": 5,
+    "auroc_magi_reg_sum": 0.525,
+    "spearman_magi_reg_sum": 0.087,
+    "auroc_magi_reg_matched": 0.533,
+    "spearman_magi_reg_matched": 0.038,
+    "auroc_CADD_PHRED": 0.511,
+    "spearman_CADD_PHRED": 0.086,
+    "auroc_avi_raw_score": 0.572,
+    "spearman_avi_raw_score": 0.131
+   },
+   "TERT": {
+    "n": 118,
+    "n_large": 35,
+    "auroc_magi_reg_sum": 0.536,
+    "spearman_magi_reg_sum": 0.255,
+    "auroc_magi_reg_matched": 0.534,
+    "spearman_magi_reg_matched": 0.217,
+    "auroc_CADD_PHRED": 0.643,
+    "spearman_CADD_PHRED": 0.245,
+    "auroc_avi_raw_score": 0.811,
+    "spearman_avi_raw_score": 0.622
+   },
+   "ZFAND3": {
+    "n": 315,
+    "n_large": 39,
+    "auroc_magi_reg_sum": 0.527,
+    "spearman_magi_reg_sum": 0.191,
+    "auroc_magi_reg_matched": 0.538,
+    "spearman_magi_reg_matched": 0.19,
+    "auroc_CADD_PHRED": 0.587,
+    "spearman_CADD_PHRED": 0.344,
+    "auroc_avi_raw_score": 0.681,
+    "spearman_avi_raw_score": 0.405
+   },
+   "ZRSh13": {
+    "n": 126,
+    "n_large": 2,
+    "auroc_magi_reg_sum": 0.778,
+    "spearman_magi_reg_sum": -0.19,
+    "auroc_magi_reg_matched": 0.81,
+    "spearman_magi_reg_matched": -0.214,
+    "auroc_CADD_PHRED": 0.468,
+    "spearman_CADD_PHRED": -0.035,
+    "auroc_avi_raw_score": 0.504,
+    "spearman_avi_raw_score": 0.088
+   }
+  },
+  "EXPLORATORY_no_scale_mixing": {
+   "note": "Post hoc (audit). within_element_rank: each score ranked within element, then pooled AUROC. mean_per_element: unweighted mean of per-element AUROCs (elements with both classes).",
+   "magi_reg_sum": {
+    "auroc_within_element_rank": {
+     "estimate": 0.5781,
+     "ci95": [
+      0.5521,
+      0.6064
+     ],
+     "n": 4141
+    },
+    "auroc_mean_per_element": {
+     "estimate": 0.6025,
+     "ci95": [
+      0.5511,
+      0.6518
+     ],
+     "n": 4141
+    }
+   },
+   "magi_reg_matched": {
+    "auroc_within_element_rank": {
+     "estimate": 0.5709,
+     "ci95": [
+      0.5424,
+      0.5985
+     ],
+     "n": 4141
+    },
+    "auroc_mean_per_element": {
+     "estimate": 0.6031,
+     "ci95": [
+      0.5204,
+      0.6688
+     ],
+     "n": 4141
+    }
+   },
+   "CADD_PHRED": {
+    "auroc_within_element_rank": {
+     "estimate": 0.6077,
+     "ci95": [
+      0.5175,
+      0.7006
+     ],
+     "n": 4141
+    },
+    "auroc_mean_per_element": {
+     "estimate": 0.5784,
+     "ci95": [
+      0.5082,
+      0.6495
+     ],
+     "n": 4141
+    }
+   },
+   "avi_raw_score": {
+    "auroc_within_element_rank": {
+     "estimate": 0.6738,
+     "ci95": [
+      0.607,
+      0.7447
+     ],
+     "n": 4141
+    },
+    "auroc_mean_per_element": {
+     "estimate": 0.6808,
+     "ci95": [
+      0.6026,
+      0.7529
+     ],
+     "n": 4141
+    }
+   },
+   "diff_magi_sum_minus_cadd_within_element_rank": {
+    "estimate": -0.0296,
+    "ci95": [
+     -0.1044,
+     0.0448
+    ],
+    "n": 4141
+   },
+   "diff_magi_sum_minus_cadd_mean_per_element": {
+    "estimate": 0.0241,
+    "ci95": [
+     -0.0574,
+     0.1142
+    ],
+    "n": 4141
+   }
+  },
+  "avi_note": "avi_raw_score = AlphaGenome Variant Impact, a general variant-impact score (not regulatory-specific, not in PLAN): DESCRIPTIVE comparator only. Non-commercial AlphaGenome Output Terms apply."
+ },
+ "comparators": {
+  "vep_most_severe_counts": {
+   "intron_variant": 1399,
+   "3_prime_UTR_variant": 916,
+   "upstream_gene_variant": 801,
+   "5_prime_UTR_variant": 565,
+   "regulatory_region_variant": 237,
+   "non_coding_transcript_exon_variant": 118,
+   "intergenic_variant": 62,
+   "splice_region_variant": 22,
+   "splice_polypyrimidine_tract_variant": 10,
+   "splice_acceptor_variant": 5,
+   "splice_donor_variant": 2,
+   "start_lost": 1,
+   "splice_donor_region_variant": 1,
+   "missense_variant": 1,
+   "splice_donor_5th_base_variant": 1
+  },
+  "reg_call_rate_by_vep_most_severe": {
+   "3_prime_UTR_variant": {
+    "n": 916,
+    "n_reg_call": 16,
+    "rate": 0.017
+   },
+   "5_prime_UTR_variant": {
+    "n": 565,
+    "n_reg_call": 42,
+    "rate": 0.074
+   },
+   "intergenic_variant": {
+    "n": 62,
+    "n_reg_call": 13,
+    "rate": 0.21
+   },
+   "intron_variant": {
+    "n": 1399,
+    "n_reg_call": 117,
+    "rate": 0.084
+   },
+   "missense_variant": {
+    "n": 1,
+    "n_reg_call": 0,
+    "rate": 0.0
+   },
+   "non_coding_transcript_exon_variant": {
+    "n": 118,
+    "n_reg_call": 40,
+    "rate": 0.339
+   },
+   "regulatory_region_variant": {
+    "n": 237,
+    "n_reg_call": 6,
+    "rate": 0.025
+   },
+   "splice_acceptor_variant": {
+    "n": 5,
+    "n_reg_call": 0,
+    "rate": 0.0
+   },
+   "splice_donor_5th_base_variant": {
+    "n": 1,
+    "n_reg_call": 1,
+    "rate": 1.0
+   },
+   "splice_donor_region_variant": {
+    "n": 1,
+    "n_reg_call": 0,
+    "rate": 0.0
+   },
+   "splice_donor_variant": {
+    "n": 2,
+    "n_reg_call": 1,
+    "rate": 0.5
+   },
+   "splice_polypyrimidine_tract_variant": {
+    "n": 10,
+    "n_reg_call": 0,
+    "rate": 0.0
+   },
+   "splice_region_variant": {
+    "n": 22,
+    "n_reg_call": 6,
+    "rate": 0.273
+   },
+   "start_lost": {
+    "n": 1,
+    "n_reg_call": 1,
+    "rate": 1.0
+   },
+   "upstream_gene_variant": {
+    "n": 801,
+    "n_reg_call": 160,
+    "rate": 0.2
+   }
+  },
+  "splice_flag_agreement": {
+   "n_annot_flag": 19,
+   "n_vep_splice_donor_acceptor_or_region": 29,
+   "n_vep_any_splice": 41,
+   "both_annot_flag_and_vep_da_or_region": 18,
+   "agreement_annot_flag_vs_vep_da_or_region": 0.9971
+  },
+  "magi_splice_type_calls": {
+   "n": 37,
+   "n_with_vep_any_splice": 5,
+   "n_with_annot_flag": 2,
+   "n_spliceai_d500_ge_0.2": 1,
+   "n_spliceai_unscored": 30
+  },
+  "spliceai_d500": {
+   "n_unscored_outside_MANE": 2209,
+   "n_ge_0.2": 8,
+   "note": "SpliceAI is a splice model; MPRA measures transcription. Sensitivity/descriptive only."
+  },
+  "reg_call_by_annot_region": {
+   "False": {
+    "exonic": 1365,
+    "intergenic": 1227,
+    "intronic": 1146
+   },
+   "True": {
+    "exonic": 86,
+    "intergenic": 200,
+    "intronic": 117
+   }
+  }
+ },
+ "EXPLORATORY_LFC": {
+  "LFC_max_abs": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": 0.1241,
+    "ci95": [
+     -0.0062,
+     0.2512
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.5623,
+    "ci95": [
+     0.5021,
+     0.6338
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.568,
+    "ci95": [
+     0.5103,
+     0.623
+    ],
+    "n": 4141
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.639
+  },
+  "LFC_max_abs_H3K27ac": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": 0.0872,
+    "ci95": [
+     -0.0943,
+     0.2261
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.5984,
+    "ci95": [
+     0.5329,
+     0.6664
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.5663,
+    "ci95": [
+     0.494,
+     0.6188
+    ],
+    "n": 3989
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.6395
+  },
+  "LFC_max_abs_DNase": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": 0.4444,
+    "ci95": [
+     0.3432,
+     0.5297
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.5921,
+    "ci95": [
+     0.5181,
+     0.6535
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.7211,
+    "ci95": [
+     0.673,
+     0.7594
+    ],
+    "n": 4044
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.6397
+  },
+  "LFC_max_abs_H3K27me3": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": -0.2506,
+    "ci95": [
+     -0.3921,
+     -0.1361
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.6296,
+    "ci95": [
+     0.5718,
+     0.6996
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.3872,
+    "ci95": [
+     0.311,
+     0.4469
+    ],
+    "n": 3474
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.65
+  },
+  "LFC_max_abs_H3K4me1": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": 0.0974,
+    "ci95": [
+     -0.0966,
+     0.3049
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.627,
+    "ci95": [
+     0.5852,
+     0.6812
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.5678,
+    "ci95": [
+     0.4918,
+     0.6423
+    ],
+    "n": 4014
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.64
+  },
+  "LFC_max_abs_H3K4me3": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": 0.0575,
+    "ci95": [
+     -0.1244,
+     0.2108
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.6131,
+    "ci95": [
+     0.5421,
+     0.7027
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.5531,
+    "ci95": [
+     0.4824,
+     0.6153
+    ],
+    "n": 3735
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.6482
+  },
+  "LFC_max_abs_H3K9ac": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": -0.0743,
+    "ci95": [
+     -0.2574,
+     0.0819
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.6164,
+    "ci95": [
+     0.5364,
+     0.7135
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.4961,
+    "ci95": [
+     0.4244,
+     0.5616
+    ],
+    "n": 3489
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.6518
+  },
+  "LFC_max_abs_H3K9me3": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": -0.1016,
+    "ci95": [
+     -0.2272,
+     0.0099
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.5861,
+    "ci95": [
+     0.5338,
+     0.6413
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.4478,
+    "ci95": [
+     0.388,
+     0.4925
+    ],
+    "n": 3359
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.6413
+  },
+  "LFC_max_abs_H3K36me3": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": -0.1975,
+    "ci95": [
+     -0.2977,
+     -0.1084
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.6195,
+    "ci95": [
+     0.571,
+     0.6605
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.4034,
+    "ci95": [
+     0.3533,
+     0.4394
+    ],
+    "n": 3349
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.6468
+  },
+  "LFC_max_abs_CAGE": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": 0.0622,
+    "ci95": [
+     -0.0376,
+     0.1583
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.5553,
+    "ci95": [
+     0.4752,
+     0.631
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.5235,
+    "ci95": [
+     0.4873,
+     0.5601
+    ],
+    "n": 4036
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.6345
+  },
+  "LFC_max_abs_RNA": {
+   "n": 4141,
+   "spearman_signed_vs_effect": {
+    "estimate": -0.0524,
+    "ci95": [
+     -0.2474,
+     0.1006
+    ],
+    "n": 4141
+   },
+   "auroc_abs_large_effect": {
+    "estimate": 0.5977,
+    "ci95": [
+     0.4984,
+     0.6741
+    ],
+    "n": 4141
+   },
+   "sign_agreement_abs_lfc_ge_0.1": {
+    "estimate": 0.4553,
+    "ci95": [
+     0.3211,
+     0.5539
+    ],
+    "n": 1992
+   },
+   "baseline_frac_effect_negative_abs_lfc_ge_0.1": 0.6832
+  },
+  "note": "EXPLORATORY: not in PLAN rules; no thresholds tuned; signed LFC = alt vs ref predicted signal."
+ },
+ "candidates_total": 265,
+ "candidates_csv": "E2_mpra/candidates.csv",
+ "inference": {
+  "command": "inference.py --share-windows --no-embeddings --bigwigs (job 3704, e2_inference.sbatch)",
+  "window_offset_counts": {
+   "0.0": 2214,
+   "128.0": 1098,
+   "-128.0": 602,
+   "-256.0": 212,
+   "256.0": 15
+  }
+ },
+ "deviations": [
+  "Significance: the file has no p-value, so all 4,141 rows are treated as significant for H4 (likely Kircher 2019's pre-filtered subset; unverified). Sensitivity at |effect| >= 0.5 and >= 1.0.",
+  "H5: significant vs non-significant cannot be formed; replaced by AUROC for |effect| >= 0.5 vs < 0.5 plus Spearman of each score vs |effect|.",
+  "H5 element-matched score uses promoter/enhancer classes recalled from Kircher 2019, not verified from the paper.",
+  "Effect sign (positive = alt raises expression) inferred from the TERT C228T/C250T check, not from a data card.",
+  "Bootstrap clusters = elements present in each subset (16 at most), so CIs are wide.",
+  "Added comparators not in PLAN (descriptive): AlphaGenome AVI, VEP 116 consequences, SpliceAI MANE d500, PLAN annotation flag.",
+  "H4 direction for REGULATORY_CHANGE-only calls (362/403) and the 1 conflict: the PLAN says 'loss vs gain of the element', but REGULATORY_CHANGE has direction 'any' in the rule file, so MAGI states no direction. The sign of the largest of the 4 promoter/enhancer deltas is an analyst convention (declared in h4_direction_mapping before the deltas were read). After the audit, four other conventions, including the plan-literal one (DESTRUCTION/GAIN calls only), were added as H4.SENSITIVITY_direction_convention.",
+  "EXPLORATORY H4 additions (always-loss baseline, within-element permutation, P(neg|pred loss) - P(neg|pred gain), mixed-sign fraction, element-equal weighting, dropping near-null elements): added because a pass driven by the base rate of losses would otherwise go unnoticed.",
+  "Bootstrap fix: clusters are the elements present in each subset (an earlier draft resampled from all 16 elements even when a subset had fewer). Resamples with one class only are skipped for AUROC and counted (n_resamples_dropped_one_class).",
+  "EXPLORATORY H5 additions after the audit: within-element-rank pooled AUROC and mean per-element AUROC, because pooled AUROCs mix score scales across elements."
+ ],
+ "caveats": [
+  "Within-element permutation p-values treat variants as exchangeable; neighbouring variants share windows and have correlated deltas, so the p-values are probably too small.",
+  "Promoter/enhancer element classes (H5 matched score, convention d) and cell types are recalled from Kircher 2019, not verified against the paper.",
+  "Candidates: many top LDLR candidates have mixed_sign=True (opposite-sign deltas near a tie); the list is weak evidence of mechanism."
+ ]
+}

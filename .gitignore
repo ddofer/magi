@@ -48,7 +48,6 @@ gradio_app/data/hg38.fa
 # Per-file size cap: tracked CSVs over ~50 MB belong outside the repo
 analyses/generated_tables/snp_results_with_mechanism.csv
 analyses/indel_results.csv
-analyses/analyses/stav-llm_evaluation_results.csv
 
 # Model cache / checkpoints
 models/

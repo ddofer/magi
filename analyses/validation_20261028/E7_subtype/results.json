@@ -1,0 +1,366 @@
+{
+ "rules": "HEAD; s4 primary calls unchanged vs Sep-13 file: 9786/9786",
+ "labelling": {
+  "n_texts": 583,
+  "adjudicated": {
+   "n": 1
+  },
+  "class_agreement": 0.983,
+  "kappa": 0.965,
+  "final_classes": {
+   "NO_RNA": 403,
+   "SKIP": 70,
+   "UNCLEAR": 44,
+   "CRYPTIC": 41,
+   "NORMAL": 18,
+   "MULTIPLE": 6,
+   "RETENTION": 1
+  },
+  "A_classes": {
+   "NO_RNA": 404,
+   "SKIP": 70,
+   "CRYPTIC": 42,
+   "UNCLEAR": 37,
+   "NORMAL": 20,
+   "MULTIPLE": 9,
+   "RETENTION": 1
+  },
+  "B_classes": {
+   "NO_RNA": 405,
+   "SKIP": 73,
+   "CRYPTIC": 44,
+   "UNCLEAR": 33,
+   "NORMAL": 19,
+   "MULTIPLE": 7,
+   "RETENTION": 2
+  },
+  "lab_positive_by_clinvar_label": {
+   "Pathogenic": 118
+  }
+ },
+ "sets": [
+  {
+   "set": "ClinVar, chosen from text (independent)",
+   "n_lab_positive": 118,
+   "coverage_any_strict_call": {
+    "k": 72,
+    "n": 118,
+    "rate": 0.61,
+    "ci95": [
+     0.52,
+     0.693
+    ]
+   },
+   "primary_match": {
+    "k": 49,
+    "n": 72,
+    "rate": 0.681,
+    "ci95": [
+     0.566,
+     0.777
+    ]
+   },
+   "primary_match_shuffle_mean": 0.742,
+   "primary_match_shuffle_p": 0.9789,
+   "any_match": {
+    "k": 52,
+    "n": 72,
+    "rate": 0.722,
+    "ci95": [
+     0.61,
+     0.812
+    ]
+   },
+   "any_match_shuffle_mean": 0.774,
+   "any_match_shuffle_p": 0.9503,
+   "opposite_among_skip": {
+    "k": 0,
+    "n": 30,
+    "rate": 0.0,
+    "ci95": [
+     0,
+     0.114
+    ]
+   },
+   "outcomes": {
+    "SKIP": 70,
+    "CRYPTIC": 41,
+    "CRYPTIC+SKIP": 5,
+    "RETENTION+SKIP": 1,
+    "RETENTION": 1
+   },
+   "primary_names": {
+    "SPLICE_SITE_DESTROYED": 39,
+    "EXON_LOSS": 11,
+    "CONSTITUTIVE_EXON_LOSS": 9,
+    "CRYPTIC_SPLICE_GAIN": 5,
+    "SPLICE_INDUCED_INTRON_RETENTION": 4,
+    "INTRON_RETENTION": 1,
+    "CRYPTIC_EXON_INCLUSION": 1,
+    "CODING_LOSS": 1,
+    "EXON_SKIPPING_INDUCED": 1
+   }
+  },
+  {
+   "set": "ClinVar, independent, excluding the E4 cases",
+   "n_lab_positive": 97,
+   "coverage_any_strict_call": {
+    "k": 51,
+    "n": 97,
+    "rate": 0.526,
+    "ci95": [
+     0.427,
+     0.622
+    ]
+   },
+   "primary_match": {
+    "k": 45,
+    "n": 51,
+    "rate": 0.882,
+    "ci95": [
+     0.766,
+     0.945
+    ]
+   },
+   "primary_match_shuffle_mean": 0.866,
+   "primary_match_shuffle_p": 0.3982,
+   "any_match": {
+    "k": 48,
+    "n": 51,
+    "rate": 0.941,
+    "ci95": [
+     0.841,
+     0.98
+    ]
+   },
+   "any_match_shuffle_mean": 0.921,
+   "any_match_shuffle_p": 0.369,
+   "opposite_among_skip": {
+    "k": 0,
+    "n": 30,
+    "rate": 0.0,
+    "ci95": [
+     0,
+     0.114
+    ]
+   },
+   "outcomes": {
+    "SKIP": 70,
+    "CRYPTIC": 20,
+    "CRYPTIC+SKIP": 5,
+    "RETENTION+SKIP": 1,
+    "RETENTION": 1
+   },
+   "primary_names": {
+    "SPLICE_SITE_DESTROYED": 39,
+    "SPLICE_INDUCED_INTRON_RETENTION": 4,
+    "CONSTITUTIVE_EXON_LOSS": 3,
+    "CRYPTIC_SPLICE_GAIN": 1,
+    "CRYPTIC_EXON_INCLUSION": 1,
+    "CODING_LOSS": 1,
+    "EXON_LOSS": 1,
+    "EXON_SKIPPING_INDUCED": 1
+   }
+  },
+  {
+   "set": "ClinVar, E4 MAGI-selected cases that the labellers also call lab-positive",
+   "n_lab_positive": 21,
+   "coverage_any_strict_call": {
+    "k": 21,
+    "n": 21,
+    "rate": 1.0,
+    "ci95": [
+     0.845,
+     1.0
+    ]
+   },
+   "primary_match": {
+    "k": 4,
+    "n": 21,
+    "rate": 0.19,
+    "ci95": [
+     0.077,
+     0.4
+    ]
+   },
+   "primary_match_shuffle_mean": 0.19,
+   "primary_match_shuffle_p": "n/a: one outcome class",
+   "any_match": {
+    "k": 4,
+    "n": 21,
+    "rate": 0.19,
+    "ci95": [
+     0.077,
+     0.4
+    ]
+   },
+   "any_match_shuffle_mean": 0.19,
+   "any_match_shuffle_p": "n/a: one outcome class",
+   "opposite_among_skip": {
+    "k": 0,
+    "n": 0,
+    "rate": null,
+    "ci95": [
+     null,
+     null
+    ]
+   },
+   "outcomes": {
+    "CRYPTIC": 21
+   },
+   "primary_names": {
+    "EXON_LOSS": 10,
+    "CONSTITUTIVE_EXON_LOSS": 6,
+    "CRYPTIC_SPLICE_GAIN": 4,
+    "INTRON_RETENTION": 1
+   }
+  },
+  {
+   "set": "EXPLORATORY: independent ClinVar, outcome-naming primary calls only (SPLICE_SITE_DESTROYED fits 3 outcomes)",
+   "n_lab_positive": 79,
+   "coverage_any_strict_call": {
+    "k": 33,
+    "n": 79,
+    "rate": 0.418,
+    "ci95": [
+     0.315,
+     0.528
+    ]
+   },
+   "primary_match": {
+    "k": 10,
+    "n": 33,
+    "rate": 0.303,
+    "ci95": [
+     0.174,
+     0.473
+    ]
+   },
+   "primary_match_shuffle_mean": 0.325,
+   "primary_match_shuffle_p": 0.7331,
+   "any_match": {
+    "k": 13,
+    "n": 33,
+    "rate": 0.394,
+    "ci95": [
+     0.247,
+     0.563
+    ]
+   },
+   "any_match_shuffle_mean": 0.353,
+   "any_match_shuffle_p": 0.3821,
+   "opposite_among_skip": {
+    "k": 0,
+    "n": 7,
+    "rate": 0.0,
+    "ci95": [
+     0.0,
+     0.354
+    ]
+   },
+   "outcomes": {
+    "SKIP": 47,
+    "CRYPTIC": 30,
+    "RETENTION+SKIP": 1,
+    "CRYPTIC+SKIP": 1
+   },
+   "primary_names": {
+    "EXON_LOSS": 11,
+    "CONSTITUTIVE_EXON_LOSS": 9,
+    "CRYPTIC_SPLICE_GAIN": 5,
+    "SPLICE_INDUCED_INTRON_RETENTION": 4,
+    "INTRON_RETENTION": 1,
+    "CRYPTIC_EXON_INCLUSION": 1,
+    "CODING_LOSS": 1,
+    "EXON_SKIPPING_INDUCED": 1
+   }
+  },
+  {
+   "set": "MFASS, \u0394PSI \u2264 \u22120.5 (exon skipping)",
+   "n_lab_positive": 1050,
+   "coverage_any_strict_call": {
+    "k": 130,
+    "n": 1050,
+    "rate": 0.124,
+    "ci95": [
+     0.105,
+     0.145
+    ]
+   },
+   "primary_match": {
+    "k": 59,
+    "n": 130,
+    "rate": 0.454,
+    "ci95": [
+     0.371,
+     0.54
+    ]
+   },
+   "primary_match_shuffle_mean": 0.454,
+   "primary_match_shuffle_p": "n/a: one outcome class",
+   "any_match": {
+    "k": 66,
+    "n": 130,
+    "rate": 0.508,
+    "ci95": [
+     0.423,
+     0.592
+    ]
+   },
+   "any_match_shuffle_mean": 0.508,
+   "any_match_shuffle_p": "n/a: one outcome class",
+   "opposite_among_skip": {
+    "k": 51,
+    "n": 130,
+    "rate": 0.392,
+    "ci95": [
+     0.313,
+     0.478
+    ]
+   },
+   "outcomes": {
+    "SKIP": 1050
+   },
+   "primary_names": {
+    "SPLICE_INDUCED_EXONIZATION": 45,
+    "SPLICE_SITE_DESTROYED": 29,
+    "CODING_LOSS": 11,
+    "CRYPTIC_SPLICE_GAIN": 10,
+    "CONSTITUTIVE_EXON_LOSS": 9,
+    "EXON_LOSS": 8,
+    "SPLICE_INDUCED_INTRON_RETENTION": 7,
+    "CRYPTIC_EXON_INCLUSION": 6,
+    "INTRON_RETENTION": 3,
+    "EXON_SKIPPING_INDUCED": 2
+   }
+  }
+ ],
+ "e4_lab_cases_labelled_here": {
+  "in_pool": 24,
+  "of": 25,
+  "final_classes": {
+   "CRYPTIC": 21,
+   "UNCLEAR": 3
+  }
+ },
+ "normal_rna": {
+  "strict_call": {
+   "k": 0,
+   "n": 18,
+   "rate": 0.0,
+   "ci95": [
+    0.0,
+    0.176
+   ]
+  },
+  "primary_strict": {
+   "k": 0,
+   "n": 18,
+   "rate": 0.0,
+   "ci95": [
+    0.0,
+    0.176
+   ]
+  }
+ }
+}

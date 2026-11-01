@@ -1,0 +1,48 @@
+{
+ "n": 111,
+ "spliceai_cut_0.2": {
+  "called": 88,
+  "right": 72,
+  "shuffle_mean": 0.499,
+  "table": {
+   "CRYPTIC": {
+    "CRYPTIC": 35,
+    "SKIP": 6
+   },
+   "SKIP": {
+    "CRYPTIC": 10,
+    "SKIP": 37
+   }
+  }
+ },
+ "ntv3_cut_0.1": {
+  "called": 66,
+  "right": 52,
+  "shuffle_mean": 0.544,
+  "table": {
+   "CRYPTIC": {
+    "CRYPTIC": 15,
+    "SKIP": 12
+   },
+   "SKIP": {
+    "CRYPTIC": 2,
+    "SKIP": 37
+   }
+  }
+ },
+ "ntv3_cut_0.2": {
+  "called": 39,
+  "right": 28,
+  "shuffle_mean": 0.567,
+  "table": {
+   "CRYPTIC": {
+    "CRYPTIC": 5,
+    "SKIP": 11
+   },
+   "SKIP": {
+    "CRYPTIC": 0,
+    "SKIP": 23
+   }
+  }
+ }
+}

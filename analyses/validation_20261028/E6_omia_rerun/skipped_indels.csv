@@ -1,0 +1,45 @@
+species,chrom,g,reason
+dog,28,NC_006610.3:g.23380074_23483377del,longer than half the window
+dog,24,g.23378062_23379640delins[MT319116.1:424_663],no letters given or not a simple del/dup/ins/delins
+dog,5,NC_006587.3:g.32551064_32551065ins[LT796559.1:g.50_276],no letters given or not a simple del/dup/ins/delins
+dog,26,NC_006608.3:g.8200944_8200945insN[(205)],no letters given or not a simple del/dup/ins/delins
+dog,7,NC_006589.3:g.41325010_41340731delinsAAGGCC,longer than half the window
+dog,37,g.30852988_30902901del,longer than half the window
+dog,14,g.22068082_22068083insN[2056],no letters given or not a simple del/dup/ins/delins
+dog,X,g.27615280_27982912del,longer than half the window
+dog,X,g.27721607_27721608insN[(4800)],no letters given or not a simple del/dup/ins/delins
+dog,X,g.27851768_28247504dup,longer than half the window
+dog,16,g.44477343_44477344ins90,no letters given or not a simple del/dup/ins/delins
+dog,X,g.122956942delA,stated letters differ from the genome
+dog,X,g.109521130_109521131insN[(1500)],no letters given or not a simple del/dup/ins/delins
+dog,X,g.109532012_109532013insN[(5000)],no letters given or not a simple del/dup/ins/delins
+dog,10,g.61822372_61822373insN[(230)],no letters given or not a simple del/dup/ins/delins
+dog,18,g.48372578_48505893dup133316,no letters given or not a simple del/dup/ins/delins
+dog,9,g.20134857_20134858insN[76],no letters given or not a simple del/dup/ins/delins
+dog,8,g.59294611_59294612insN[78],no letters given or not a simple del/dup/ins/delins
+dog,2,g.19371988_19371989ins[N[236];CACACAAAGGTTT],no letters given or not a simple del/dup/ins/delins
+dog,12,g.22603767_22603768insN[226],no letters given or not a simple del/dup/ins/delins
+dog,15,g.52905336_52927296del,longer than half the window
+dog,20,g.21836232_21836427delinsN[198],no letters given or not a simple del/dup/ins/delins
+dog,25,g.48150749_50insC,invalid span
+dog,9,g.20407670_20407671ins[A[(40_70)];20407660_20407670],no letters given or not a simple del/dup/ins/delins
+dog,X,g.37950668_37950668insC,"other (letters not ACGT, or ins span not adjacent)"
+dog,X,g.120749179_120763577del,longer than half the window
+dog,19,g.37903870_37903871insN[218],no letters given or not a simple del/dup/ins/delins
+dog,15,g.18332036_18332037ins[A[29];GGAAGCAACAGGATG],no letters given or not a simple del/dup/ins/delins
+dog,4,g.66946539_66963863del,longer than half the window
+dog,14,g.60628774_60758561del,longer than half the window
+dog,25,g.40417857_40417862delinsN[35],no letters given or not a simple del/dup/ins/delins
+cat,D4,NC_058380.1:g.93561989_93595728del,longer than half the window
+cat,D2,NC_058378.1:g.77479931_77479934insN[585],no letters given or not a simple del/dup/ins/delins
+cat,C2,NC_058376.1:g.34574435_34612034delinsN[334],no letters given or not a simple del/dup/ins/delins
+cat,B1,NC_058371.1:g.161142882_161237957del,longer than half the window
+cat,B1,NC_058371.1:g.161388687_161388688insN[617],no letters given or not a simple del/dup/ins/delins
+cat,B1,NC_058371.1:g.161388687_161388688insN[7125],no letters given or not a simple del/dup/ins/delins
+cat,A1,NC_058368.1:g.159254616_159394886del,longer than half the window
+cat,D2,NC_058378.1:g.13064245_13083649dup,longer than half the window
+cat,C1,NC_058375.1:g.205833101_205833102insN[395],no letters given or not a simple del/dup/ins/delins
+cat,C1,NC_058375.1:g.205834854_205834855insN[433],no letters given or not a simple del/dup/ins/delins
+cat,B1,NC_058371.1:g.172171181_172174505delinsN[108],no letters given or not a simple del/dup/ins/delins
+chicken,10,g.9683879_9683880insN[7524],no letters given or not a simple del/dup/ins/delins
+chicken,13,g.16089993_16107660del,longer than half the window

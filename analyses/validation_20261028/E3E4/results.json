@@ -1,0 +1,1192 @@
+{
+ "experiment": "E3E4",
+ "E3": {
+  "H6": {
+   "splice-annotated": {
+    "n": 49,
+    "n_genes": 44,
+    "strict_calls": 8,
+    "strict_rate": 0.1633,
+    "strict_rate_95ci_gene_boot": [
+     0.0638,
+     0.2778
+    ],
+    "loose_calls": 31,
+    "loose_rate": 0.6327,
+    "loose_rate_95ci_gene_boot": [
+     0.4898,
+     0.766
+    ],
+    "variant_effects": {
+     "splicing": 49
+    }
+   },
+   "missense": {
+    "n": 225,
+    "n_genes": 178,
+    "strict_calls": 3,
+    "strict_rate": 0.0133,
+    "strict_rate_95ci_gene_boot": [
+     0.0,
+     0.0309
+    ],
+    "loose_calls": 4,
+    "loose_rate": 0.0178,
+    "loose_rate_95ci_gene_boot": [
+     0.0043,
+     0.0369
+    ],
+    "variant_effects": {
+     "missense": 225
+    }
+   },
+   "nonsense": {
+    "n": 82,
+    "n_genes": 74,
+    "strict_calls": 13,
+    "strict_rate": 0.1585,
+    "strict_rate_95ci_gene_boot": [
+     0.0864,
+     0.2353
+    ],
+    "loose_calls": 30,
+    "loose_rate": 0.3659,
+    "loose_rate_95ci_gene_boot": [
+     0.2597,
+     0.475
+    ],
+    "variant_effects": {
+     "nonsense (stop-gain)": 82
+    }
+   },
+   "synonymous": {
+    "n": 0,
+    "n_genes": 0,
+    "strict_calls": 0,
+    "strict_rate": null,
+    "strict_rate_95ci_gene_boot": [
+     null,
+     null
+    ],
+    "loose_calls": 0,
+    "loose_rate": null,
+    "loose_rate_95ci_gene_boot": [
+     null,
+     null
+    ],
+    "variant_effects": {}
+   },
+   "regulatory": {
+    "n": 14,
+    "n_genes": 10,
+    "strict_calls": 0,
+    "strict_rate": 0.0,
+    "strict_rate_95ci_gene_boot": [
+     0.0,
+     0.0
+    ],
+    "loose_calls": 0,
+    "loose_rate": 0.0,
+    "loose_rate_95ci_gene_boot": [
+     0.0,
+     0.0
+    ],
+    "variant_effects": {
+     "regulatory": 14
+    }
+   },
+   "other": {
+    "n": 2,
+    "n_genes": 2,
+    "strict_calls": 0,
+    "strict_rate": 0.0,
+    "strict_rate_95ci_gene_boot": [
+     0.0,
+     0.0
+    ],
+    "loose_calls": 0,
+    "loose_rate": 0.0,
+    "loose_rate_95ci_gene_boot": [
+     0.0,
+     0.0
+    ],
+    "variant_effects": {
+     "nan": 1,
+     "extension (stop-lost)": 1
+    }
+   }
+  },
+  "by_species": [
+   {
+    "species": "canis_lupus_familiaris",
+    "group": "missense",
+    "strict_calls": 3,
+    "n": 132
+   },
+   {
+    "species": "canis_lupus_familiaris",
+    "group": "nonsense",
+    "strict_calls": 7,
+    "n": 48
+   },
+   {
+    "species": "canis_lupus_familiaris",
+    "group": "other",
+    "strict_calls": 0,
+    "n": 2
+   },
+   {
+    "species": "canis_lupus_familiaris",
+    "group": "regulatory",
+    "strict_calls": 0,
+    "n": 5
+   },
+   {
+    "species": "canis_lupus_familiaris",
+    "group": "splice-annotated",
+    "strict_calls": 6,
+    "n": 33
+   },
+   {
+    "species": "felis_catus",
+    "group": "missense",
+    "strict_calls": 0,
+    "n": 77
+   },
+   {
+    "species": "felis_catus",
+    "group": "nonsense",
+    "strict_calls": 6,
+    "n": 27
+   },
+   {
+    "species": "felis_catus",
+    "group": "regulatory",
+    "strict_calls": 0,
+    "n": 5
+   },
+   {
+    "species": "felis_catus",
+    "group": "splice-annotated",
+    "strict_calls": 2,
+    "n": 16
+   },
+   {
+    "species": "gallus_gallus",
+    "group": "missense",
+    "strict_calls": 0,
+    "n": 16
+   },
+   {
+    "species": "gallus_gallus",
+    "group": "nonsense",
+    "strict_calls": 0,
+    "n": 7
+   },
+   {
+    "species": "gallus_gallus",
+    "group": "regulatory",
+    "strict_calls": 0,
+    "n": 4
+   }
+  ],
+  "EXPLORATORY_splice_annotated_by_hgvs_offset": [
+   {
+    "offset_group": "canonical +/-1-2",
+    "n": 28,
+    "strict_calls": 4,
+    "loose_calls": 21
+   },
+   {
+    "offset_group": "intronic other",
+    "n": 11,
+    "strict_calls": 1,
+    "loose_calls": 4
+   },
+   {
+    "offset_group": "no c. string",
+    "n": 1,
+    "strict_calls": 0,
+    "loose_calls": 0
+   },
+   {
+    "offset_group": "no intron offset (exonic)",
+    "n": 9,
+    "strict_calls": 3,
+    "loose_calls": 6
+   }
+  ],
+  "n_input": 372,
+  "n_candidates": 8,
+  "candidates_with_omia_match": 8
+ },
+ "E4": {
+  "n": 62,
+  "ref_mismatches_hg38": 0,
+  "magi_strict_tier0_3_all_mechanisms": 62,
+  "magi_strict_primary_vs_tier_based_agree": 62,
+  "magi_loose": 62,
+  "magi_splice_score_median": 0.3515,
+  "magi_splice_score_zero": 0,
+  "spliceai_unscored_no_gene": 3,
+  "spliceai_ge_0.2": 48,
+  "spliceai_lt_0.2": 11,
+  "spliceai_max_median": 0.76,
+  "annotation_flagged_gencode_all_tx": 5,
+  "annot_region_counts": {
+   "exonic": 62
+  },
+  "rows_annotation_flag_x_cols_spliceai": {
+   "flagged": {
+    "ge_0.2": 4,
+    "lt_0.2": 0,
+    "unscored": 1
+   },
+   "silent": {
+    "ge_0.2": 44,
+    "lt_0.2": 11,
+    "unscored": 2
+   }
+  },
+  "unscored_variants": [
+   {
+    "VariationID": 1298365,
+    "gene": "SRD5A2",
+    "chrom": "chr2",
+    "pos": 31529416
+   },
+   {
+    "VariationID": 402436,
+    "gene": "BTK",
+    "chrom": "chrX",
+    "pos": 101390479
+   },
+   {
+    "VariationID": 930478,
+    "gene": "PLP1",
+    "chrom": "chrX",
+    "pos": 103785750
+   }
+  ],
+  "silent_and_spliceai_lt_0.2": [
+   {
+    "VariationID": 99421,
+    "gene": "ABCA4",
+    "label": "Pathogenic",
+    "spliceai_max": 0.01
+   },
+   {
+    "VariationID": 134520,
+    "gene": "IDH1",
+    "label": "Benign",
+    "spliceai_max": 0.04
+   },
+   {
+    "VariationID": 1455934,
+    "gene": "ABCA12",
+    "label": "Pathogenic",
+    "spliceai_max": 0.0
+   },
+   {
+    "VariationID": 21342,
+    "gene": "RAF1",
+    "label": "Pathogenic",
+    "spliceai_max": 0.02
+   },
+   {
+    "VariationID": 972899,
+    "gene": "SLC12A2",
+    "label": "Pathogenic",
+    "spliceai_max": 0.19
+   },
+   {
+    "VariationID": 180789,
+    "gene": "BRAF",
+    "label": "Pathogenic",
+    "spliceai_max": 0.08
+   },
+   {
+    "VariationID": 375946,
+    "gene": "BRAF",
+    "label": "Pathogenic",
+    "spliceai_max": 0.07
+   },
+   {
+    "VariationID": 92655,
+    "gene": "SGCG",
+    "label": "Benign",
+    "spliceai_max": 0.01
+   },
+   {
+    "VariationID": 660018,
+    "gene": "ATP7B",
+    "label": "Pathogenic",
+    "spliceai_max": 0.02
+   },
+   {
+    "VariationID": 1176084,
+    "gene": "ERCC2",
+    "label": "Pathogenic",
+    "spliceai_max": 0.03
+   },
+   {
+    "VariationID": 97357,
+    "gene": "OTC",
+    "label": "Pathogenic",
+    "spliceai_max": 0.17
+   }
+  ],
+  "by_label": {
+   "Benign": {
+    "n": 6,
+    "spliceai_ge_0.2": 3,
+    "annotation_flagged": 2
+   },
+   "Pathogenic": {
+    "n": 56,
+    "spliceai_ge_0.2": 45,
+    "annotation_flagged": 3
+   }
+  },
+  "primary_mechanism_in_strict_set": 62,
+  "flagged_variants": [
+   {
+    "VariationID": 5726,
+    "gene": "KRIT1",
+    "dist_gencode": 3.0,
+    "bp_to_nearest_MANE_exon_end": 115,
+    "spliceai_max": 0.39
+   },
+   {
+    "VariationID": 15161,
+    "gene": "HBB",
+    "dist_gencode": 3.0,
+    "bp_to_nearest_MANE_exon_end": 13,
+    "spliceai_max": 0.76
+   },
+   {
+    "VariationID": 446956,
+    "gene": "CACNA1H",
+    "dist_gencode": -1.0,
+    "bp_to_nearest_MANE_exon_end": 33,
+    "spliceai_max": 0.22
+   },
+   {
+    "VariationID": 17660,
+    "gene": "BRCA1",
+    "dist_gencode": -1.0,
+    "bp_to_nearest_MANE_exon_end": 22,
+    "spliceai_max": 0.65
+   },
+   {
+    "VariationID": 402436,
+    "gene": "BTK",
+    "dist_gencode": -2.0,
+    "bp_to_nearest_MANE_exon_end": 567,
+    "spliceai_max": null
+   }
+  ],
+  "spliceai_command": "spliceai -I e4.vcf -O e4.spliceai.vcf -R hg38.fa -A grch38 (-D 50 = package default; max |DP| in output = 50; every scored gene span in spliceai/annotations/grch38.txt covers its variant), SLURM job 3700, -p low -w sblxa123c, CPU only"
+ },
+ "deviations": [
+  "E3 95% intervals: cluster bootstrap over (species, gene) (2,000 resamples, seed 0) because OMIA rows carry no exon/element ID; PLAN asks for exons/elements.",
+  "E3 groups: 'other' = extension (stop-lost) 1 + missing variant_effect 1; synonymous group has 0 SNVs in the scored OMIA set (1 synonymous variant exists in the raw OMIA cache but not among the 372 scored dog/cat/chicken SNVs).",
+  "E4 MAGI strict status: the 62-row CSV has only the primary NT_Mechanism, so NT_All_Mechanisms and D_BED_* were joined 1:1 from the saved SNV mechanism table s4_snv_mechanism_assignments.csv on (VariationID, chrom, pos, ref, alt); 62/62 matched. Strict (tier 0-3, PLAN definition) = 62/62, agreeing with the primary-based status on 62/62.",
+  "E4 SpliceAI unscored rows kept as NA (not 0) in e4_scores.csv and counted separately.",
+  "Pangolin not run (not installed; see setup notes).",
+  "E4 rating scheme: raters used 5 classes (lab_rna_or_minigene, prediction_only, negated_or_inconclusive, functional_other, no_splice_claim) instead of PLAN's 3; for the candidate definition every class other than lab_rna_or_minigene counts as 'no lab RNA evidence'. Kappa on PLAN's 3 classes (functional_other -> no_splice_claim) is reported beside it for both placements of negated_or_inconclusive.",
+  "E4 Cohen's kappa CI: bootstrap over rated variants (2,000) and exact Clopper-Pearson intervals for fractions are variant-level; PLAN's cluster bootstrap over exons applies to model performance and the rater unit is the variant. Gene-cluster bootstrap intervals are reported beside them for fractions and AUROC (no exon IDs in the 62-row set, so genes are the clusters). Each bootstrap now draws from its own generator (seed 0), so intervals no longer depend on code order; this shifted some gene-bootstrap intervals slightly from the first report.",
+  "E4 annotation flag: VEP 116 (vepyr, GENCODE 50) splice flags reported beside the PLAN GENCODE v44 flag, as any splice term and as the PLAN-window terms (splice_region, splice_donor_region, splice_donor_5th_base, splice_donor, splice_acceptor). The first report's 'PLAN-equivalent' splice_region|donor|acceptor left out splice_donor_region_variant (intron +3 to +6) and is kept only for reference. With the PLAN-window terms the flags agree on 61/62; the one VEP-only case is SRD5A2 1298365 (splice_donor_region_variant on a GENCODE 50 transcript, not flagged by the v44 PLAN flag).",
+  "E4 ascertainment check (added after audit): per-class counts of rationales that mention splicing or cite an in-silico splice prediction, from FullRationale; only boolean flags are written out."
+ ],
+ "caveats": [
+  "omia.org unreachable from compute node sblxa123c (job 3702: curl timed out after 30 s for both the phene page and the results table). OMIA evidence comes from the offline cache data/omia_raw_variants.csv (c., p., Verbal Description, PMIDs, year) and data/*_variants.parquet rationale.",
+  "OMIA rule calls are on non-human genomes; SpliceAI, CADD and the GENCODE annotation flag are hg38-only, so they are not applicable to E3 candidates. The exon-end offset is read from the OMIA HGVS c. string as written.",
+  "SNX14 (OMIA variant 415) c. string is 'c.26531G>A' in the OMIA cache, which is implausible for SNX14 cDNA (possibly c.2653+1G>A with the '+' lost). Reported as found and classed 'no intron offset (exonic)'; not corrected.",
+  "E3 has no negatives (all OMIA variants are disease variants), so rates are descriptive only.",
+  "E4 dist_gencode is the signed setup-script distance to the nearest internal exon end in any GENCODE v44 transcript (sign not strand-aware and unreliable: TMEM67 and TIMM44 are exonic yet positive); bp_to_nearest_MANE_exon_end is unsigned MANE-only, kept beside it. All 62 are annot_region=exonic. 5/62 are annotation-flagged only through non-MANE GENCODE transcripts (e.g. KRIT1 5726: 3 bp in GENCODE, 115 bp in MANE).",
+  "E4 MAGI strict = 62/62 by construction (the input file is MAGI's splice calls away from MANE exon ends), so 'AND MAGI strict call' filters nothing. The lab fraction 25/62 = 0.40 is a floor on the precision of these calls, not a precision: at least 25/62 have lab RNA/minigene confirmation, at most 6/62 are ClinVar Benign (all in no_splice_claim), and the other 31 are of unknown splice status.",
+  "E4 SpliceAI d500 sensitivity uses the precomputed MANE set (SpliceAI 1.3.1, distance 500, masked); the d50 run (job 3700, GRCh38 package annotation) is unmasked. d50-vs-d500 differences (3 ge->lt, 2 unscored->ge) mix distance, masking and transcript set.",
+  "E4 ratings come from ClinVar submitter rationales; absence of lab evidence in a rationale is not evidence of no splice effect. 25/25 lab-confirmed variants are Pathogenic/Likely pathogenic.",
+  "E4 ascertainment: submitters order RNA/minigene assays mostly after a splice predictor flags the variant. 20/25 lab rationales also cite an in-silico splice prediction (regex in E4_ratings.rationale_regex_in_silico); 0/9 functional_other and 1/14 no_splice_claim rationales mention splicing at all. So (a) '0 candidates' (lab AND SpliceAI < 0.2) has almost no power by design and is not evidence that MAGI lacks signal independent of SpliceAI; (b) the lab-vs-rest contrasts and AUROCs are confounded by test selection and are not head-to-head accuracy. Lab vs (functional_other or no_splice_claim) is close to 'did the rationale discuss splicing at all'.",
+  "E4 rater provenance, as relayed: final.json holds the adjudicated classes; rater_A/B.json are rebuilt by ratings/make_raw.py from final.json plus the relayed differences. No rater prompt, blinding protocol, adjudication record or raw rater output is saved. final equals rater A on 61/62 and rater B on 61/62. The claim 'two independent blind raters with adjudication' cannot be verified from saved files; kappa and raw agreement are computed from the relayed ratings.",
+  "E4 clusters are genes (the 62-row set has no exon IDs). Genes with >1 variant: NF1 6 (6 lab), ABCA4 3 (0 lab), KRIT1 2 (2 lab), BRAF 2 (0 lab), PTEN 2 (1 lab), HBB 2 (2 lab), CDH1 2 (2 lab), BRCA1 2 (1 lab), BTK 2 (1 lab). The gene bootstrap resamples whole genes. Gene-bootstrap intervals for 0/n are degenerate [0,0]; Clopper-Pearson intervals are beside them.",
+  "E4 MAGI continuous splice score (PLAN definition) counts losses only (max of -D_BED over exon, always_on_exon, splice_donor, splice_acceptor), so gain-triggered calls score low (e.g. 99421 ABERRANT_EXON_INCLUSION from always_on_exon=+0.227 scores 0.038). Its AUROC is also computed on a set MAGI called 100% of the time (restricted range), so it says little about MAGI's discrimination in general.",
+  "E4 SpliceAI d50 unscored (3): SRD5A2 1298365 and PLP1 930478 (genes absent from the package grch38.txt), BTK 402436 (chrX:101390479 lies outside the package BTK span 101349449-101386195).",
+  "E4 AVI (AlphaGenome Variant Impact) is a general impact score under the AlphaGenome Output Terms (non-commercial); reported descriptively only."
+ ],
+ "exploratory": [
+  "EXPLORATORY: strict-call rate in nonsense SNVs (13/82 = 0.1585, gene-bootstrap 95% CI 0.0864-0.2353) is about the same as in splice-annotated SNVs (8/49 = 0.1633, 0.0638-0.2778); 11 of the 13 nonsense calls have primary CODING_LOSS or EXON_LOSS. In OMIA the strict call does not separate splice from nonsense variants.",
+  "EXPLORATORY: splice-annotated OMIA SNVs by HGVS c. offset: canonical +/-1-2: strict 4/28, loose 21/28; intronic other: strict 1/11, loose 4/11; no c. string: strict 0/1, loose 0/1; no intron offset (exonic): strict 3/9, loose 6/9. The 4 strict calls at canonical +1 donors (ADAMTS17, ANO6, SLC37A2, KRT71) and the +5 donor call (COL17A1) all have a GAIN primary (SPLICE_INDUCED_EXONIZATION or CRYPTIC_SPLICE_GAIN), not donor loss; 17/28 canonical +/-1-2 variants get only tier-4 SPLICE_CHANGE/EXON_CHANGE.",
+  "EXPLORATORY: of the 8 splice-annotated candidates, MOCOS and XDH have cDNA-described whole-exon skipping in the OMIA text (Tate et al. 2021, PMID 34584846), both at exonic positions (c.232G>T, c.654G>A), and MAGI primary SPLICE_SITE_DESTROYED (tier 0) with EXON_LOSS among secondaries.",
+  "EXPLORATORY: E4 MAGI continuous splice score (PLAN definition) median 0.3515 over the 62; 11 of the 59 SpliceAI-scored variants have SpliceAI < 0.2, all annotation-silent.",
+  "EXPLORATORY: E4 ratings AUROC, lab_vs_all_other: spliceai_d50 0.8871 (0.799-0.9609, n=59, lab=25); spliceai_d500_mane 0.8811 (0.7859-0.9519, n=61, lab=25); magi_continuous_splice_score (losses only) 0.6205 (0.4571-0.7562, n=62, lab=25); magi_abs_delta_max (gain or loss, 4 D_BED tracks) 0.6573 (0.468-0.8135, n=62, lab=25); avi_raw_score (general impact, not splice) 0.6832 (0.5417-0.8125, n=62, lab=25). Confounded by test selection (see the E4 ascertainment caveat); not head-to-head accuracy. The within-splicing contrast is mostly lab vs prediction_only, a class defined by a positive in-silico splice prediction, so it still favours SpliceAI. magi_abs_delta_max was added after the audit.",
+  "EXPLORATORY: E4 ratings AUROC, lab_vs_functional_other_or_no_splice_claim: spliceai_d50 0.9657 (0.8995-1.0, n=46, lab=25); spliceai_d500_mane 0.9455 (0.8636-0.9951, n=47, lab=25); magi_continuous_splice_score (losses only) 0.6574 (0.474-0.818, n=48, lab=25); magi_abs_delta_max (gain or loss, 4 D_BED tracks) 0.6713 (0.4589-0.854, n=48, lab=25); avi_raw_score (general impact, not splice) 0.7322 (0.5537-0.8752, n=48, lab=25). Confounded by test selection (see the E4 ascertainment caveat); not head-to-head accuracy. The within-splicing contrast is mostly lab vs prediction_only, a class defined by a positive in-silico splice prediction, so it still favours SpliceAI. magi_abs_delta_max was added after the audit.",
+  "EXPLORATORY: E4 ratings AUROC, lab_vs_other_within_rationales_mentioning_splicing: spliceai_d50 0.7771 (0.6278-0.9139, n=39, lab=25); spliceai_d500_mane 0.7947 (0.65-0.9213, n=40, lab=25); magi_continuous_splice_score (losses only) 0.568 (0.3802-0.7384, n=40, lab=25); magi_abs_delta_max (gain or loss, 4 D_BED tracks) 0.648 (0.4364-0.8249, n=40, lab=25); avi_raw_score (general impact, not splice) 0.6293 (0.4382-0.8182, n=40, lab=25). Confounded by test selection (see the E4 ascertainment caveat); not head-to-head accuracy. The within-splicing contrast is mostly lab vs prediction_only, a class defined by a positive in-silico splice prediction, so it still favours SpliceAI. magi_abs_delta_max was added after the audit.",
+  "EXPLORATORY: E4 ratings, lab fraction by SpliceAI d50: >= 0.2 25/48, < 0.2 0/11, unscored 0/3. This mainly reflects which variants submitters sent for RNA testing (often because a splice predictor flagged them)."
+ ],
+ "slurm_jobs": {
+  "3700": "E4 SpliceAI (-p low -w sblxa123c, CPU)",
+  "3701": "E4 annotation flag (CPU)",
+  "3702": "omia.org reachability test (failed: timeout)"
+ },
+ "files": {
+  "e3_candidates": "e3_candidates.csv",
+  "e3_all_calls": "e3_all_calls.csv",
+  "e4_scores": "e4_scores.csv",
+  "spliceai_vcf": "e4.spliceai.vcf",
+  "annotation": "e4_annot.csv",
+  "scripts": [
+   "assemble_results.py",
+   "e3_omia.py",
+   "e4_ratings.py",
+   "e4_scores.py"
+  ],
+  "e4_ratings": "e4_ratings.csv",
+  "e4_table": "e4_table.csv",
+  "e4_ratings_results": "e4_ratings_results.json",
+  "ratings": [
+   "ratings/final.json",
+   "ratings/rater_A.json",
+   "ratings/rater_B.json",
+   "ratings/make_raw.py"
+  ]
+ },
+ "E4_ratings": {
+  "n_variants": 62,
+  "rater_provenance": "as relayed: final.json holds the adjudicated classes; rater_A/B.json are rebuilt by ratings/make_raw.py from final.json plus the relayed differences. No rater prompt, blinding protocol, adjudication record or raw rater output is saved. final equals rater A on 61/62 and rater B on 61/62.",
+  "rating_scheme": "5 classes used by the raters: lab_rna_or_minigene, prediction_only, negated_or_inconclusive, functional_other, no_splice_claim",
+  "kappa_rater_A_vs_B": {
+   "classes": 5,
+   "agree": 60,
+   "n": 62,
+   "kappa": 0.9551,
+   "kappa_95ci_variant_boot_approx": [
+    0.8868,
+    1.0
+   ],
+   "note": "ratings as relayed (rater_A/B.json rebuilt from final.json plus relayed differences); percentile CI is approximate with only 2 disagreements"
+  },
+  "kappa_lab_vs_rest": {
+   "classes": "lab_rna_or_minigene vs rest",
+   "agree": 62,
+   "n": 62,
+   "kappa": 1.0
+  },
+  "kappa_plan_3_classes": {
+   "negated_or_inconclusive_to_prediction_only": {
+    "agree": 61,
+    "kappa": 0.9752
+   },
+   "negated_or_inconclusive_to_no_splice_claim": {
+    "agree": 60,
+    "kappa": 0.9503
+   }
+  },
+  "rater_disagreements": [
+   {
+    "VariationID": 99288,
+    "gene": "ABCA4",
+    "rater_A_class": "prediction_only",
+    "rater_B_class": "negated_or_inconclusive",
+    "final_class": "negated_or_inconclusive"
+   },
+   {
+    "VariationID": 92655,
+    "gene": "SGCG",
+    "rater_A_class": "no_splice_claim",
+    "rater_B_class": "prediction_only",
+    "final_class": "no_splice_claim"
+   }
+  ],
+  "label_counts": {
+   "Pathogenic": 56,
+   "Benign": 6
+  },
+  "benign_by_class": {
+   "no_splice_claim": 6
+  },
+  "lab_fraction_interpretation": "floor on precision: at least 25/62 have lab RNA/minigene confirmation; at most 6/62 are ClinVar Benign; the rest are of unknown splice status",
+  "rationale_content_by_class": {
+   "lab_rna_or_minigene": {
+    "n": 25,
+    "mentions_splicing": 25,
+    "cites_in_silico_splice_prediction": 20
+   },
+   "prediction_only": {
+    "n": 13,
+    "mentions_splicing": 13,
+    "cites_in_silico_splice_prediction": 13
+   },
+   "negated_or_inconclusive": {
+    "n": 1,
+    "mentions_splicing": 1,
+    "cites_in_silico_splice_prediction": 1
+   },
+   "functional_other": {
+    "n": 9,
+    "mentions_splicing": 0,
+    "cites_in_silico_splice_prediction": 0
+   },
+   "no_splice_claim": {
+    "n": 14,
+    "mentions_splicing": 1,
+    "cites_in_silico_splice_prediction": 0
+   }
+  },
+  "rationale_regex_in_silico": "(?:spliceai|algorithm|in[ -]silico|predict|maxent|nnsplice|human splicing finder|splicesitefinder|varseak)[^.]{0,200}splic|splic[^.]{0,200}(?:spliceai|algorithm|in[ -]silico|predict|maxent|nnsplice|human splicing finder|splicesitefinder|varseak)",
+  "gene_repeats": {
+   "NF1": {
+    "n": 6,
+    "n_lab": 6
+   },
+   "ABCA4": {
+    "n": 3,
+    "n_lab": 0
+   },
+   "KRIT1": {
+    "n": 2,
+    "n_lab": 2
+   },
+   "BRAF": {
+    "n": 2,
+    "n_lab": 0
+   },
+   "PTEN": {
+    "n": 2,
+    "n_lab": 1
+   },
+   "HBB": {
+    "n": 2,
+    "n_lab": 2
+   },
+   "CDH1": {
+    "n": 2,
+    "n_lab": 2
+   },
+   "BRCA1": {
+    "n": 2,
+    "n_lab": 1
+   },
+   "BTK": {
+    "n": 2,
+    "n_lab": 1
+   }
+  },
+  "sensitivity_99288_as_lab": {
+   "lab_if_99288_counted_as_lab": 26,
+   "fraction": 0.4194,
+   "spliceai_d50_99288": 0.8,
+   "candidates": 0
+  },
+  "final_class_counts": {
+   "lab_rna_or_minigene": 25,
+   "no_splice_claim": 14,
+   "prediction_only": 13,
+   "functional_other": 9,
+   "negated_or_inconclusive": 1
+  },
+  "per_class": {
+   "lab_rna_or_minigene": {
+    "n": 25,
+    "pathogenic_or_LP": 25,
+    "spliceai_d50": {
+     "ge_0.2": 25
+    },
+    "spliceai_d500_mane": {
+     "ge_0.2": 25
+    },
+    "plan_annotation_flagged": 3,
+    "vep_any_splice": 3,
+    "vep_splice_region": 1,
+    "vep_splice_donor_acceptor": 0,
+    "magi_strict": 25
+   },
+   "prediction_only": {
+    "n": 13,
+    "pathogenic_or_LP": 13,
+    "spliceai_d50": {
+     "ge_0.2": 12,
+     "unscored": 1
+    },
+    "spliceai_d500_mane": {
+     "ge_0.2": 13
+    },
+    "plan_annotation_flagged": 0,
+    "vep_any_splice": 3,
+    "vep_splice_region": 0,
+    "vep_splice_donor_acceptor": 0,
+    "magi_strict": 13
+   },
+   "negated_or_inconclusive": {
+    "n": 1,
+    "pathogenic_or_LP": 1,
+    "spliceai_d50": {
+     "ge_0.2": 1
+    },
+    "spliceai_d500_mane": {
+     "ge_0.2": 1
+    },
+    "plan_annotation_flagged": 0,
+    "vep_any_splice": 0,
+    "vep_splice_region": 0,
+    "vep_splice_donor_acceptor": 0,
+    "magi_strict": 1
+   },
+   "functional_other": {
+    "n": 9,
+    "pathogenic_or_LP": 9,
+    "spliceai_d50": {
+     "lt_0.2": 5,
+     "ge_0.2": 4
+    },
+    "spliceai_d500_mane": {
+     "lt_0.2": 6,
+     "ge_0.2": 3
+    },
+    "plan_annotation_flagged": 0,
+    "vep_any_splice": 1,
+    "vep_splice_region": 0,
+    "vep_splice_donor_acceptor": 0,
+    "magi_strict": 9
+   },
+   "no_splice_claim": {
+    "n": 14,
+    "pathogenic_or_LP": 8,
+    "spliceai_d50": {
+     "ge_0.2": 6,
+     "lt_0.2": 6,
+     "unscored": 2
+    },
+    "spliceai_d500_mane": {
+     "lt_0.2": 8,
+     "ge_0.2": 5,
+     "unscored": 1
+    },
+    "plan_annotation_flagged": 2,
+    "vep_any_splice": 3,
+    "vep_splice_region": 2,
+    "vep_splice_donor_acceptor": 0,
+    "magi_strict": 14
+   }
+  },
+  "crosstab_class_x_plan_flag__cols_spliceai_d50": {
+   "functional_other | silent": {
+    "ge_0.2": 4,
+    "lt_0.2": 5,
+    "unscored": 0
+   },
+   "lab_rna_or_minigene | flagged": {
+    "ge_0.2": 3,
+    "lt_0.2": 0,
+    "unscored": 0
+   },
+   "lab_rna_or_minigene | silent": {
+    "ge_0.2": 22,
+    "lt_0.2": 0,
+    "unscored": 0
+   },
+   "negated_or_inconclusive | silent": {
+    "ge_0.2": 1,
+    "lt_0.2": 0,
+    "unscored": 0
+   },
+   "no_splice_claim | flagged": {
+    "ge_0.2": 1,
+    "lt_0.2": 0,
+    "unscored": 1
+   },
+   "no_splice_claim | silent": {
+    "ge_0.2": 5,
+    "lt_0.2": 6,
+    "unscored": 1
+   },
+   "prediction_only | silent": {
+    "ge_0.2": 12,
+    "lt_0.2": 0,
+    "unscored": 1
+   }
+  },
+  "crosstab_class_x_vep_any_splice__cols_spliceai_d50": {
+   "functional_other | vep_no_splice": {
+    "ge_0.2": 4,
+    "lt_0.2": 4,
+    "unscored": 0
+   },
+   "functional_other | vep_splice": {
+    "ge_0.2": 0,
+    "lt_0.2": 1,
+    "unscored": 0
+   },
+   "lab_rna_or_minigene | vep_no_splice": {
+    "ge_0.2": 22,
+    "lt_0.2": 0,
+    "unscored": 0
+   },
+   "lab_rna_or_minigene | vep_splice": {
+    "ge_0.2": 3,
+    "lt_0.2": 0,
+    "unscored": 0
+   },
+   "negated_or_inconclusive | vep_no_splice": {
+    "ge_0.2": 1,
+    "lt_0.2": 0,
+    "unscored": 0
+   },
+   "no_splice_claim | vep_no_splice": {
+    "ge_0.2": 4,
+    "lt_0.2": 6,
+    "unscored": 1
+   },
+   "no_splice_claim | vep_splice": {
+    "ge_0.2": 2,
+    "lt_0.2": 0,
+    "unscored": 1
+   },
+   "prediction_only | vep_no_splice": {
+    "ge_0.2": 10,
+    "lt_0.2": 0,
+    "unscored": 0
+   },
+   "prediction_only | vep_splice": {
+    "ge_0.2": 2,
+    "lt_0.2": 0,
+    "unscored": 1
+   }
+  },
+  "crosstab_class_x_plan_flag__cols_spliceai_d500_mane": {
+   "functional_other | silent": {
+    "ge_0.2": 3,
+    "lt_0.2": 6,
+    "unscored": 0
+   },
+   "lab_rna_or_minigene | flagged": {
+    "ge_0.2": 3,
+    "lt_0.2": 0,
+    "unscored": 0
+   },
+   "lab_rna_or_minigene | silent": {
+    "ge_0.2": 22,
+    "lt_0.2": 0,
+    "unscored": 0
+   },
+   "negated_or_inconclusive | silent": {
+    "ge_0.2": 1,
+    "lt_0.2": 0,
+    "unscored": 0
+   },
+   "no_splice_claim | flagged": {
+    "ge_0.2": 1,
+    "lt_0.2": 0,
+    "unscored": 1
+   },
+   "no_splice_claim | silent": {
+    "ge_0.2": 4,
+    "lt_0.2": 8,
+    "unscored": 0
+   },
+   "prediction_only | silent": {
+    "ge_0.2": 13,
+    "lt_0.2": 0,
+    "unscored": 0
+   }
+  },
+  "plan_flag_vs_vep_any_splice": {
+   "rows_plan_flag_cols_vep_any_splice": {
+    "false": {
+     "false": 52,
+     "true": 5
+    },
+    "true": {
+     "false": 0,
+     "true": 5
+    }
+   },
+   "agree": 57,
+   "disagreements": [
+    {
+     "VariationID": 1298365,
+     "gene": "SRD5A2",
+     "annotation_flag": false,
+     "vep_any_splice": true,
+     "vep_most_severe": "missense_variant",
+     "dist_gencode": -42.0,
+     "bp_to_nearest_MANE_exon_end": 41
+    },
+    {
+     "VariationID": 642294,
+     "gene": "TMEM67",
+     "annotation_flag": false,
+     "vep_any_splice": true,
+     "vep_most_severe": "missense_variant",
+     "dist_gencode": 16.0,
+     "bp_to_nearest_MANE_exon_end": 29
+    },
+    {
+     "VariationID": 7710,
+     "gene": "PMM2",
+     "annotation_flag": false,
+     "vep_any_splice": true,
+     "vep_most_severe": "missense_variant",
+     "dist_gencode": -15.0,
+     "bp_to_nearest_MANE_exon_end": 14
+    },
+    {
+     "VariationID": 137657,
+     "gene": "TIMM44",
+     "annotation_flag": false,
+     "vep_any_splice": true,
+     "vep_most_severe": "missense_variant",
+     "dist_gencode": 15.0,
+     "bp_to_nearest_MANE_exon_end": 15
+    },
+    {
+     "VariationID": 97357,
+     "gene": "OTC",
+     "annotation_flag": false,
+     "vep_any_splice": true,
+     "vep_most_severe": "missense_variant",
+     "dist_gencode": -40.0,
+     "bp_to_nearest_MANE_exon_end": 39
+    }
+   ]
+  },
+  "plan_flag_vs_vep_splice_region_or_donor_acceptor": {
+   "rows_plan_flag_cols_vep_splice_region_or_donor_acceptor": {
+    "false": {
+     "false": 57,
+     "true": 0
+    },
+    "true": {
+     "false": 2,
+     "true": 3
+    }
+   },
+   "agree": 60,
+   "disagreements": [
+    {
+     "VariationID": 5726,
+     "gene": "KRIT1",
+     "final_class": "lab_rna_or_minigene",
+     "annotation_flag": true,
+     "vep_splice_region": false,
+     "vep_splice_minor": true,
+     "bp_to_nearest_MANE_exon_end": 115
+    },
+    {
+     "VariationID": 15161,
+     "gene": "HBB",
+     "final_class": "lab_rna_or_minigene",
+     "annotation_flag": true,
+     "vep_splice_region": false,
+     "vep_splice_minor": true,
+     "bp_to_nearest_MANE_exon_end": 13
+    }
+   ]
+  },
+  "plan_flag_vs_vep_plan_window_terms": {
+   "terms": [
+    "splice_acceptor_variant",
+    "splice_donor_5th_base_variant",
+    "splice_donor_region_variant",
+    "splice_donor_variant",
+    "splice_region_variant"
+   ],
+   "rows_plan_flag_cols_vep": {
+    "false": {
+     "false": 56,
+     "true": 1
+    },
+    "true": {
+     "false": 0,
+     "true": 5
+    }
+   },
+   "agree": 61,
+   "disagreements": [
+    {
+     "VariationID": 1298365,
+     "gene": "SRD5A2",
+     "annotation_flag": false,
+     "vep_terms": "3_prime_UTR_variant,NMD_transcript_variant,intron_variant,missense_variant,non_coding_transcript_variant,splice_donor_region_variant,synonymous_variant"
+    }
+   ]
+  },
+  "lab_rna_fraction_by_spliceai_d50": {
+   "all_62_magi_strict": {
+    "n": 62,
+    "n_lab": 25,
+    "lab_fraction": 0.4032,
+    "95ci_gene_boot": [
+     0.2363,
+     0.5616
+    ],
+    "95ci_clopper_pearson_variants": [
+     0.2805,
+     0.5355
+    ]
+   },
+   "spliceai_d50_ge_0.2": {
+    "n": 48,
+    "n_lab": 25,
+    "lab_fraction": 0.5208,
+    "95ci_gene_boot": [
+     0.3182,
+     0.68
+    ],
+    "95ci_clopper_pearson_variants": [
+     0.3719,
+     0.6671
+    ]
+   },
+   "spliceai_d50_lt_0.2": {
+    "n": 11,
+    "n_lab": 0,
+    "lab_fraction": 0.0,
+    "95ci_gene_boot": [
+     0.0,
+     0.0
+    ],
+    "95ci_clopper_pearson_variants": [
+     0.0,
+     0.2849
+    ]
+   },
+   "spliceai_d50_unscored": {
+    "n": 3,
+    "n_lab": 0,
+    "lab_fraction": 0.0,
+    "95ci_gene_boot": [
+     0.0,
+     0.0
+    ],
+    "95ci_clopper_pearson_variants": [
+     0.0,
+     0.7076
+    ]
+   }
+  },
+  "spliceai_d50_vs_d500_mane_bins": {
+   "rows_d50_cols_d500": {
+    "ge_0.2": {
+     "ge_0.2": 45,
+     "lt_0.2": 3,
+     "unscored": 0
+    },
+    "lt_0.2": {
+     "ge_0.2": 0,
+     "lt_0.2": 11,
+     "unscored": 0
+    },
+    "unscored": {
+     "ge_0.2": 2,
+     "lt_0.2": 0,
+     "unscored": 1
+    }
+   },
+   "agree": 57
+  },
+  "candidates_plan": {
+   "definition": "final_class == lab_rna_or_minigene AND MAGI strict AND SpliceAI d50 < 0.2",
+   "n_lab": 25,
+   "n_lab_magi_strict": 25,
+   "n": 0,
+   "ids": [],
+   "lab_spliceai_unscored": []
+  },
+  "candidates_sensitivity_spliceai_d500_mane": {
+   "n": 0,
+   "ids": []
+  },
+  "lab_lowest_spliceai_d50": [
+   {
+    "VariationID": 5726,
+    "gene": "KRIT1",
+    "spliceai_max": 0.39,
+    "spliceai_d500_mane": 0.39,
+    "annotation_flag": true,
+    "vep_any_splice": true,
+    "NT_Mechanism": "CONSTITUTIVE_EXON_LOSS"
+   },
+   {
+    "VariationID": 527322,
+    "gene": "IDS",
+    "spliceai_max": 0.58,
+    "spliceai_d500_mane": 0.59,
+    "annotation_flag": false,
+    "vep_any_splice": false,
+    "NT_Mechanism": "EXON_LOSS"
+   },
+   {
+    "VariationID": 142287,
+    "gene": "PTEN",
+    "spliceai_max": 0.64,
+    "spliceai_d500_mane": 0.64,
+    "annotation_flag": false,
+    "vep_any_splice": false,
+    "NT_Mechanism": "EXON_LOSS"
+   },
+   {
+    "VariationID": 17660,
+    "gene": "BRCA1",
+    "spliceai_max": 0.65,
+    "spliceai_d500_mane": 0.65,
+    "annotation_flag": true,
+    "vep_any_splice": true,
+    "NT_Mechanism": "CRYPTIC_SPLICE_GAIN"
+   },
+   {
+    "VariationID": 15161,
+    "gene": "HBB",
+    "spliceai_max": 0.76,
+    "spliceai_d500_mane": 0.76,
+    "annotation_flag": true,
+    "vep_any_splice": true,
+    "NT_Mechanism": "EXON_LOSS"
+   }
+  ],
+  "EXPLORATORY_auroc_lab_rna_vs_other": {
+   "lab_vs_all_other": {
+    "spliceai_d50": {
+     "n": 59,
+     "n_lab": 25,
+     "auroc": 0.8871,
+     "auroc_95ci_gene_boot": [
+      0.799,
+      0.9609
+     ]
+    },
+    "spliceai_d500_mane": {
+     "n": 61,
+     "n_lab": 25,
+     "auroc": 0.8811,
+     "auroc_95ci_gene_boot": [
+      0.7859,
+      0.9519
+     ]
+    },
+    "magi_continuous_splice_score (losses only)": {
+     "n": 62,
+     "n_lab": 25,
+     "auroc": 0.6205,
+     "auroc_95ci_gene_boot": [
+      0.4571,
+      0.7562
+     ]
+    },
+    "magi_abs_delta_max (gain or loss, 4 D_BED tracks)": {
+     "n": 62,
+     "n_lab": 25,
+     "auroc": 0.6573,
+     "auroc_95ci_gene_boot": [
+      0.468,
+      0.8135
+     ]
+    },
+    "avi_raw_score (general impact, not splice)": {
+     "n": 62,
+     "n_lab": 25,
+     "auroc": 0.6832,
+     "auroc_95ci_gene_boot": [
+      0.5417,
+      0.8125
+     ]
+    }
+   },
+   "lab_vs_functional_other_or_no_splice_claim": {
+    "spliceai_d50": {
+     "n": 46,
+     "n_lab": 25,
+     "auroc": 0.9657,
+     "auroc_95ci_gene_boot": [
+      0.8995,
+      1.0
+     ]
+    },
+    "spliceai_d500_mane": {
+     "n": 47,
+     "n_lab": 25,
+     "auroc": 0.9455,
+     "auroc_95ci_gene_boot": [
+      0.8636,
+      0.9951
+     ]
+    },
+    "magi_continuous_splice_score (losses only)": {
+     "n": 48,
+     "n_lab": 25,
+     "auroc": 0.6574,
+     "auroc_95ci_gene_boot": [
+      0.474,
+      0.818
+     ]
+    },
+    "magi_abs_delta_max (gain or loss, 4 D_BED tracks)": {
+     "n": 48,
+     "n_lab": 25,
+     "auroc": 0.6713,
+     "auroc_95ci_gene_boot": [
+      0.4589,
+      0.854
+     ]
+    },
+    "avi_raw_score (general impact, not splice)": {
+     "n": 48,
+     "n_lab": 25,
+     "auroc": 0.7322,
+     "auroc_95ci_gene_boot": [
+      0.5537,
+      0.8752
+     ]
+    }
+   },
+   "lab_vs_other_within_rationales_mentioning_splicing": {
+    "spliceai_d50": {
+     "n": 39,
+     "n_lab": 25,
+     "auroc": 0.7771,
+     "auroc_95ci_gene_boot": [
+      0.6278,
+      0.9139
+     ]
+    },
+    "spliceai_d500_mane": {
+     "n": 40,
+     "n_lab": 25,
+     "auroc": 0.7947,
+     "auroc_95ci_gene_boot": [
+      0.65,
+      0.9213
+     ]
+    },
+    "magi_continuous_splice_score (losses only)": {
+     "n": 40,
+     "n_lab": 25,
+     "auroc": 0.568,
+     "auroc_95ci_gene_boot": [
+      0.3802,
+      0.7384
+     ]
+    },
+    "magi_abs_delta_max (gain or loss, 4 D_BED tracks)": {
+     "n": 40,
+     "n_lab": 25,
+     "auroc": 0.648,
+     "auroc_95ci_gene_boot": [
+      0.4364,
+      0.8249
+     ]
+    },
+    "avi_raw_score (general impact, not splice)": {
+     "n": 40,
+     "n_lab": 25,
+     "auroc": 0.6293,
+     "auroc_95ci_gene_boot": [
+      0.4382,
+      0.8182
+     ]
+    }
+   }
+  }
+ }
+}
